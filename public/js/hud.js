@@ -6,7 +6,7 @@ const st=document.createElement('style');
 st.textContent=`
 #czp{position:absolute;left:max(10px,env(safe-area-inset-left));top:8px;display:flex;flex-direction:column;gap:.7vmin;min-width:24vmin;padding:1vmin 1.8vmin 1.2vmin;background:rgba(10,14,30,.58);border:2px solid rgba(255,255,255,.3);border-radius:12px;pointer-events:none;z-index:3}
 #czp #gems{order:1;position:static!important;font-size:5.2vmin!important;line-height:1;display:flex;align-items:baseline;gap:1.2vmin;flex-wrap:wrap}
-#czp #gems small{font-size:.42em!important;color:#cfe0ff;font-weight:700}
+#czp #gems small{display:none!important}
 #czp .cztime{order:2;position:static!important;font:800 3.2vmin ui-monospace,monospace!important;color:#fff;text-align:left!important;text-shadow:2px 2px 0 #000;letter-spacing:.05em}
 #czp #hnhud{order:3;position:static!important;width:100%!important;font:800 2.1vmin ui-monospace,monospace!important;letter-spacing:.06em;z-index:auto!important}
 #czp #hnhud>div>div{height:1.5vmin!important;border-radius:4px;overflow:hidden;margin-top:.3vmin}
