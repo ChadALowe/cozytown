@@ -548,7 +548,7 @@ const TOD=[
  {top:[.01,.02,.07],hor:[.06,.08,.16],fn:18,ff:105,tint:[.34,.4,.65],car:[.5,.55,.85],sun:[.85,.9,1],sd:[-.4,.5,-.8],ss:14,cloud:[.2,.22,.38],st:1}];
 let todI=0,paintC=[1,1,1];
 scene.fog=new THREE.Fog(0xffffff,90,480);
-function applyPaint(){if(window.lrPaint)lrPaint();U.uTint.value.set(...paintC);if(FU){FU.uTint.value.set(...paintC);fiesRecolor()}const l=TOD[todI].car;mirMat.color.setRGB(paintC[0]*.93*l[0],paintC[1]*.93*l[1],paintC[2]*.93*l[2])}
+function applyPaint(){if(window.lrPaint)lrPaint();if(window.NC)NC.paint();U.uTint.value.set(...paintC);if(FU){FU.uTint.value.set(...paintC);fiesRecolor()}const l=TOD[todI].car;mirMat.color.setRGB(paintC[0]*.93*l[0],paintC[1]*.93*l[1],paintC[2]*.93*l[2])}
 let seasonI=0;
 function applyTOD(i){todI=i;const T=TOD[i];let hor=T.hor,top=T.top,fn=T.fn,ff=T.ff;
  if(seasonI){hor=mix3(hor,[.78,.82,.88],i===2?.2:.55);top=mix3(top,[.42,.52,.68],i===2?.1:.35);fn*=.6;ff*=.68}
@@ -592,7 +592,7 @@ function step(dt){
  if(hAt(nx,nz)<.25){GS.vx*=-.3;GS.vz*=-.3;nx=GS.x;nz=GS.z;impact=Math.max(impact,6)}
  const cf=[Math.sin(GS.psi),Math.cos(GS.psi)];
  for(const off of[1.1,-1,0]){const px=nx+cf[0]*off,pz=nz+cf[1]*off;
-  for(let i=0;i<COL.length;i++){const c=COL[i];if(c.d&&dOpen>.7)continue;const dx=px-c[0],dz=pz-c[1];if(dx>c[2]+2||dx<-c[2]-2||dz>c[2]+2||dz<-c[2]-2)continue;const dd=Math.hypot(dx,dz),rr=c[2]+(CARI===2?1.05:CARI===3?1.0:CARI?.95:.85);if(dd<rr&&dd>1e-3){const ux=dx/dd,uz=dz/dd;nx+=ux*(rr-dd);nz+=uz*(rr-dd);const vn=GS.vx*ux+GS.vz*uz;if(vn<0){GS.vx-=vn*ux*1.35;GS.vz-=vn*uz*1.35;GS.vx*=.94;GS.vz*=.94;impact=Math.max(impact,-vn)}}}}
+  for(let i=0;i<COL.length;i++){const c=COL[i];if(c.d&&dOpen>.7)continue;const dx=px-c[0],dz=pz-c[1];if(dx>c[2]+2||dx<-c[2]-2||dz>c[2]+2||dz<-c[2]-2)continue;const dd=Math.hypot(dx,dz),rr=c[2]+(CARI===5?1.12:CARI===4?.92:CARI===2?1.05:CARI===3?1.0:CARI?.95:.85);if(dd<rr&&dd>1e-3){const ux=dx/dd,uz=dz/dd;nx+=ux*(rr-dd);nz+=uz*(rr-dd);const vn=GS.vx*ux+GS.vz*uz;if(vn<0){GS.vx-=vn*ux*1.35;GS.vz-=vn*uz*1.35;GS.vx*=.94;GS.vz*=.94;impact=Math.max(impact,-vn)}}}}
  GS.x=nx;GS.z=nz;
  const F=1.17,Sd=.72,hf=gH(nx+cf[0]*F,nz+cf[1]*F),hb=gH(nx-cf[0]*F,nz-cf[1]*F),hl=gH(nx+lx*Sd,nz+lz*Sd),hr=gH(nx-lx*Sd,nz-lz*Sd);
  const hc=gH(nx,nz),gy=Math.max((hf+hb+hl+hr)/4,hc)+.08+Math.abs(Math.sin(GS.roll))*.35+Math.abs(Math.sin(GS.pitch))*.5;GS.gy=gy;const gvy=(gy-GS.prevGY)/dt;GS.prevGY=gy;
@@ -1003,7 +1003,7 @@ function updGallery(dt){if(!GAL.on)return;GAL.t+=dt;if(GAL.spin)GAL.az+=dt*.5;
  const P_=document.createElement('div');P_.id='galP';galUI.appendChild(P_);
  const row=()=>{const r=document.createElement('div');r.className='r';P_.appendChild(r);return r},btn=(r,t,fn,grp)=>{const b=document.createElement('button');b.textContent=t;b.onclick=e=>{e.stopPropagation();fn(b)};if(grp){b.dataset.g=grp}r.appendChild(b);return b};
  const mark=(g,b)=>{for(const x of galUI.querySelectorAll('button[data-g="'+g+'"]'))x.classList.toggle('on',x===b)};
- let r=row();const bc=[btn(r,'CITROËN C1',b=>{setCar(0);mark('car',b)},'car'),btn(r,'FORD FIESTA',b=>{setCar(1);mark('car',b)},'car'),btn(r,'RM VAN',b=>{setCar(2);mark('car',b)},'car'),btn(r,'DEFENDER',b=>{setCar(3);mark('car',b)},'car')];
+ let r=row();const bc=[btn(r,'CITROËN C1',b=>{setCar(0);mark('car',b)},'car'),btn(r,'FORD FIESTA',b=>{setCar(1);mark('car',b)},'car'),btn(r,'RM VAN',b=>{setCar(2);mark('car',b)},'car'),btn(r,'DEFENDER',b=>{setCar(3);mark('car',b)},'car'),btn(r,'MX-5',b=>{setCar(4);mark('car',b)},'car'),btn(r,'V60',b=>{setCar(5);mark('car',b)},'car')];
  r=row();const prow=r;setTimeout(()=>{r=prow;PCOL.forEach((c,i)=>{const b=btn(r,'',()=>{paintC=c[1];applyPaint()});b.style.flex='0 0 34px';b.style.minWidth='34px';b.style.padding='4px';const d=document.createElement('i');d.style.background=c[0];b.appendChild(d)})},0);
  r=row();btn(r,'3/4',()=>galView(.62,1.5,6.6,30));btn(r,'FRONT',()=>galView(0,.9,7.5,28));btn(r,'SIDE',()=>galView(1.5708,.9,8,28));btn(r,'REAR',()=>galView(3.1416,.9,7.5,28));btn(r,'TOP',()=>galView(0,11,.5,40));btn(r,'LOW',()=>galView(.5,.25,5.5,40));
  r=row();for(const k of['STUDIO','DAY','DUSK','NIGHT'])btn(r,k,b=>{GAL.lt=k;mark('lt',b)},'lt');
@@ -2328,36 +2328,38 @@ Object.assign(HRS,{'VILLAGE MOTORS':[9,18],"JOE'S GARAGE":[8,17.5],'STRIKE BOWL'
 TH['VILLAGE MOTORS']={wall:0xf4f4f8,fl:'tile',cnt:0x20242c,top:0x888890,sh:0x2a3a5a};
 TH["JOE'S GARAGE"]={wall:0xc4c2ba,fl:'stone',cnt:0x6a2a1a,top:0x9a9a9a,sh:0x2a4a8a};
 TH['STRIKE BOWL']={wall:0x5a4a7a,fl:'wood',cnt:0x2a1a4a,top:0xffd040,sh:0x8a2a8a};
-const CARN=['CITROËN C1','FORD FIESTA','ROYAL MAIL VAN','LAND ROVER DEFENDER'],CARSD=['YOUR TRUSTY STANDARD','FASTER + GRIPPIER','+25% PARCEL PAY','TOUGH + GRIPPY'],SHOWC=[];
-const CPR=i=>[0,CARP,VANP,DEFP][i];
+const CARN=['CITROËN C1','FORD FIESTA','ROYAL MAIL VAN','LAND ROVER DEFENDER','MAZDA MX-5','VOLVO V60 ESTATE'],CARSD=['YOUR TRUSTY STANDARD','FASTER + GRIPPIER','+25% PARCEL PAY','TOUGH + GRIPPY','QUICK + SPORTY','ROOMY + STEADY'],SHOWC=[];
+const CPR=i=>[0,CARP,VANP,DEFP,MXP,VOP][i];
 const LEAVE_IA=()=>({r:[1.0,2.2,RZ-.3,RZ],label:'LEAVE',fn:()=>leaveShop()});
 function gbox(g,x,y,z,w,h,d,hex){const m=sbox(x,y,z,w,h,d,fmc(hex));SG.remove(m);g.add(m);return m}
 function dispCar(k){const g=new THREE.Group(),A=(x,y,z,w,h,d,c)=>gbox(g,x,y,z,w,h,d,c),wh=(L,W)=>{for(const sx of[-1,1])for(const sz of[-1,1])A(sx*L*.3,0,sz*(W/2-.02),.56,.56,.26,0x15151a)};
  if(k===0){A(0,.22,0,3.4,.5,1.5,0xf2f2f2);A(-.1,.72,0,1.9,.46,1.38,0xf2f2f2);A(-.1,.78,0,1.92,.3,1.4,0x7090a8);A(1.7,.3,0,.06,.2,1.2,0xffe080);wh(3.4,1.5)}
  else if(k===1){A(0,.22,0,4.0,.52,1.7,0x2a5aa0);A(-.2,.74,0,2.1,.5,1.56,0x2a5aa0);A(-.2,.8,0,2.12,.32,1.58,0x7090a8);A(2.0,.3,0,.06,.2,1.4,0xffe080);wh(4.0,1.7)}
  else if(k===2){A(-.2,.24,0,3.3,1.55,1.75,0xc82020);A(1.6,.24,0,1.1,.95,1.75,0xc82020);A(1.75,.7,0,.9,.5,1.7,0x7090a8);A(-.2,1.55,0,3.3,.06,1.76,0xe8e8e8);A(2.18,.3,0,.06,.2,1.4,0xffe080);A(-.2,.9,0,3.32,.22,1.77,0xf0f0f0);wh(4.5,1.75)}
- else{A(0,.3,0,4.0,.85,1.75,0x2e5a34);A(-.3,1.14,0,2.3,.55,1.7,0x2e5a34);A(-.3,1.7,0,2.3,.08,1.72,0xf0f0f0);A(-.3,1.2,0,2.32,.36,1.72,0x8ab0b8);A(2.0,.5,0,.06,.25,1.5,0xffe080);wh(4.0,1.75)}
+ else if(k===3){A(0,.3,0,4.0,.85,1.75,0x2e5a34);A(-.3,1.14,0,2.3,.55,1.7,0x2e5a34);A(-.3,1.7,0,2.3,.08,1.72,0xf0f0f0);A(-.3,1.2,0,2.32,.36,1.72,0x8ab0b8);A(2.0,.5,0,.06,.25,1.5,0xffe080);wh(4.0,1.75)}
+ else if(k===4){A(0,.22,0,3.9,.46,1.6,0xa4a9b4);A(-.25,.66,0,1.3,.34,1.45,0x1c1c20);A(.5,.62,0,.34,.28,1.45,0x7090a8);A(1.95,.3,0,.06,.15,1.3,0xffe080);wh(3.9,1.6)}
+ else{A(0,.3,0,4.6,.7,1.8,0xa4a9b4);A(-.2,.95,0,3.0,.5,1.75,0xa4a9b4);A(-.2,1.0,0,3.02,.34,1.77,0x6a7480);A(-.2,1.25,0,3.0,.06,1.78,0x202024);A(2.3,.4,0,.06,.2,1.5,0xffe080);wh(4.6,1.8)}
  g.rotation.y=0;return g}
 function boardTex(i){const f=cvT(256,128),g=f.cv.getContext('2d');g.fillStyle='#14181f';g.fillRect(0,0,256,128);g.strokeStyle='#e8c040';g.lineWidth=4;g.strokeRect(3,3,250,122);g.fillStyle='#f4f4f4';g.font='bold 20px monospace';g.textAlign='center';g.fillText(CARN[i],128,34);g.fillStyle='#9ab';g.font='bold 14px monospace';g.fillText(CARSD[i],128,60);g.fillStyle=OWN.car[i]?'#6fe06f':'#ffd840';g.font='bold 30px monospace';g.fillText(OWN.car[i]?'OWNED':(CPR(i)?'£'+CPR(i):'FREE'),128,102);f.tx.needsUpdate=true;return f.tx}
 function sPlane(w,h,x,y,z,ry,tex){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex,fog:false}));m.position.set(x,y,z);m.rotation.y=ry;SG.add(m);return m}
 function txtTex(w,h,bg,fg,t,sz){const f=cvT(w,h),g=f.cv.getContext('2d');g.fillStyle=bg;g.fillRect(0,0,w,h);g.fillStyle=fg;g.font='bold '+(sz||h*.55)+'px Georgia,serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,w/2,h/2+2);f.tx.needsUpdate=true;return f.tx}
-function buildShowroom(o){IA.splice(0,IA.length,LEAVE_IA());IROOM.splice(0,IROOM.length,[-8.2,8.2,-4.2,-1.5]);SHOWC.length=0;
+function buildShowroom(o){IA.splice(0,IA.length,LEAVE_IA());IROOM.splice(0,IROOM.length,[-9.4,9.4,-4.2,-1.5]);SHOWC.length=0;
  gbox(SG,0,0,-2.1,2.6,.95,.7,0x20242c);gbox(SG,0,.95,-2.1,2.7,.06,.8,0xc0c4cc);gbox(SG,.5,1.01,-2.2,.5,.35,.05,0x181c24);
  const sp=pSpec(9301,{f:false,gl:false,scarf:null,bp:false,bag:0,old:false,tc:[.12,.16,.3]});window.SHK=personIn(sp,0,-2.85,0);
- const XS=[-5.4,-1.8,1.8,5.4];
+ const XS=[-8,-4.8,-1.6,1.6,4.8,8];
  XS.forEach((x,i)=>{const pod=new THREE.Mesh(new THREE.CylinderGeometry(1.35,1.4,.14,20),new THREE.MeshBasicMaterial({color:0x303642}));pod.position.set(x,.07,-.6);SG.add(pod);
   const rg=new THREE.Mesh(new THREE.RingGeometry(1.2,1.34,28).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xe8c040}));rg.position.set(x,.145,-.6);SG.add(rg);
-  const car=dispCar(i);car.position.set(x,.14,-.6);car.scale.setScalar(.8);car.rotation.y=i*.7;SG.add(car);SHOWC.push(car);
+  const car=dispCar(i);car.position.set(x,.14,-.6);car.scale.setScalar(.75);car.rotation.y=i*.7;SG.add(car);SHOWC.push(car);
   gbox(SG,x,0,.95,.08,.55,.08,0x303030);sPlane(1.5,.75,x,.9,.97,0,boardTex(i));
   IROOM.push([x-1.4,x+1.4,-1.5,.45]);IA.push({r:[x-1.4,x+1.4,.5,2.6],label:()=>'VIEW '+CARN[i]+(OWN.car[i]?' (OWNED)':CPR(i)?' £'+CPR(i):''),fn:()=>showroomGo(i)})});
  sPlane(5,.7,0,2.0,-RZ+.03,0,txtTex(512,72,'#10151c','#f0c840','VILLAGE MOTORS',46));
- for(const sx of[-6.5,6.5])for(const sy of[0])gbox(SG,sx,0,-2.8,.3,2.2,.3,0xc82020);
+ for(const sx of[-9.2,9.2])for(const sy of[0])gbox(SG,sx,0,-2.8,.3,2.2,.3,0xc82020);
  IA.push({r:[-1.5,1.5,-1.5,-.9],label:'TALK TO DEREK',fn:()=>say('DEREK','Take your time. Every one of them has a story.',3600)})}
 function showroomGo(i){leaveShop(true);openGallery('show',i)}
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(GS.inside&&SHOPCUR&&SHOPCUR.o.t==='VILLAGE MOTORS')SHOWC.forEach((c,i)=>c.rotation.y+=dt*(.35+i*.04))}}
 /* ---- Joe's garage ---- */
 function buildGarage(o){IA.splice(0,IA.length,LEAVE_IA());IROOM.splice(0,IROOM.length,[-6.2,6.2,-4.2,-1.4],[-2.95,.15,-1.1,1.1],[2.3,4.6,-1.3,1.1]);
- const lc=new THREE.Group();gbox(lc,0,0,0,.14,.9,.14,0x707078);const car=dispCar(CARI>2?3:CARI);car.position.set(0,.95,0);car.scale.setScalar(.8);const lift=new THREE.Group();lift.add(car);lift.position.set(-1.4,0,0);SG.add(lift);
+ const lc=new THREE.Group();gbox(lc,0,0,0,.14,.9,.14,0x707078);const car=dispCar(CARI);car.position.set(0,.95,0);car.scale.setScalar(.8);const lift=new THREE.Group();lift.add(car);lift.position.set(-1.4,0,0);SG.add(lift);
  for(const sx of[-1.7,1.7])for(const sz of[-.75,.75]){const m=sbox(-1.4+sx,0,sz,.16,1.1,.16,fmc(0xe0b020))}sbox(-1.4,.82,0,3.6,.08,1.7,fmc(0x505058));
  for(let i=0;i<4;i++)for(const[tx,tz]of[[-4.5,1.8],[-4.5,-.6]]){const t=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.22,12),new THREE.MeshBasicMaterial({color:i%2?0x202024:0x16161a}));t.position.set(tx,.11+i*.22,tz);SG.add(t)}IROOM.push([-5.0,-4.0,-.95,-.2],[-5.0,-4.0,1.4,2.2]);
  [[4.5,-2.4,0x2a4a9a],[4.0,-2.6,0xc02020],[4.6,-1.9,0xe0b020]].forEach(([dx,dz,c])=>{const d=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,.85,10),new THREE.MeshBasicMaterial({color:c}));d.position.set(dx,.43,dz);SG.add(d)});
@@ -2395,7 +2397,7 @@ function sprEnd(abort){const S=GAL.spray;if(!S)return;if(SPR){galG.remove(SPR.pt
  if(Math.floor(S.t*18)!==Math.floor((S.t-dt)*18))beep(3200+Math.random()*1800,.025,'sawtooth',.012);
  if(!S.applied&&p>.5){S.applied=1;paintC=S.col;applyPaint()}if(S.t>=S.dur)sprEnd(0)}}
 /* ---- wrapper ---- */
-const CUSTB={'VILLAGE MOTORS':{rx:7.2,fn:buildShowroom},"JOE'S GARAGE":{rx:5.2,fn:buildGarage},'STRIKE BOWL':{rx:8,fn:o=>buildBowl(o)}};
+const CUSTB={'VILLAGE MOTORS':{rx:9.6,fn:buildShowroom},"JOE'S GARAGE":{rx:5.2,fn:buildGarage},'STRIKE BOWL':{rx:8,fn:o=>buildBowl(o)}};
 {const b0=buildShop;buildShop=function(o){const c=CUSTB[o.t];if(c)o.rx=c.rx;b0(o);if(c){while(SG.children.length>9)SG.remove(SG.children[SG.children.length-1]);c.fn(o)}}}
 /* ---- STRIKE BOWL: 3D bowling alley + game ---- */
 var BOWLS={best:0,n:0,g:0},BW=null,BWM=null;
@@ -4196,8 +4198,8 @@ function updCiv(){if(GS.inside)return;const cx=cam.position.x,cz=cam.position.z,
 
 /* ---------- cash shop (garage + wardrobe) ---------- */
 var OWN={paint:[1,0,0,0,0,0,0,0],out:[1,0,0,0,0,0],car:[1,0]},ENG=0,TYR=0,shopMode='';
-const DEFP=420,VANP=380,CARP=220,ENGP=[60,120,200],TYRP=[40,90],PAINTP=8,OUTP=12;
-function applyUpg(){MAXV=[38,42,46,50][ENG];ACCM=[1,1.12,1.25,1.4][ENG];GRIPM=[1,1.25,1.5][TYR];if(CARI===1){MAXV+=4;ACCM*=1.12;GRIPM*=1.1}else if(CARI===2){MAXV-=2;ACCM*=.88;GRIPM*=.97}else if(CARI===3){MAXV-=1;ACCM*=.95;GRIPM*=1.15}}
+const DEFP=420,VANP=380,CARP=220,MXP=480,VOP=400,ENGP=[60,120,200],TYRP=[40,90],PAINTP=8,OUTP=12;
+function applyUpg(){MAXV=[38,42,46,50][ENG];ACCM=[1,1.12,1.25,1.4][ENG];GRIPM=[1,1.25,1.5][TYR];if(CARI===1){MAXV+=4;ACCM*=1.12;GRIPM*=1.1}else if(CARI===2){MAXV-=2;ACCM*=.88;GRIPM*=.97}else if(CARI===3){MAXV-=1;ACCM*=.95;GRIPM*=1.15}else if(CARI===4){MAXV+=7;ACCM*=1.18;GRIPM*=1.12}else if(CARI===5){MAXV+=2;ACCM*=1.05;GRIPM*=1.1}}
 function openShop(m){if(window._cb)_cb.style.display='none';shopMode=m;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;$('shop').style.display='flex';renderShop('')}
 function closeShop(){busy=0;$('shop').style.display='none'}
 function shRow(lbl,btn,fn,on,sw){const r=document.createElement('div');r.className='shrow';const l=document.createElement('span');l.textContent=lbl;if(sw){const d=document.createElement('i');d.style.background=sw;l.prepend(d)}const b=document.createElement('button');b.textContent=btn;if(on)b.className='on';b.onclick=fn;r.append(l,b);$('shList').append(r)}
@@ -4207,7 +4209,9 @@ function renderShop(msg){$('shList').innerHTML='';$('shCash').textContent='CASH 
   shRow('FORD FIESTA  (FASTER, GRIPPIER)',CARI===1?'DRIVING':OWN.car[1]?'USE':'BUY £'+CARP,()=>{if(!OWN.car[1]){if(cash<CARP)return renderShop('NOT ENOUGH CASH');cash-=CARP;OWN.car[1]=1}setCar(1);renderShop('DRIVING THE FIESTA')},CARI===1);
   shRow('ROYAL MAIL VAN  (+25% PARCEL PAY)',CARI===2?'DRIVING':OWN.car[2]?'USE':'BUY £'+VANP,()=>{if(!OWN.car[2]){if(cash<VANP)return renderShop('NOT ENOUGH CASH');cash-=VANP;OWN.car[2]=1}setCar(2);renderShop('DRIVING THE ROYAL MAIL VAN')},CARI===2);
   shRow('LAND ROVER DEFENDER  (GRIPPY, TOUGH)',CARI===3?'DRIVING':OWN.car[3]?'USE':'BUY £'+DEFP,()=>{if(!OWN.car[3]){if(cash<DEFP)return renderShop('NOT ENOUGH CASH');cash-=DEFP;OWN.car[3]=1}setCar(3);renderShop('DRIVING THE DEFENDER')},CARI===3);
-  PCOL.forEach((c,i)=>{const cur=paintC===c[1];shRow('PAINT '+(CARI===3&&!i?'STOCK GREEN':PN[i]),cur?'WEARING':OWN.paint[i]?'USE':'BUY £'+PAINTP,()=>{if(!OWN.paint[i]){if(cash<PAINTP)return renderShop('NOT ENOUGH CASH');cash-=PAINTP;OWN.paint[i]=1}paintC=c[1];applyPaint();renderShop('PAINTED '+PN[i])},cur,c[0])});
+  shRow('MAZDA MX-5  (QUICK, SPORTY)',CARI===4?'DRIVING':OWN.car[4]?'USE':'BUY £'+MXP,()=>{if(!OWN.car[4]){if(cash<MXP)return renderShop('NOT ENOUGH CASH');cash-=MXP;OWN.car[4]=1}setCar(4);renderShop('DRIVING THE MX-5')},CARI===4);
+  shRow('VOLVO V60 ESTATE  (ROOMY, STEADY)',CARI===5?'DRIVING':OWN.car[5]?'USE':'BUY £'+VOP,()=>{if(!OWN.car[5]){if(cash<VOP)return renderShop('NOT ENOUGH CASH');cash-=VOP;OWN.car[5]=1}setCar(5);renderShop('DRIVING THE VOLVO')},CARI===5);
+  PCOL.forEach((c,i)=>{const cur=paintC===c[1];shRow('PAINT '+(CARI===3&&!i?'STOCK GREEN':CARI>=4&&!i?'STOCK SILVER':PN[i]),cur?'WEARING':OWN.paint[i]?'USE':'BUY £'+PAINTP,()=>{if(!OWN.paint[i]){if(cash<PAINTP)return renderShop('NOT ENOUGH CASH');cash-=PAINTP;OWN.paint[i]=1}paintC=c[1];applyPaint();renderShop('PAINTED '+PN[i])},cur,c[0])});
   shRow('ENGINE TUNE '+(ENG+1<4?'STAGE '+(ENG+1):'MAXED'),ENG>=3?'MAXED':'BUY £'+ENGP[ENG],()=>{if(ENG>=3)return;if(cash<ENGP[ENG])return renderShop('NOT ENOUGH CASH');cash-=ENGP[ENG];ENG++;applyUpg();renderShop('ENGINE UPGRADED: FASTER!')},ENG>=3);
   shRow('GRIP TYRES '+(TYR+1<3?'STAGE '+(TYR+1):'MAXED'),TYR>=2?'MAXED':'BUY £'+TYRP[TYR],()=>{if(TYR>=2)return;if(cash<TYRP[TYR])return renderShop('NOT ENOUGH CASH');cash-=TYRP[TYR];TYR++;applyUpg();renderShop('TYRES UPGRADED: MORE GRIP')},TYR>=2)}
  else{$('shT').textContent='WARDROBE';OUTF.forEach((o,i)=>{const cur=outfitI===i;shRow(o[0],cur?'WEARING':OWN.out[i]?'WEAR':'BUY £'+OUTP,()=>{if(!OWN.out[i]){if(cash<OUTP)return renderShop('NOT ENOUGH CASH');cash-=OUTP;OWN.out[i]=1}outfitI=i;applyOutfit();renderShop('NEW LOOK!')},cur)})}}
@@ -4223,7 +4227,7 @@ function updateCam(dt){
  cam.position.set(px,py,pz);if(window.DBGC){const c=window.DBGC,a=T.psi+c[0];cam.position.set(T.x+Math.sin(a)*c[1],T.y+c[2],T.z+Math.cos(a)*c[1]);cam.lookAt(T.x+(c[5]||0)*Math.sin(a+1.5708),T.y+c[3],T.z+(c[5]||0)*Math.cos(a+1.5708));cam.fov=c[4]||30;cam.updateProjectionMatrix();skyG.position.copy(cam.position);return}cam.lookAt(T.x+Math.sin(camAng)*2.5,T.y+(GS.onFoot?1.2:1.1),T.z+Math.cos(camAng)*2.5);
  const tf=m.f+sp*.3;if(Math.abs(tf-fovNow)>.05){fovNow=lerp(fovNow,tf,Math.min(1,dt*4));cam.fov=fovNow;cam.updateProjectionMatrix()}
  skyG.position.copy(cam.position)}
-function updateCar(){for(const w of wheels){w.userData.wu.uSp.value=GS_SPIN;if(w.userData.front)w.rotation.y=GS.steer*.5}car.position.set(GS.x,GS.y,GS.z);car.rotation.set(GS.pitch+GS.dp,GS.psi,GS.roll+GS.dr,'YXZ');car.updateMatrixWorld(true);U.uCI.value.copy(car.matrixWorld).invert();if(CARI===1)fiesUpd();else if(CARI===2)vanUpd();else if(CARI===3)lrUpd();lampsUpd()}
+function updateCar(){for(const w of wheels){w.userData.wu.uSp.value=GS_SPIN;if(w.userData.front)w.rotation.y=GS.steer*.5}car.position.set(GS.x,GS.y,GS.z);car.rotation.set(GS.pitch+GS.dp,GS.psi,GS.roll+GS.dr,'YXZ');car.updateMatrixWorld(true);U.uCI.value.copy(car.matrixWorld).invert();if(CARI===1)fiesUpd();else if(CARI===2)vanUpd();else if(CARI===3)lrUpd();else if(CARI>=4&&window.NC)NC.upd();lampsUpd()}
 
 /* ---------- audio ---------- */
 let AC=null,eng=null,snd=true;
