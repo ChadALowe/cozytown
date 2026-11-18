@@ -409,10 +409,13 @@ for(let a=0;a<4;a++){const ang=a*1.5708+1.4,x=GRC[0]+Math.cos(ang)*(GRR-3.5),z=G
 /* ---- trees ---- */
 function tree(x,z,s,col){const K=ck(x,z),y=Y0-.1;pcyl(K.o,x,y,z,.28*s,2.6*s,5,[.35,.24,.14]);col=col||mix3([.12,.34,.12],[.2,.46,.16],rnd());poct(K.o,x,y+3.4*s,z,2.3*s,2*s,2.3*s,col,.3);poct(K.o,x+.8*s,y+2.7*s,z+.5*s,1.5*s,1.3*s,1.5*s,shd(col,1.1),.3)}
 function conifer(x,z,s){const K=ck(x,z),c=mix3([.08,.28,.14],[.12,.36,.18],rnd());pcyl(K.o,x,Y0-.1,z,.25*s,1.8*s,5,[.35,.24,.14]);for(let q=0;q<3;q++)pcone(K.o,x,Y0+(1.2+q*1.4)*s,z,(2.1-q*.55)*s,2.5*s,7,c,rnd()*6)}
+/* kart track zone: trees here are still generated (keeps the random world identical) but drawn into a throwaway chunk and given no collider */
+var KZN=0;function kartZone(x,z){return x>-150&&x<-40&&z>-96&&z<-6}
+{const ck0=ck,KDUM=new Proxy({},{get:(t,k)=>t[k]||(t[k]=new Builder(3))});ck=function(x,z){return KZN?KDUM:ck0(x,z)}}
 function inAnyBld(x,z,m){const me={x,z,rot:0,hw:m,hd:m};for(const p of PLACED)if(Math.hypot(p.x-x,p.z-z)<p.hw+p.hd+m*2&&obbHit(me,p))return true;return false}
 for(let a=0;a<7;a++){const ang=a*.9+.3,rr=8+(a%3)*7;tree(GRC[0]+Math.cos(ang)*rr,GRC[1]+Math.sin(ang)*rr,1.15);COL.push([GRC[0]+Math.cos(ang)*rr,GRC[1]+Math.sin(ang)*rr,.7])}
 for(let q=0,n=0;q<2500&&n<230;q++){const x=(rnd()-.5)*(SIZE-30),z=(rnd()-.5)*(SIZE-30);if(roadDist(x,z)<RW+PW+2.2||inAnyBld(x,z,3)||Math.hypot(x-GRC[0],z-GRC[1])<GRR+2&&Math.hypot(x-GRC[0],z-GRC[1])>GRR-1)continue;if(Math.hypot(x-GRC[0],z-GRC[1])<GRR-1)continue;if(Math.hypot(x-HM.cx,z-HM.cz)<13)continue;if(Math.hypot(x-GRC[0]-9,z-GRC[1]+6)<6)continue;
- const cd=Math.hypot(x,z),p=clamp(.35+cd/260,.2,1);if(rnd()>p)continue;if(rnd()<.2)conifer(x,z,1+rnd()*.6);else tree(x,z,.9+rnd()*.7);COL.push([x,z,.6]);n++}
+ const cd=Math.hypot(x,z),p=clamp(.35+cd/260,.2,1);if(rnd()>p)continue;KZN=kartZone(x,z);if(rnd()<.2)conifer(x,z,1+rnd()*.6);else tree(x,z,.9+rnd()*.7);KZN=0;if(!kartZone(x,z))COL.push([x,z,.6]);n++}
 for(let q=0;q<4;q++)for(let u=-HALF+8;u<HALF-6;u+=5+rnd()*2){const e=[[u,-HALF+5+rnd()*3],[u,HALF-5-rnd()*3],[-HALF+5+rnd()*3,u],[HALF-5-rnd()*3,u]][q];if(roadDist(e[0],e[1])<10)continue;if(rnd()<.6)conifer(e[0],e[1],1.2+rnd()*.8);else tree(e[0],e[1],1.2+rnd()*.6)}
 /* ---- finalise chunks ---- */
 for(const c of CHL){const g=new THREE.Group();c.grp=g;for(const[k,m]of[['o',mObj],['b',mBrick],['s',mStone],['r',mRoof],['g',mGlass],['l',gLit],['rd',mRoad]]){if(c[k].p.length)g.add(c[k].mesh(m));c[k].p=c[k].c=c[k].u=null}for(const e of c.x)g.add(e);scene.add(g)}
