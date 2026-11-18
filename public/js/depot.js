@@ -14,12 +14,12 @@ const Y=G0;
 const GREY=[.62,.62,.64],DKG=[.28,.28,.3],YEL=[.95,.78,.1],WHT=[.92,.92,.88],ASP=[.3,.3,.32],BRN=[.8,.62,.36],ORG=[.92,.5,.1],RED=[.78,.1,.1];
 
 /* ---------- surface: the tarmac yard behind the shop counts as road ---------- */
-{const d0=dAt;dAt=function(x,z){const d=d0(x,z);if(d<4.7)return d;if(x>49.6&&x<58.5&&z>14.9&&z<26)return Math.min(d,4.0);return d}}
+{const d0=dAt;dAt=function(x,z){const d=d0(x,z);if(d<4.7)return d;if(x>44.2&&x<58.5&&z>14.9&&z<29.5)return Math.min(d,4.0);return d}}
 
 /* ---------- scenery ---------- */
 const B=new Builder(2),B2=new Builder(3);
-quadXZ(B,[49.6,14.9],[58.4,14.9],[58.4,26],[49.6,26],ASP,Y+.055);
-for(const x of[49.9,52.5]){quadXZ(B,[x,16.9],[x+.14,16.9],[x+.14,21.4],[x,21.4],WHT,Y+.075)}
+quadXZ(B,[44.3,15.0],[58.4,15.0],[58.4,29],[44.3,29],ASP,Y+.055);
+for(const x of[50.0,52.5]){quadXZ(B,[x,16.9],[x+.14,16.9],[x+.14,21.4],[x,21.4],WHT,Y+.075)}
 quadXZ(B,[49.9,21.3],[52.64,21.3],[52.64,21.45],[49.9,21.45],WHT,Y+.075);
 for(let i=0;i<6;i++)quadXZ(B,[50.1+i*.4,16.95],[50.1+i*.4+.2,16.95],[50.5+i*.4+.2,17.5],[50.5+i*.4,17.5],i%2?DKG:YEL,Y+.08);
 scene.add(B.mesh(mRoad));
@@ -39,9 +39,24 @@ for(const z of[17.4,19.2,21.0]){pcyl(B2,53.0,Y,z,.14,.9,8,YEL);pcyl(B2,53.0,Y+.5
 pbox(B2,51.2,Y,17.1,2.0,.2,.28,YEL,0);
 pbox(B2,50.2,Y,16.55,.4,.12,.1,[.4,.4,.42],0);
 COL.push([49.7,16.5,.5],[51.2,16.55,.5],[52.4,16.55,.5]);
-pcyl(B2,57.8,Y,18.5,.35,.9,8,[.15,.35,.2]);COL.push([57.8,18.5,.4]);
-pbox(B2,56.2,Y,22.8,.12,2.8,.12,DKG,0);
-{const cv=document.createElement('canvas');cv.width=256;cv.height=160;const g=cv.getContext('2d');g.fillStyle='#b81818';g.fillRect(0,0,256,160);g.strokeStyle='#fff';g.lineWidth=5;g.strokeRect(6,6,244,148);g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';g.font='bold 34px Georgia';g.fillText('POST OFFICE',128,34);g.fillStyle='#ffd23a';g.font='bold 40px Georgia';g.fillText('LOADING BAY',128,80);g.fillStyle='#fff';g.font='bold 24px monospace';g.fillText('REVERSE IN',128,124);const tx=new THREE.CanvasTexture(cv);const t=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.0),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));t.position.set(56.2,Y+2.3,22.8);t.rotation.y=Math.PI/2;scene.add(t);const t2=t.clone();t2.rotation.y=-Math.PI/2;scene.add(t2)}
+{const cv=document.createElement('canvas');cv.width=256;cv.height=160;const g=cv.getContext('2d');g.fillStyle='#b81818';g.fillRect(0,0,256,160);g.strokeStyle='#fff';g.lineWidth=5;g.strokeRect(6,6,244,148);g.fillStyle='#fff';g.textAlign='center';g.textBaseline='middle';g.font='bold 34px Georgia';g.fillText('POST OFFICE',128,34);g.fillStyle='#ffd23a';g.font='bold 40px Georgia';g.fillText('LOADING BAY',128,80);g.fillStyle='#fff';g.font='bold 24px monospace';g.fillText('REVERSE IN',128,124);const tx=new THREE.CanvasTexture(cv);const t=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.0),new THREE.MeshBasicMaterial({map:tx,side:THREE.DoubleSide}));t.position.set(56.26,Y+3.45,23);t.scale.set(1.25,1.25,1);t.rotation.y=Math.PI/2;scene.add(t);const t2=t.clone();t2.position.x=55.74;t2.rotation.y=-Math.PI/2;scene.add(t2)}
+/* ---------- walled yard (the house that used to sit here is gone) ---------- */
+{const BRK=[.6,.29,.22],CAP=[.55,.55,.58],yh=2.3;
+ const wall=(x0,z0,x1,z1)=>{const L=Math.hypot(x1-x0,z1-z0),cx=(x0+x1)/2,cz=(z0+z1)/2,ax=Math.abs(x1-x0)>Math.abs(z1-z0);
+  pbox(B2,cx,Y,cz,ax?L:.35,yh,ax?.35:L,BRK,0);pbox(B2,cx,Y+yh,cz,ax?L+.05:.5,.14,ax?.5:L+.05,CAP,0);
+  for(let i=0;i<=L;i+=1.0)COL.push([x0+(x1-x0)*i/L,z0+(z1-z0)*i/L,.5]);
+  for(let i=0;i<=L+.1;i+=3){const px=x0+(x1-x0)*Math.min(1,i/L),pz=z0+(z1-z0)*Math.min(1,i/L);pbox(B2,px,Y,pz,.55,yh+.05,.55,[.55,.26,.2],0);pbox(B2,px,Y+yh+.05,pz,.7,.1,.7,CAP,0)}};
+ wall(44.0,15.0,44.0,29.0);wall(44.0,29.0,56.0,29.0);wall(56.0,29.0,56.0,27.0);wall(56.0,19.0,56.0,15.0);wall(52.0,15.0,56.0,15.0);
+ /* gate piers, beam, open gates */
+ for(const z of[19.0,27.0]){pbox(B2,56.0,Y,z,.8,3.1,.8,[.5,.24,.18],0);pbox(B2,56.0,Y+3.1,z,.95,.14,.95,CAP,0);COL.push([56.0,z,.5])}
+ pbox(B2,56.0,Y+3.2,23.0,.5,.32,8.8,[.2,.2,.24],0);
+ for(const[gz,gr]of[[19.8,1.0],[26.2,2.14]]){const g=new THREE.Mesh(new THREE.BoxGeometry(.08,1.8,3.0),wmat([.18,.2,.24],{vertexColors:false}));g.position.set(57.26,Y+.95,gz);g.rotation.y=gr;scene.add(g)}
+ /* yard furniture: bins, pallets, a parked red van */
+ pcyl(B2,45.2,Y,28.0,.4,1.0,8,[.15,.35,.2]);COL.push([45.2,28.0,.45]);pcyl(B2,46.1,Y,28.1,.4,1.0,8,[.15,.35,.2]);COL.push([46.1,28.1,.45]);
+ for(const[px,pz]of[[45.0,17.0],[45.0,18.3]]){pbox(B2,px,Y,pz,1.1,.14,1.1,[.6,.45,.25],0);pbox(B2,px,Y+.14,pz,.9,.5,.9,BRN,0);pbox(B2,px,Y+.64,pz,.7,.4,.7,[.76,.6,.34],0);COL.push([px,pz,.7])}
+ {const vx=46.0,vz=23.0,rot=Math.PI/2,c=Math.cos(rot),s=Math.sin(rot),W=(lx,ly,lz)=>[vx+lx*c+lz*s,Y+ly,vz-lx*s+lz*c];
+  carParts((k,lx,ly,lz,sx,sy,sz,cc)=>pbox(B2,...W(lx,ly,lz),sx,sy,sz,k==='g'?[.25,.3,.4]:cc,rot),3,[.82,.1,.1]);for(const z of[-1.6,0,1.6])COL.push([vx+z*s,vz+z*c,1.05])}
+ for(const z of[18.5])pbox(B2,44.4,Y+1.0,z,.04,.01,.01,CAP,0)}
 /* trolley of parcels beside the door */
 const mkParcel=()=>{const g=new THREE.Group(),m=new THREE.Mesh(new THREE.BoxGeometry(.42,.3,.34),wmat([.8,.62,.36],{vertexColors:false}));g.add(m);const t=new THREE.Mesh(new THREE.BoxGeometry(.1,.31,.35),wmat([.95,.9,.7],{vertexColors:false}));g.add(t);return g};
 scene.add(B2.mesh(mObj));
@@ -89,12 +104,12 @@ function updDepot(dt){
  if(want){
   if(inBay()){
    const face=Math.cos(GS.psi),sp=Math.abs(GS.speed);
-   if(face>.72&&sp<1.4){PJ.load=1;PJ.t+=dt}
+   if(PJ.hold>0)PJ.hold-=dt;else if(face>.72&&sp<1.4){PJ.load=1;PJ.t+=dt}
    else{if(PJ.load&&sp>=1.4&&face>.72)toast('STAY STILL WHILE THEY LOAD');PJ.load=PJ.load&&face>.72?1:0;if(face<=.72&&PJ.warn<=0&&sp<3){PJ.warn=6;toast('REVERSE IN: BOOT TOWARDS THE DOCK')}}
   }else{PJ.load=0;PJ.t=Math.max(0,PJ.t-dt*.5)}
   PJ.warn-=dt;
   const tot=PJ.acc.n*CYC;
-  if(PJ.load&&PJ.t>=tot){const a=PJ.acc;PJ.acc=null;PJ.load=0;PJ.t=0;startJob(DEP,{n:a.n,kind:a.kind});if(!JOB.on){PJ.acc=a;toast('NO ROUND AVAILABLE, TRY AGAIN')}}
+  if(PJ.load&&PJ.t>=tot){const a=PJ.acc;PJ.acc=null;PJ.load=0;PJ.t=0;startJob(DEP,{n:a.n,kind:a.kind});if(!JOB.on){PJ.acc=a;PJ.t=0;PJ.load=0;PJ.hold=3}}
   else if(PJ.load){
    const k=Math.min(PJ.acc.n-1,Math.floor(PJ.t/CYC)),u=(PJ.t-k*CYC)/CYC,bp=bootP(),px=49.9,ex=Math.max(50.6,Math.min(51.9,bp[0])),ez=15.95;
    pile.forEach((m,i)=>m.visible=i<pile.length-(k+(u>.3?1:0))||false);

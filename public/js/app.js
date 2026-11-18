@@ -369,6 +369,11 @@ special({kind:'shop',units:1,w:20,d:10,eaves:6,ridge:3,fg:.6,wall:'render',wc:[.
 PLACED.push({x:-193,z:-17,rot:0,hw:18,hd:15},{x:-193,z:-60,rot:0,hw:17,hd:16});
 RNDALT=0;
 for(const dp of DEPOTS)console.log('depot',dp.name,dp.x.toFixed(0),dp.z.toFixed(0));
+/* post office yard: any house overlapping the loading yard is built into a throw-away chunk so the world's random layout stays the same */
+{const ckA=ck,KDY=new Proxy({},{get:(t,k)=>t[k]||(t[k]=new Builder(3))});let YZ=0;ck=function(x,z){return YZ?KDY:ckA(x,z)};
+ const bA=bld;bld=function(cx,cz,rot,o){const r=Math.max(o.w,o.d)/2;
+  if(o.kind!=='shop'&&o.kind!=='pub'&&o.kind!=='church'&&o.kind!=='school'&&cx+r>43&&cx-r<60&&cz+r>15&&cz-r<31){const nc=COL.length,no=OBS.length,nb=BLD.length,nt=TG.length;YZ=1;try{bA(cx,cz,rot,o)}finally{YZ=0}COL.length=nc;OBS.length=no;BLD.length=nb;TG.length=nt;return}
+  bA(cx,cz,rot,o)}}
 // procedural fill
 for(const r of ROADS){if(r.n==='HIGH STREET'&&false)continue}
 const cnt={};
@@ -1689,7 +1694,7 @@ function tireF(){const e=HN.en,f=e>=TIRED?1:e>=12?.88:.74;return f*(HN.food<=0?.
 {const s0=stepFoot;stepFoot=function(dt){const f=tireF();if(f<1&&P.speed>0){if(HN.en<TIRED&&Math.random()<.002)toast('*YAWN*')}s0(dt*f)}}
 {const s0=stepIn;stepIn=function(dt){s0(dt*tireF())}}
 /* jobs need a full tummy */
-{const s0=startJob;startJob=function(d){if(HN.food<=HUNGRY){jobCool=12;toast('TOO HUNGRY TO WORK. GRAB A BITE FIRST!');return}if(HN.en<=8){jobCool=12;toast('TOO SLEEPY TO WORK. GO HOME AND REST');return}s0(d)}}
+{const s0=startJob;startJob=function(d,o){if(HN.food<=HUNGRY){jobCool=12;toast('TOO HUNGRY TO WORK. GRAB A BITE FIRST!');return}if(HN.en<=8){jobCool=12;toast('TOO SLEEPY TO WORK. GO HOME AND REST');return}s0(d,o)}}
 /* food in shops */
 {const b0=buildShop;buildShop=function(o){b0(o);for(const a of IA){if(typeof a.label==='string'&&a.label.indexOf('BUY ')===0){const m=a.label.match(/^BUY (.+?) £(\d+)/);if(m){const nm=m[1],pr=+m[2],ft=FOODT[nm]||[10,3];a.fn=()=>{if(cash<pr){toast('NOT ENOUGH CASH');return}if(HN.food>=96&&ft[0]>0&&ft[1]<20){toast('YOU ARE FULL UP');return}cash-=pr;if(nm==='A DAISY'){toast('LOVELY. THANK YOU');INV.flower=(INV.flower|0)+0;beep(700,.1,'sine',.05);return}if(nm==='A COMIC'){toast('GOOD READ. YOU FEEL CHEERY');beep(700,.1,'sine',.05);return}fed(ft[0],ft[1],'MMM. FOOD +'+ft[0]+(ft[1]?'  ENERGY +'+ft[1]:'')+' (-£'+pr+')')}}}
  if(typeof a.label==='string'&&a.label.indexOf('START SHIFT')===0){const f0=a.fn;a.fn=()=>{if(CF&&CF.on)return f0();if(HN.food<=HUNGRY){toast('YOU ARE TOO HUNGRY FOR A SHIFT');return}if(HN.en<=15){toast('YOU ARE TOO TIRED FOR A SHIFT');return}f0()}}}}}
