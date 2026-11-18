@@ -737,7 +737,7 @@ var FZ={"L": 3.95, "BW": 1.79, "pL": [317.0, 145.82278481012656, 316.0, 145.8227
 var FZ_IMG="assets/fz-img.jpg";
 var FZ_MASK="assets/fz-mask.png";
 /* ---------- courier jobs ---------- */
-var jbc=0,cash=1000,dels=0,jobCool=0,carry=null,streak=0;
+var jbc=0,cash=800,dels=0,jobCool=0,carry=null,streak=0;
 function repStars(){return Math.min(5,Math.floor(streak/2))}
 const carryBox=new THREE.Mesh(new THREE.BoxGeometry(.42,.3,.34),wmat([.8,.62,.36],{vertexColors:false}));carryBox.position.set(.22,1.0,.3);carryBox.visible=false;carryBox.add(Object.assign(new THREE.Mesh(new THREE.BoxGeometry(.1,.31,.35),wmat([.95,.9,.7],{vertexColors:false}))));man.add(carryBox);
 const bootM=new THREE.Mesh(new THREE.OctahedronGeometry(.28,0),new THREE.MeshBasicMaterial({color:0xffe14a,fog:false}));bootM.visible=false;scene.add(bootM);
