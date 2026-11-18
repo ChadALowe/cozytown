@@ -47,8 +47,8 @@ function build(cfg){
   const w=[Math.pow(Math.max(nx,0),E),Math.pow(Math.max(-nx,0),E),ny>0?Math.pow(ny,8):0,Math.pow(Math.max(nz,0),E),Math.pow(Math.max(-nz,0),E)];
   let cum=0;const dk=1-.9*Math.min(1,Math.max(0,(-ny-.55)/.35));
   for(let k=0;k<5;k++){cum+=w[k];const u=uvOf(k,x,y,z);UVs[k][v*2]=u[0];UVs[k][v*2+1]=u[1];const a=cum>1e-9?w[k]/cum:0;COLs[k].set([dk,dk,dk,k===0?1:a],v*4)}}
- const bodyG=new THREE.Group();grp.add(bodyG);
- for(let k=0;k<5;k++){const g=new THREE.BufferGeometry();g.setAttribute('position',posA);g.setIndex(idxA);g.setAttribute('uv',new THREE.BufferAttribute(UVs[k],2));g.setAttribute('color',new THREE.BufferAttribute(COLs[k],4));
+ const bodyG=new THREE.Group();grp.add(bodyG);const GEO=[];
+ for(let k=0;k<5;k++){const g=new THREE.BufferGeometry();GEO.push(g);g.setAttribute('position',posA);g.setIndex(idxA);g.setAttribute('uv',new THREE.BufferAttribute(UVs[k],2));g.setAttribute('color',new THREE.BufferAttribute(COLs[k],4));
   const m=new THREE.MeshBasicMaterial({map:tex,vertexColors:true,transparent:k>0,depthWrite:k===0});if(k>0){m.polygonOffset=true;m.polygonOffsetFactor=-1;m.polygonOffsetUnits=-1}
   const me=new THREE.Mesh(g,m);me.frustumCulled=false;me.renderOrder=10+k;bodyG.add(me);S.bodyMs.push(m)}
  /* mirrors */
@@ -56,11 +56,20 @@ function build(cfg){
  for(const sx of[1,-1]){const m=new THREE.Mesh(new THREE.BoxGeometry(mi.s[0],mi.s[1],mi.s[2]),mirM);m.position.set(sx*mi.x,mi.y,mi.z);m.rotation.y=-sx*.25;bodyG.add(m)}
  /* wheels */
  const tyreM=new THREE.MeshBasicMaterial({color:0x151518}),R_=C.R,wls=[],dM=new THREE.MeshBasicMaterial({map:tex});
- function disc(sx){const gd=new THREE.CircleGeometry(R_*.99,20),p=gd.attributes.position,uv=[],c=C.wl;for(let i=0;i<p.count;i++)uv.push((c[0]+p.getX(i)/R_*c[2])/IW,(c[1]-p.getY(i)/R_*c[2])/IH);gd.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));gd.rotateY(sx>0?Math.PI/2:-Math.PI/2);gd.translate(sx*.113,0,0);return new THREE.Mesh(gd,dM)}
+ function disc(sx,mat){const gd=new THREE.CircleGeometry(R_*.99,20),p=gd.attributes.position,uv=[],c=C.wl;for(let i=0;i<p.count;i++)uv.push((c[0]+p.getX(i)/R_*c[2])/IW,(c[1]-p.getY(i)/R_*c[2])/IH);gd.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));gd.rotateY(sx>0?Math.PI/2:-Math.PI/2);gd.translate(sx*.113,0,0);return new THREE.Mesh(gd,mat||dM)}
  const stz=z=>{let b=C.st[0];for(const s of C.st)if(Math.abs(s[0]-z)<Math.abs(b[0]-z))b=s;return b};
  for(const sx of[1,-1])for(let k=0;k<2;k++){const z=C.wz[k],w=stz(z)[3],piv=new THREE.Group(),spin=new THREE.Group();piv.position.set(sx*(w+.02-.11),R_,z);
   spin.add(new THREE.Mesh(new THREE.CylinderGeometry(R_*.985,R_*.985,.22,16).rotateZ(Math.PI/2),tyreM));spin.add(disc(sx));piv.add(spin);grp.add(piv);wls.push({piv,spin,front:k==0})}
 
+ /* a static copy in stock paint, for the showroom pods */
+ S.inst=function(){S.load();const g=new THREE.Group();
+  for(let k=0;k<5;k++){const m=new THREE.MeshBasicMaterial({map:tex,vertexColors:true,transparent:k>0,depthWrite:k===0});if(k>0){m.polygonOffset=true;m.polygonOffsetFactor=-1;m.polygonOffsetUnits=-1}
+   const me=new THREE.Mesh(GEO[k],m);me.frustumCulled=false;me.renderOrder=10+k;g.add(me)}
+  const tm=new THREE.MeshBasicMaterial({color:0x151518}),dm=new THREE.MeshBasicMaterial({map:tex}),mm=new THREE.MeshBasicMaterial({color:0x151518});
+  for(const sx of[1,-1]){const m=new THREE.Mesh(new THREE.BoxGeometry(mi.s[0],mi.s[1],mi.s[2]),mm);m.position.set(sx*mi.x,mi.y,mi.z);m.rotation.y=-sx*.25;g.add(m)}
+  for(const sx of[1,-1])for(let k=0;k<2;k++){const z=C.wz[k],w=stz(z)[3],piv=new THREE.Group();piv.position.set(sx*(w+.02-.11),R_,z);
+   piv.add(new THREE.Mesh(new THREE.CylinderGeometry(R_*.985,R_*.985,.22,16).rotateZ(Math.PI/2),tm));piv.add(disc(sx,dm));g.add(piv)}
+  return g};
  /* ---- paint ---- */
  S.recol=function(rgb){const o=S.orig,n=IW*IH,c=document.createElement('canvas');c.width=IW;c.height=IH;const x=c.getContext('2d'),id=x.createImageData(IW,IH),d=id.data,Lr=C.Lref,mk=S.mask,lm=S.lum;
   const R=rgb[0]*255,G=rgb[1]*255,B=rgb[2]*255;
@@ -76,6 +85,7 @@ function build(cfg){
 for(const c of CFG)build(c);
 LPOS[4]={f:[.58,.66,1.95],b:[.62,.82,-1.78]};
 LPOS[5]={f:[.66,.74,2.28],b:[.7,1.02,-2.3]};
+NC.inst=function(id){const c=NC.cars[id];return c?c.inst():null};
 NC.paint=function(){for(const k in NC.cars)NC.cars[k].paint()};
 NC.upd=function(){const s=NC.cars[CARI];if(s)s.upd()};
 NC.show=function(){for(const k in NC.cars){const c=NC.cars[k];c.grp.visible=(CARI===+k);if(CARI===+k)c.load()}};
