@@ -43,7 +43,7 @@ function build(cfg){
  const uvOf=(k,x,y,z)=>{const p=P5[k];let u,v;if(k===0){u=p[0]-z*p[1];v=p[2]-y*p[3]}else if(k===1){u=p[0]+z*p[1];v=p[2]-y*p[3]}else if(k===2){u=p[0]-z*p[1];v=p[2]+x*p[3]}else if(k===3){u=p[0]+x*p[1];v=p[2]-y*p[3]}else{u=p[0]-x*p[1];v=p[2]-y*p[3]}return[u/IW,v/IH]};
  const NV=pos.length/3,nrm=gN.attributes.normal,posA=new THREE.Float32BufferAttribute(pos,3),idxA=new THREE.BufferAttribute(new Uint16Array(idx),1);
  const UVs=[0,1,2,3,4].map(()=>new Float32Array(NV*2)),COLs=[0,1,2,3,4].map(()=>new Float32Array(NV*4));
- for(let v=0;v<NV;v++){const x=pos[v*3],y=pos[v*3+1],z=pos[v*3+2],nx=nrm.getX(v),ny=nrm.getY(v),nz=nrm.getZ(v),E=5;
+ for(let v=0;v<NV;v++){const x=pos[v*3],y=pos[v*3+1],z=pos[v*3+2],nx=nrm.getX(v),ny=nrm.getY(v),nz=nrm.getZ(v),E=7;
   const w=[Math.pow(Math.max(nx,0),E),Math.pow(Math.max(-nx,0),E),ny>0?Math.pow(ny,8):0,Math.pow(Math.max(nz,0),E),Math.pow(Math.max(-nz,0),E)];
   let cum=0;const dk=1-.9*Math.min(1,Math.max(0,(-ny-.55)/.35));
   for(let k=0;k<5;k++){cum+=w[k];const u=uvOf(k,x,y,z);UVs[k][v*2]=u[0];UVs[k][v*2+1]=u[1];const a=cum>1e-9?w[k]/cum:0;COLs[k].set([dk,dk,dk,k===0?1:a],v*4)}}
