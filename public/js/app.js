@@ -4211,7 +4211,7 @@ function updateCam(dt){
  const T=GS.onFoot?P:GS,sp=GS.onFoot?0:GS.speed;
  const m=menuOpen?{d:8.5,h:2.4,f:50}:GS.inside?{d:4.4,h:3.9,f:60}:GS.onFoot?{d:4.4,h:1.9,f:62}:CAMS[camMode];
  if(menuOpen)camAng+=dt*.4;else if(CAMD.hold>0&&!GS.inside){CAMD.hold-=dt*(Math.abs(T.speed||0)>1.2?3:1)}else{let da=T.psi-camAng;da=Math.atan2(Math.sin(da),Math.cos(da));camAng+=da*Math.min(1,dt*(GS.onFoot?4:3.2));CAMD.el-=CAMD.el*Math.min(1,dt*2)}
- let d=m.d+sp*.06;if(!GS.inside&&!menuOpen&&!GAL.on)d=camClip(T,d,dt);const px=T.x-Math.sin(camAng)*d,pz=T.z-Math.cos(camAng)*d,py=GS.inside?T.y+m.h:Math.max(T.y+m.h+(window.CUP||0)+(GS.inside?0:CAMD.el),hAt(px,pz)+1.2);
+ let d=m.d+sp*.06;if(!GS.inside&&!menuOpen&&!GAL.on)d=camClip(T,d,dt);let px=T.x-Math.sin(camAng)*d,pz=T.z-Math.cos(camAng)*d;if(GS.inside&&SG.visible&&SHOPCUR&&SHOPCUR.o&&(SHOPCUR.o.t==='NEON ARCADE'||SHOPCUR.o.t==='BULLSEYE RANGE')){px=clamp(px,IX-RX+.5,IX+RX-.5);pz=clamp(pz,IZ-RZ+.5,IZ+RZ-.5)}const py=GS.inside?T.y+m.h:Math.max(T.y+m.h+(window.CUP||0)+(GS.inside?0:CAMD.el),hAt(px,pz)+1.2);
  cam.position.set(px,py,pz);if(window.DBGC){const c=window.DBGC,a=T.psi+c[0];cam.position.set(T.x+Math.sin(a)*c[1],T.y+c[2],T.z+Math.cos(a)*c[1]);cam.lookAt(T.x+(c[5]||0)*Math.sin(a+1.5708),T.y+c[3],T.z+(c[5]||0)*Math.cos(a+1.5708));cam.fov=c[4]||30;cam.updateProjectionMatrix();skyG.position.copy(cam.position);return}cam.lookAt(T.x+Math.sin(camAng)*2.5,T.y+(GS.onFoot?1.2:1.1),T.z+Math.cos(camAng)*2.5);
  const tf=m.f+sp*.3;if(Math.abs(tf-fovNow)>.05){fovNow=lerp(fovNow,tf,Math.min(1,dt*4));cam.fov=fovNow;cam.updateProjectionMatrix()}
  skyG.position.copy(cam.position)}
