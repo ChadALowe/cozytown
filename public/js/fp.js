@@ -41,8 +41,22 @@ const CK=[
  {n:'MX5',roof:0,pT:15,pB:20,pw:3.2,dY:76,dash:'#17181b',dash2:'#2a2b30',belt:70,door:'#8e9097',mir:{x:23,y:63,w:6,h:7,r:50,c:'#c8c8cc'},wheel:{s:38,t:2.2,sp:'three',c:'#141416'},cl:[{x:-6,y:0,d:8,c:'#f2f2f2'},{x:0,y:0,d:7,c:'#e6e6e6'},{x:6,y:0,d:8,c:'#f2f2f2'}],stack:{x:46,y:77,w:8,h:7,c:'#202126'},roofc:null,hdr:3},
  {n:'V60',roof:10,pT:8,pB:19,pw:5.5,dY:64,dash:'#202226',dash2:'#2f3238',belt:61,door:'#1d1f22',mir:{x:19,y:55,w:9,h:9,r:4,c:'#b9b9bc'},wheel:{s:45,t:2.4,sp:'three',c:'#18181a'},cl:[{x:-5.5,y:0,d:10,c:'#dfe4ea'},{x:5.5,y:0,d:10,c:'#dfe4ea'}],stack:{x:42,y:66,w:16,h:15,c:'#15171b',scr:'#4aa0e0'},roofc:'#2a2c30'}
 ];
+
+// image-based cockpit (made from supplied artwork) for cars that have it
+const IMG={0:{dash:'assets/c1-dash.webp',wheel:'assets/c1-wheel.webp',W:1376,H:768,wc:[880,680],wd:363,
+ dials:[{k:'spd',c:[865,368],len:52,th:3.6,a0:154,sw:229,mx:150},{k:'rpm',c:[1065,384],len:21,th:2.6,a0:158,sw:210}]}};
+let imgBox=null,imgNeedles=null;
+function buildImg(i){const c=IMG[i];ckI=i;
+ let h=`<div id="fpBox" style="position:absolute;left:0;top:0;width:${c.W}px;height:${c.H}px;transform-origin:0 0"><img src="${c.dash}" style="position:absolute;left:0;top:0;width:100%;height:100%">`;
+ for(const d of c.dials)h+=`<div class="fn" data-k="${d.k}" style="position:absolute;left:${d.c[0]}px;top:${d.c[1]-d.th/2}px;width:${d.len}px;height:${d.th}px;background:linear-gradient(90deg,#c8281c,#ff4a2a);border-radius:${d.th}px;transform-origin:0 50%;transform:rotate(${d.a0}deg);box-shadow:0 0 2px #000"></div>`;
+ h+=`<img id="fpWheel" src="${c.wheel}" style="position:absolute;left:${c.wc[0]-c.wd/2}px;top:${c.wc[1]-c.wd/2}px;width:${c.wd}px;height:${c.wd}px">`;
+ dash.innerHTML=h+'</div>';wheel=dash.querySelector('#fpWheel');imgBox=dash.querySelector('#fpBox');needles=null;
+ imgNeedles=[...dash.querySelectorAll('.fn')].map((e,n)=>[c.dials[n],e])}
+function fitImg(){if(!imgBox)return;const c=IMG[ckI];if(!c)return;const W=innerWidth,H=innerHeight,s=W/c.W,ty=Math.max(H*.8-(c.wc[1]-c.wd*.48)*s,H-c.H*s);imgBox.style.transform=`translate(0px,${ty}px) scale(${s})`}
+addEventListener('resize',fitImg);
+function updImg(v){if(!imgNeedles)return;const mph=v*2.237,f=Math.min(1,v/42);for(const[d,e]of imgNeedles){const p=d.k==='spd'?Math.min(1,mph/d.mx):(.12+.5*f+.15*((v*.35)%1));e.style.transform='rotate('+(d.a0+p*d.sw)+'deg)'}}
 let ckI=-1;
-function buildCk(i){const c=CK[i]||CK[0];ckI=i;
+function buildCk(i){if(IMG[i]){buildImg(i);fitImg();return}const c=CK[i]||CK[0];ckI=i;
  const P=(...a)=>a.join(' '),sv=[];
  // roof header (angled lower edge) + A-pillars + door tops
  if(c.roof)sv.push(`<polygon points="0,0 100,0 100,${c.roof-(c.tall?0:3)} 50,${c.roof+1.5} 0,${c.roof-(c.tall?0:3)}" fill="${c.roofc}"/>`);
@@ -86,7 +100,7 @@ updateCam=function(dt){
  else{psi=GS.psi;pitch=(GS.pitch+GS.dp)*.6;const h=HGT[CARI]||1.15,c=Math.cos(psi),s=Math.sin(psi);
   // local +x is the car's left; SEAT<0 puts the driver on the right
   x=GS.x+c*SEAT+s*.1;z=GS.z-s*SEAT+c*.1;y=GS.y+h;
-  fpSteer+=(GS.steer-fpSteer)*Math.min(1,dt*8);{const v=Math.hypot(GS.vx||0,GS.vz||0),f=Math.min(1,v/42);if(needles)for(const[k,el]of needles)el.style.transform='rotate('+(k==='spd'?125+f*270:125+(.12+.5*f+.15*((v*.35)%1))*270)+'deg)'}if(wheel)wheel.style.transform='rotate('+(-fpSteer*120)+'deg)'}
+  fpSteer+=(GS.steer-fpSteer)*Math.min(1,dt*8);{const v=Math.hypot(GS.vx||0,GS.vz||0),f=Math.min(1,v/42);updImg(v);if(needles)for(const[k,el]of needles)el.style.transform='rotate('+(k==='spd'?125+f*270:125+(.12+.5*f+.15*((v*.35)%1))*270)+'deg)'}if(wheel)wheel.style.transform='rotate('+(-fpSteer*120)+'deg)'}
  const look=psi+(GS.onFoot?0:GS.steer*.12);
  cam.position.set(x,y,z);
  cam.lookAt(x+Math.sin(look)*10,y-Math.sin(pitch)*10-(GS.onFoot?.2:.35),z+Math.cos(look)*10);
