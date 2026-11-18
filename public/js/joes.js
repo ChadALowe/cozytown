@@ -38,7 +38,7 @@ for(const bx of BAYS){
  x.fillStyle='#fff';x.font='bold 54px monospace';x.textAlign='center';x.textBaseline='middle';x.fillText("JOE'S GARAGE",w*.27,h/2+1);
  x.fillStyle='#f6d020';x.font='bold 24px monospace';x.fillText('TUNING · TYRES · MOT · EXHAUSTS',w*.7,h/2-13);x.fillText('BRAKES · SERVICING · BODY KITS',w*.7,h/2+17);
  x.fillStyle='#f6d020';x.fillRect(w*.5-3,14,6,h-28)});
- plane(22.7,1.3,CX,G+3.72,Z0+1.22,t,0)}
+ plane(22.9,1.3,CX,G+3.62,Z0+3.98,t,0)}
 // roadside pylon sign
 {const px=CX-12.8,pz=-6.6;box(.35,6.5,.35,px,G,pz,0x55565c);
  const t=cvs(128,160,(x,w,h)=>{x.fillStyle='#0a3ca0';x.fillRect(0,0,w,h);x.fillStyle='#f6d020';x.fillRect(4,4,w-8,6);x.fillRect(4,h-10,w-8,6);x.fillStyle='#fff';x.font='bold 21px monospace';x.textAlign='center';x.fillText('JOE\'S',w/2,40);x.fillText('GARAGE',w/2,66);x.fillStyle='#f6d020';x.font='bold 15px monospace';for(const[i,l]of['MOT','TYRES','TUNING','EXHAUSTS'].entries())x.fillText(l,w/2,96+i*17)});
@@ -52,7 +52,10 @@ for(const[x,z]of[[CX+3,Z0+.9],[CX+3.8,Z0+.9]]){const d=new THREE.Mesh(new THREE.
  box(.7,.9,.06,CX+9.3,G,Z0+5,0x7a5a30);plane(.62,.78,CX+9.3,G+.5,Z0+5.04,t,0)}
 box(.3,1.4,.3,CX+10.2,G,Z0+3.2,0xc82020);box(.5,.3,.4,CX+10.2,G+1.3,Z0+3.2,0x222222);
 // a couple of lamps over the forecourt
-for(const sx of[-5,3]){box(.12,.12,.9,CX+sx,G+3.95,Z0+1.05,0xfff6d0,false)}
+// flat-roofed canopy front (single storey, Quik-Fit style)
+box(22.8,.9,3.9,CX,G+3.3,Z0+1.95,0xd4d7dd);box(22.6,.06,3.8,CX,G+3.26,Z0+1.95,0x70747e);
+for(const x of[-9,-4.5,0,4.5,9])box(.16,.06,2.6,CX+x,G+3.21,Z0+1.95,0xfff6d0,false);
+for(const x of[-11.1,-4.75,3.6,11.1]){box(.34,3.3,.34,CX+x,G,Z0+3.7,0xe8c21a);for(let i=0;i<5;i++)box(.36,.3,.36,CX+x,G+.15+i*.6,Z0+3.7,0x1a1a1a)}
 
 const hint=()=>toast('DRIVE INTO A BAY TO TUNE YOUR CAR');
 let cd=0,near=0;
