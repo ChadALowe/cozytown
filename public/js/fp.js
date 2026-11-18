@@ -43,7 +43,7 @@ const CK=[
 ];
 
 // image-based cockpit (made from supplied artwork) for cars that have it
-const IMG={0:{dash:'assets/c1-dash.webp',wheel:'assets/c1-wheel.webp',W:1376,H:768,wc:[880,585],wd:350,ly:545,
+const IMG={0:{dash:'assets/c1-dash.webp',wheel:'assets/c1-wheel.webp',W:1376,H:768,wc:[880,545],wd:525,ly:545,
  dials:[{k:'spd',c:[865,368],len:52,th:3.6,a0:154,sw:229,mx:150},{k:'rpm',c:[1065,384],len:21,th:2.6,a0:158,sw:210}]}};
 let imgBox=null,imgNeedles=null;
 function buildImg(i){const c=IMG[i];ckI=i;
