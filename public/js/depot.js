@@ -50,7 +50,6 @@ COL.push([49.7,16.5,.5],[51.2,16.55,.5],[52.4,16.55,.5]);
  /* gate piers, beam, open gates */
  for(const z of[19.0,27.0]){pbox(B2,56.0,Y,z,.8,3.1,.8,[.5,.24,.18],0);pbox(B2,56.0,Y+3.1,z,.95,.14,.95,CAP,0);COL.push([56.0,z,.5])}
  pbox(B2,56.0,Y+3.2,23.0,.5,.32,8.8,[.2,.2,.24],0);
- for(const[gz,gr]of[[19.8,1.0],[26.2,2.14]]){const g=new THREE.Mesh(new THREE.BoxGeometry(.08,1.8,3.0),wmat([.18,.2,.24],{vertexColors:false}));g.position.set(57.26,Y+.95,gz);g.rotation.y=gr;scene.add(g)}
  /* yard furniture: bins, pallets, a parked red van */
  pcyl(B2,45.2,Y,28.0,.4,1.0,8,[.15,.35,.2]);COL.push([45.2,28.0,.45]);pcyl(B2,46.1,Y,28.1,.4,1.0,8,[.15,.35,.2]);COL.push([46.1,28.1,.45]);
  for(const[px,pz]of[[45.0,17.0],[45.0,18.3]]){pbox(B2,px,Y,pz,1.1,.14,1.1,[.6,.45,.25],0);pbox(B2,px,Y+.14,pz,.9,.5,.9,BRN,0);pbox(B2,px,Y+.64,pz,.7,.4,.7,[.76,.6,.34],0);COL.push([px,pz,.7])}
