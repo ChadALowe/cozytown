@@ -102,6 +102,47 @@ function rimsApply(){const o=rimTargets(CARI),r=RIM(),dy=RHT[r.h]||0;
 setTimeout(rimsApply,800);setTimeout(rimsApply,7000);
 
 /* ======== tuning screen ======== */
+/* ---- garage interior set for the tuning screen (round room so any orbit angle looks right) ---- */
+let TG=null;
+function buildSet(){const g=new THREE.Group();g.position.set(GX,GY,GZ);g.visible=false;scene.add(g);const ms=[];
+ const mt=(c,keep)=>{const m=new THREE.MeshBasicMaterial({color:c});m.userData={b:new THREE.Color(c),keep:!!keep};ms.push(m);return m};
+ const bx=(w,h,d,x,y,z,c,keep,ry)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mt(c,keep));m.position.set(x,y+h/2,z);if(ry)m.rotation.y=ry;g.add(m);return m};
+ const cv=(w,h,fn)=>{const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.magFilter=t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;return t};
+ const pl=(w,h,x,y,z,tex,ry,keep)=>{const m=new THREE.MeshBasicMaterial({map:tex,transparent:true,alphaTest:.05});m.userData={b:new THREE.Color(1,1,1),keep:!!keep};ms.push(m);const p=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);p.position.set(x,y,z);p.rotation.y=ry||0;g.add(p);return p};
+ const RAD=10.5,H=4.6;
+ // floor + markings
+ const fl=new THREE.Mesh(new THREE.CircleGeometry(RAD+1,28).rotateX(-Math.PI/2),mt(0x4b4d56));fl.position.y=-.02;g.add(fl);
+ bx(5.6,.01,.14,0,0,2.9,0xe8c21a);bx(5.6,.01,.14,0,0,-2.9,0xe8c21a);bx(.14,.01,5.8,2.8,0,0,0xe8c21a);bx(.14,.01,5.8,-2.8,0,0,0xe8c21a);
+ // walls: ring of panels
+ const N=14,panelW=2*Math.PI*RAD/N+.05;
+ const shut=cv(64,64,(x,w,h)=>{x.fillStyle='#d8801a';x.fillRect(0,0,w,h);for(let y=0;y<h;y+=4){x.fillStyle='#a85a10';x.fillRect(0,y,w,1)}});
+ const peg=cv(128,96,(x,w,h)=>{x.fillStyle='#8a7a5a';x.fillRect(0,0,w,h);x.fillStyle='#5a4a30';for(let i=0;i<w;i+=8)for(let j=0;j<h;j+=8)x.fillRect(i,j,1,1);
+  const tool=(px,py,tw,th,c)=>{x.fillStyle=c;x.fillRect(px,py,tw,th)};for(let i=0;i<7;i++){tool(8+i*17,10,4,40+i%3*8,'#c8c8d0');tool(5+i*17,10,10,8,i%2?'#d03030':'#3060d0')}for(let i=0;i<5;i++)tool(10+i*24,70,18,5,'#b0b0b8')});
+ for(let i=0;i<N;i++){const a=i/N*Math.PI*2,x=Math.sin(a)*RAD,z=Math.cos(a)*RAD,ry=a+Math.PI;
+  const grp=new THREE.Group();grp.position.set(x,0,z);grp.rotation.y=ry;g.add(grp);
+  const add=(w,h,d,px,py,pz,c,keep)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mt(c,keep));m.position.set(px,py+h/2,pz);grp.add(m);return m};
+  add(panelW,H,.5,0,0,0,i%2?0x8e939c:0x80858f);add(panelW,1.1,.55,0,0,0,0x3a3f4a);add(panelW,.18,.6,0,.55,0,i%2?0xe8c21a:0x1a1a1a);
+  if(i%4===1){const m=new THREE.Mesh(new THREE.PlaneGeometry(panelW*.86,2.9),new THREE.MeshBasicMaterial({map:shut}));m.userData.b=1;ms.push(Object.assign(m.material,{userData:{b:new THREE.Color(1,1,1)}}));m.position.set(0,1.7,.27);grp.add(m);add(panelW*.9,.3,.3,0,3.15,.3,0xe8c21a,1)}
+  else if(i%4===3){const m=new THREE.Mesh(new THREE.PlaneGeometry(panelW*.9,2.1),new THREE.MeshBasicMaterial({map:peg}));ms.push(Object.assign(m.material,{userData:{b:new THREE.Color(1,1,1)}}));m.position.set(0,2.4,.27);grp.add(m)}
+  else{add(panelW*.9,.12,.3,0,1.1,.4,0x55575e);add(.2,1.1,.3,-panelW*.3,0,.4,0x55575e);add(.2,1.1,.3,panelW*.3,0,.4,0x55575e);add(.8,.5,.4,panelW*.1,1.22,.4,0xb82020)}}
+ // ceiling + strip lights + beams
+ const ce=new THREE.Mesh(new THREE.CircleGeometry(RAD+1,28).rotateX(Math.PI/2),mt(0x24262c));ce.position.y=H;g.add(ce);
+ for(let i=-2;i<=2;i++){bx(.5,.12,13,i*3.6,H-.15,0,0x30323a);for(const z of[-3.8,-.2,3.4])bx(.34,.1,2.4,i*3.6,H-.24,z,0xfff8e0,1)}
+ // wall sign
+ pl(5.6,1.1,0,3.7,-RAD+.52,cv(512,100,(x,w,h)=>{x.fillStyle='#0a3ca0';x.fillRect(0,0,w,h);x.fillStyle='#f6d020';x.fillRect(0,0,w,9);x.fillRect(0,h-9,w,9);x.fillStyle='#fff';x.font='bold 34px monospace';x.textAlign='center';x.textBaseline='middle';x.fillText("JOE'S GARAGE · TUNING",w/2,h/2)}),0,1);
+ // props round the room
+ const tyres=(x,z,n)=>{for(let i=0;i<n;i++){const m=new THREE.Mesh(new THREE.CylinderGeometry(.44,.44,.25,10),mt(0x16161a));m.position.set(x,.13+.26*i,z);g.add(m);const r=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,.26,8),mt(0x6a6c74));r.position.set(x,.13+.26*i,z);g.add(r)}};
+ const ring=(a,r)=>[Math.sin(a)*r,Math.cos(a)*r];
+ {const[x,z]=ring(.55,RAD-1.6);tyres(x,z,6);tyres(x+.9,z-.3,4);tyres(x-.2,z-1,3)}
+ {const[x,z]=ring(2.6,RAD-1.4);bx(2.4,.9,.8,x,0,z,0xb82020);bx(2.5,.12,.9,x,.9,z,0x9a9aa2);bx(.5,1.3,.5,x+2.1,0,z-.2,0x2a5ab0)}
+ {const[x,z]=ring(-2.3,RAD-1.5);bx(3.4,.9,.9,x,0,z,0x7a5a30);bx(3.5,.1,1,x,.9,z,0xb8b8c0)}
+ for(const[a,r]of[[-.7,RAD-1.2],[3.9,RAD-1.1],[4.3,RAD-1.3]]){const[x,z]=ring(a,r);const d=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,.95,10),mt(a<0?0x1a5a2a:0xb82020));d.position.set(x,.48,z);g.add(d)}
+ {const[x,z]=ring(5.4,RAD-1.6);bx(.3,1.2,.3,x,0,z,0xe8c21a);bx(1.8,.12,.3,x,1.2,z,0xe8c21a)}
+ // wall lights glow (kept bright at night)
+ g.userData.ms=ms;return g}
+function setLit(){if(!TG)return;const k=GAL.lt==='NIGHT'?.4:GAL.lt==='STUDIO'?1:GAL.lt==='DUSK'?.72:.95;for(const m of TG.userData.ms){const b=m.userData.b;if(!b||b===1)continue;const f=m.userData.keep?1:k;m.color.setRGB(b.r*f,b.g*f,b.b*f)}}
+{const g0=updGallery;updGallery=function(dt){g0(dt);if(!on)return;GAL.d=Math.min(GAL.d,9.2);GAL.h=Math.min(GAL.h,3.6);setLit()}}
+
 const css=document.createElement('style');css.textContent=`
 #tn{display:none;position:fixed;inset:0;z-index:61;pointer-events:none;font-family:monospace;color:#dff;text-transform:uppercase;letter-spacing:.06em;-webkit-user-select:none;user-select:none}
 #tn *{box-sizing:border-box}#tn .pe{pointer-events:auto}
@@ -280,24 +321,26 @@ function openTune(tab){
  openGallery();GAL.mode=null;galUI.classList.add('tuning');
  const gx=document.getElementById('galX');if(gx)gx.style.display='none';
  build();root.style.display='block';GAL.lt='STUDIO';
+ if(!TG)TG=buildSet();TG.visible=true;galG.visible=false;
  go(tab||'cars')}
 function closeTune(){
  if(!on)return;on=0;
  // undo anything previewed but not bought
  paintC=S.commit.paint;finPrev=null;rp=null;applyPaint();
  neonPrev=null;GAL.sv.car=S.commit.car;GAL.sv.paint=S.commit.paint;
- root.style.display='none';galUI.classList.remove('tuning');save();
+ if(window.JOEBAY){GAL.sv.x=JOEBAY.x;GAL.sv.z=JOEBAY.z;GAL.sv.psi=JOEBAY.psi;window.JOEBAY=null}
+ root.style.display='none';galUI.classList.remove('tuning');if(TG)TG.visible=false;save();
  closeGallery();neonNow();
  if(TN.custOn&&TN.cust&&paintC===TN.cust)applyPaint()}
-window.openTune=openTune;window.closeTune=closeTune;
+window.openTune=openTune;window.closeTune=closeTune;window.TNon=()=>on;
 // car sits in the free part of the screen, the menu on the other
 {const uc=updateCam;updateCam=function(dt){uc(dt);
   if(on&&GAL.on){const W=innerWidth,H=innerHeight,pn=$q('#tnPanel').getBoundingClientRect();
    if(W>H*1.0)cam.setViewOffset(W,H,pn.width/2+4,0,W,H);else cam.setViewOffset(W,H,0,pn.height/2+4,W,H)}
   else if(cam.view&&cam.view.enabled)cam.clearViewOffset()}}
 // keep the first-person overlay etc. out of the way and make sure leaving by any route cleans up
-{const c0=closeGallery;closeGallery=function(){if(on){on=0;root.style.display='none';galUI.classList.remove('tuning')}c0()}}
+{const c0=closeGallery;closeGallery=function(){if(on){on=0;root.style.display='none';galUI.classList.remove('tuning');if(TG)TG.visible=false}c0()}}
 // Joe's garage + the old spray booth now open the tuning screen
-{const o0=openShop;openShop=function(m){if(m==='garage2'){openTune('perf');return}o0.apply(this,arguments)}}
-garagePaint=function(){openTune('paint')};
+{const o0=openShop;openShop=function(m){if(m==='garage2'){toast('DRIVE YOUR CAR INTO A BAY AT JOES GARAGE');return}o0.apply(this,arguments)}}
+garagePaint=function(){toast('DRIVE YOUR CAR INTO A BAY AT JOES GARAGE')};
 })();

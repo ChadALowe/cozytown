@@ -397,7 +397,8 @@ special({kind:'church',w:20,d:8.5,eaves:6.5,ridge:3.8,fg:6,wall:'stone',wc:[1.2,
 special({kind:'school',w:30,d:9,eaves:3.6,ridge:2.2,fg:4,wall:'brick',wc:[1,.92,.85],roof:'tile',hip:1},5,125,1,0,1);
 RNDALT=1;
 special({kind:'shop',units:1,w:20,d:10,eaves:6.2,ridge:3.2,fg:.6,wall:'render',wc:[.96,.96,.98],roof:'tile',showroom:1,names:[{t:'VILLAGE MOTORS',bg:'#101820',fg:'#f0c840',col:[.08,.12,.2]}]},-62,0,1,0,1);
-special({kind:'shop',units:1,w:16,d:11,eaves:5.4,ridge:2.6,fg:.6,wall:'brick',wc:[.9,.78,.7],roof:'slate',names:[{t:"JOE'S GARAGE",bg:'#c82020',fg:'#ffffff',col:[.6,.1,.1]}]},-100,0,1,0,-1);
+special({kind:'shop',units:1,w:22,d:11,eaves:5.4,ridge:2.6,fg:12,wall:'brick',wc:[.9,.78,.7],roof:'slate',names:[{t:"JOE'S GARAGE",bg:'#c82020',fg:'#ffffff',col:[.6,.1,.1]}]},-100,0,1,0,-1);
+PLACED.push({x:-100,z:-11,rot:0,hw:15,hd:7.5});
 special({kind:'shop',units:1,w:26,d:12,eaves:6.4,ridge:3.4,fg:.6,wall:'render',wc:[.9,.9,1],roof:'tile',names:[{t:'STRIKE BOWL',bg:'#5a1a8a',fg:'#ffe040',col:[.3,.1,.5]}]},78,0,1,0,-1);
 special({kind:'shop',units:1,w:18,d:10,eaves:6,ridge:3,fg:.6,wall:'brick',wc:[.92,.84,.86],roof:'tile',names:[{t:'THREADS',bg:'#3a2a4a',fg:'#f4d8ff',col:[.4,.28,.5]}]},-86,0,1,0,1);
 special({kind:'shop',units:1,w:16,d:10,eaves:5.8,ridge:2.8,fg:.6,wall:'brick',wc:[.85,.7,.66],roof:'slate',names:[{t:'LUCKY BETS',bg:'#b01020',fg:'#ffe040',col:[.65,.1,.14]}]},-72,0,1,0,-1);
@@ -2412,7 +2413,7 @@ function buildGarage(o){IA.splice(0,IA.length,LEAVE_IA());IROOM.splice(0,IROOM.l
  const nz=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,.4),new THREE.MeshBasicMaterial({color:0x202020}));nz.position.set(3.4,1.3,-.3);SG.add(nz);
  sPlane(1.8,.5,0,2.3,-RZ+.04,0,txtTex(256,64,'#c82020','#fff',"JOE'S GARAGE",34));
  const sp=pSpec(9411,{f:false,gl:false,scarf:null,bp:false,bag:0,old:false,hr:PHR[2],tc:[.1,.25,.55]});window.SHK=personIn(sp,1.2,-2.7,0);gbox(SG,1.2,0,-2.0,2.2,.9,.6,0x6a2a1a);gbox(SG,1.2,.9,-2.0,2.3,.06,.7,0x9a9a9a);IROOM.push([.0,2.4,-2.4,-1.5]);
- IA.push({r:[-3.6,1.0,1.0,3.0],label:'UPGRADE ENGINE & TYRES',fn:()=>openShop('garage2')},{r:[2.0,4.8,1.0,3.0],label:'SPRAY BOOTH: RESPRAY',fn:()=>garagePaint()},{r:[-.3,2.7,-1.4,-.9],label:'TALK TO JOE',fn:()=>say('JOE','Tune her up, spray her up. Cash talks, mate.',3600)})}
+ IA.push({r:[-3.6,1.0,1.0,3.0],label:'ASK ABOUT TUNING',fn:()=>say('JOE','Drive her into a bay out front, mate. Tuning is done on the ramps.',3600)},{r:[2.0,4.8,1.0,3.0],label:'ASK ABOUT PAINT',fn:()=>say('JOE','Same again, drive her in. Spray, wheels, neon, the lot.',3600)},{r:[-.3,2.7,-1.4,-.9],label:'TALK TO JOE',fn:()=>say('JOE','Tune her up, spray her up. Cash talks, mate.',3600)})}
 function garagePaint(){closeShop();leaveShop(true);openGallery('paint')}
 CUSTOM_SHOP.garage2=function(msg){document.getElementById('shT').textContent="JOE'S GARAGE";document.getElementById('shMsg').textContent=msg||('YOUR '+CARN[CARI]+'  TOP SPEED '+Math.round(MAXV));
  dRow('SPRAY BOOTH: NEW COLOUR (£'+PAINTP+' EACH, FREE AFTER)',[['OPEN',()=>garagePaint()]]);
