@@ -612,7 +612,7 @@ function enterCar(){if(!GS.onFoot)return;if(carry){toast('DELIVER THE PARCEL FIR
 function stepFoot(dt){
  const mv=moveIn(dt),run=mv.run,fwd=mv.fwd,turn=mv.turn;
  P.psi+=turn*2.4*dt;if(fwd)P.dir=fwd;
- const sp=fwd>0?(run?6:3.4):fwd<0?2:0;P.speed+=(sp-P.speed)*Math.min(1,dt*(run?5:10));
+ const sp=fwd>0?(run?7.4:3.4):fwd<0?2:0;P.speed+=(sp-P.speed)*Math.min(1,dt*(run?5:10));
  let nx=P.x+Math.sin(P.psi)*P.speed*P.dir*dt,nz=P.z+Math.cos(P.psi)*P.speed*P.dir*dt;
  if(hAt(nx,nz)<.35){nx=P.x;nz=P.z;P.speed=0}
  for(let i=0;i<COL.length;i++){const c=COL[i];if(c.d&&dOpen>.7)continue;const dx=nx-c[0],dz=nz-c[1];if(dx>c[2]+1||dx<-c[2]-1||dz>c[2]+1||dz<-c[2]-1)continue;const dd=Math.hypot(dx,dz),rr=c[2]+.4;if(dd<rr&&dd>1e-3){nx+=dx/dd*(rr-dd);nz+=dz/dd*(rr-dd)}}
@@ -1533,7 +1533,7 @@ function mkPerson(sp,mat,parent){const w=sp.w,S=sp.sk,hr=sp.hr,tc=sp.tc,bc=sp.bc
   if(hs===0)lft(UP,cap,8,true);
   else if(hs===1){lft(UP,cap,8,true);lft(UP,[{y:1.74,rx:.104,rz:.04,cz:hz-.085,c:hr},{y:1.55,rx:.11,rz:.05,cz:hz-.1,c:hr},{y:1.38,rx:.09,rz:.05,cz:hz-.09,c:dk(hr,.85)}],8,false)}
   else if(hs===2){lft(UP,cap,8,true);pb(UP,0,1.88,hz-.12,.08,.07,.08,hr)}
-  else if(hs===3){lft(UP,[{y:1.725,rx:.1,rz:.112,cz:hz-.012,c:dk(hr,.8)},{y:1.78,rx:.099,rz:.11,cz:hz-.02,c:hr},{y:1.82,rx:.09,rz:.098,cz:hz-.04,top:0,c:hr}],8,false)}
+  else if(hs===3){lft(UP,[{y:1.725,rx:.1,rz:.112,cz:hz-.012,c:dk(hr,.8)},{y:1.8,rx:.101,rz:.113,cz:hz-.012,c:hr},{y:1.87,rx:.09,rz:.102,cz:hz-.012,c:hr},{y:1.935,rx:.052,rz:.066,cz:hz-.005,top:.012,c:hr}],8,true);pb(UP,0,1.915,hz+.075,.13,.05,.07,hr)}
   else if(hs===4){lft(UP,cap,8,true);pb(UP,0,1.83,hz+.12,.19,.02,.11,dk([.35,.3,.28],1))}
   else if(hs===5){lft(UP,[{y:1.74,rx:.108,rz:.12,cz:hz-.012,c:[.6,.2,.2]},{y:1.85,rx:.105,rz:.118,cz:hz-.012,c:[.7,.25,.25]},{y:1.94,rx:.07,rz:.08,cz:hz-.012,top:.01,c:[.7,.25,.25]}],8,true);pb(UP,0,1.95,hz-.012,.04,.04,.04,[.9,.9,.9])}
   else if(hs===6){lft(UP,[{y:1.7,rx:.13,rz:.14,cz:hz-.02,c:dk(hr,.8)},{y:1.82,rx:.15,rz:.155,cz:hz-.02,c:hr},{y:1.95,rx:.12,rz:.13,cz:hz-.02,top:.02,c:hr}],8,true)}
