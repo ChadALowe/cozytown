@@ -18,7 +18,7 @@ const LEN=cum[dense.length],N=Math.round(LEN/1.5),SP=LEN/N,S=[];
 {let j=0;for(let i=0;i<N;i++){const t=i*SP;while(cum[j+1]<t)j++;const a=dense[j],b=dense[(j+1)%dense.length],f=(t-cum[j])/(cum[j+1]-cum[j]||1);S.push({x:a[0]+(b[0]-a[0])*f,z:a[1]+(b[1]-a[1])*f})}}
 for(let i=0;i<N;i++){const a=S[(i+N-1)%N],b=S[(i+1)%N],l=Math.hypot(b.x-a.x,b.z-a.z)||1;S[i].tx=(b.x-a.x)/l;S[i].tz=(b.z-a.z)/l;S[i].nx=-S[i].tz;S[i].nz=S[i].tx;S[i].a=Math.atan2(S[i].tx,S[i].tz)}
 {const raw=S.map((s,i)=>{let d=S[(i+1)%N].a-s.a;d=Math.atan2(Math.sin(d),Math.cos(d));return Math.abs(d)/SP});for(let i=0;i<N;i++){let m=0;for(let k=-4;k<=4;k++)m=Math.max(m,raw[(i+k+N)%N]);S[i].k=m}}
-const VTOP=21,ALAT=24;
+const VTOP=23,ALAT=30;
 for(const s of S)s.vm=Math.min(VTOP,Math.sqrt(ALAT/Math.max(s.k,1e-4)));
 function posAt(s,lat){s=((s%LEN)+LEN)%LEN;const f0=s/SP,i=Math.floor(f0)%N,f=f0-Math.floor(f0),a=S[i],b=S[(i+1)%N];
  const x=a.x+(b.x-a.x)*f,z=a.z+(b.z-a.z)*f;let nx=a.nx+(b.nx-a.nx)*f,nz=a.nz+(b.nz-a.nz)*f;const l=Math.hypot(nx,nz)||1;nx/=l;nz/=l;
@@ -72,23 +72,46 @@ scene.add(B.mesh(mRoad));scene.add(B2.mesh(mObj));
 
 /* ---------- kart model ---------- */
 const kmc={};function km(hex){if(kmc[hex])return kmc[hex];const c=new THREE.Color(hex),m=wmat([c.r,c.g,c.b],{vertexColors:false});m.color.copy(c);return kmc[hex]=m}
-function mkKart(col,hcol){const g=new THREE.Group();
- const bx=(w,h,d,x,y,z,m)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);q.position.set(x,y,z);g.add(q);return q};
- const body=km(col),dark=km(0x1c1c20),grey=km(0x80808a),white=km(0xf2f2f2);
- bx(.95,.14,1.7,0,.3,0,dark);bx(1.0,.22,.55,0,.4,.85,body);bx(.18,.3,1.4,.56,.44,-.05,body);bx(.18,.3,1.4,-.56,.44,-.05,body);
- bx(.9,.4,.2,0,.58,-.5,body);bx(.6,.1,.5,0,.36,-.1,dark);bx(.55,.4,.45,0,.55,-.95,grey);bx(1.25,.1,.12,0,.32,1.18,white);
- bx(.08,.4,.08,0,.62,.32,dark);bx(.34,.05,.12,0,.84,.3,dark);
- g.userData.fw=[];
- for(const[sx,sz]of[[-1,1],[1,1],[-1,-1],[1,-1]]){const p=new THREE.Group();p.position.set(sx*.58,.24,sz*.62);
-  const w=new THREE.Mesh(new THREE.CylinderGeometry(.24,.24,.24,10).rotateZ(Math.PI/2),dark);p.add(w);g.add(p);if(sz>0)g.userData.fw.push(p)}
- bx(.42,.5,.3,0,.86,-.12,km(hcol));
- const hd=new THREE.Mesh(new THREE.SphereGeometry(.2,8,6),km(hcol===0xffd820?0xe03030:0xf4f4f4));hd.position.set(0,1.3,-.1);g.add(hd);bx(.3,.09,.1,0,1.28,.08,dark);
- bx(.1,.12,.5,.24,.74,.12,km(hcol));bx(.1,.12,.5,-.24,.74,.12,km(hcol));
- const sh=new THREE.Mesh(new THREE.CircleGeometry(1,16).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.28}));sh.scale.set(.9,1,1.25);sh.position.y=.03;g.add(sh);
+function mkKart(col,hcol,num){const g=new THREE.Group();
+ const bx=(w,h,d,x,y,z,m,rx)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);q.position.set(x,y,z);if(rx)q.rotation.x=rx;g.add(q);return q};
+ const body=km(col),dark=km(0x1c1c20),grey=km(0x80808a),white=km(0xf2f2f2),chrome=km(0xc8ccd4),suit=km(hcol),black=km(0x0c0c0e),glove=km(0x2a2a30);
+ const tn=txtTex(64,64,'#f4f4f4','#111',String(num||1),44),nm=new THREE.MeshBasicMaterial({map:tn,side:THREE.DoubleSide});
+ const plate=(w,h,x,y,z,ry,rx)=>{const q=new THREE.Mesh(new THREE.PlaneGeometry(w,h),nm);q.position.set(x,y,z);q.rotation.set(rx||0,ry||0,0);g.add(q)};
+ // chassis, floor pan, bumpers
+ bx(1.0,.08,1.8,0,.25,0,dark);bx(.9,.04,1.5,0,.3,-.05,grey);
+ bx(1.34,.09,.1,0,.3,1.28,chrome);bx(.08,.14,.14,.65,.3,1.26,black);bx(.08,.14,.14,-.65,.3,1.26,black);bx(.1,.1,.4,.5,.3,1.1,chrome);bx(.1,.1,.4,-.5,.3,1.1,chrome);
+ bx(1.2,.09,.09,0,.34,-1.2,chrome);bx(.08,.1,.3,.5,.34,-1.06,chrome);bx(.08,.1,.3,-.5,.34,-1.06,chrome);
+ // nose cone + stripe + number plate
+ bx(.86,.18,.5,0,.4,.98,body);bx(.74,.14,.35,0,.5,.85,body,-.25);bx(.14,.03,.9,0,.6,.8,white,-.12);plate(.3,.3,0,.46,1.245,0,0);
+ // side pods with stripes and number plates
+ for(const sx of[-1,1]){bx(.22,.3,1.3,sx*.58,.42,-.05,body);bx(.22,.14,.5,sx*.58,.36,.7,body);bx(.05,.04,1.1,sx*.58,.59,-.05,white);plate(.28,.28,sx*.7,.45,.0,sx*Math.PI/2)}
+ // seat, back rest, rear plate
+ bx(.62,.08,.5,0,.34,-.1,dark);bx(.74,.5,.14,0,.62,-.42,dark,-.18);bx(.5,.18,.1,0,.9,-.5,dark);plate(.3,.3,0,.72,-.5,Math.PI,0);
+ // engine, air filter, exhaust, brake light
+ bx(.56,.34,.44,0,.52,-.9,grey);bx(.4,.18,.3,0,.74,-.9,dark);
+ {const f=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.1,8),chrome);f.position.set(-.1,.88,-.88);g.add(f)}
+ {const e=new THREE.Mesh(new THREE.CylinderGeometry(.04,.05,.5,6).rotateX(Math.PI/2),chrome);e.position.set(.28,.4,-1.15);g.add(e)}
+ bx(.22,.06,.04,0,.5,-1.14,new THREE.MeshBasicMaterial({color:0xff2020}));
+ // steering column, rim, dash
+ bx(.08,.42,.08,0,.58,.36,dark,.5);{const t=new THREE.Mesh(new THREE.TorusGeometry(.13,.022,6,14),black);t.position.set(0,.8,.28);t.rotation.x=-1.0;g.add(t)}
+ bx(.5,.1,.14,0,.55,.52,body);
+ // wheels (front pivots steer; all spin)
+ g.userData.fw=[];g.userData.wh=[];
+ for(const[sx,sz,r,w]of[[-1,1,.22,.2],[1,1,.22,.2],[-1,-1,.26,.3],[1,-1,.26,.3]]){const p=new THREE.Group();p.position.set(sx*(sz>0?.58:.64),r,sz*(sz>0?.78:-.72));
+  const t=new THREE.Mesh(new THREE.CylinderGeometry(r,r,w,12).rotateZ(Math.PI/2),dark);p.add(t);
+  const h=new THREE.Mesh(new THREE.CylinderGeometry(r*.55,r*.55,w+.03,8).rotateZ(Math.PI/2),chrome);t.add(h);
+  const n=new THREE.Mesh(new THREE.BoxGeometry(w+.05,.05,r*.8),white);n.position.y=r*.28;t.add(n);
+  g.add(p);g.userData.wh.push(t);if(sz>0)g.userData.fw.push(p)}
+ // driver
+ bx(.44,.52,.28,0,.86,-.18,suit,-.12);bx(.5,.12,.3,0,1.08,-.2,suit);
+ for(const sx of[-1,1]){bx(.1,.1,.46,sx*.27,.9,.1,suit,.55);bx(.1,.1,.12,sx*.18,.84,.3,glove);bx(.14,.12,.5,sx*.13,.45,.3,suit);bx(.13,.1,.22,sx*.13,.4,.62,black)}
+ {const hl=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),km(hcol===0xffd820?0xe03030:0xf4f4f4));hl.position.set(0,1.32,-.14);g.add(hl);
+  bx(.32,.1,.12,0,1.3,.04,black);bx(.05,.03,.34,0,1.53,-.14,white)}
+ const sh=new THREE.Mesh(new THREE.CircleGeometry(1,16).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.28}));sh.scale.set(.95,1,1.3);sh.position.y=.03;g.add(sh);
  return g}
-const kartM=mkKart(0xd02828,0xffd820);kartM.visible=false;scene.add(kartM);
-const AICOL=[[0x2860d8,0xf4f4f4,'BLUEBELL'],[0x28a848,0xff9020,'MOSS'],[0x9030c8,0x20d0e0,'PLUM']];
-for(const[i,y]of[[0,-20.5],[1,-26.5]]){const k=mkKart(i?0xffd820:0x2860d8,i?0xd02828:0xf4f4f4);k.position.set(-107.5,G0+.08,y);k.rotation.y=Math.PI/2;scene.add(k)}
+const kartM=mkKart(0xd02828,0xffd820,7);kartM.visible=false;scene.add(kartM);
+const AICOL=[[0x2860d8,0xf4f4f4,'BLUEBELL',23],[0x28a848,0xff9020,'MOSS',5],[0x9030c8,0x20d0e0,'PLUM',88]];
+for(const[i,y]of[[0,-20.5],[1,-26.5]]){const k=mkKart(i?0xffd820:0x2860d8,i?0xd02828:0xf4f4f4,i?42:11);k.position.set(-107.5,G0+.08,y);k.rotation.y=Math.PI/2;scene.add(k)}
 
 /* ---------- minimap ---------- */
 {const x=mb.getContext('2d');x.strokeStyle='#6a6a72';x.lineWidth=1.8;x.lineJoin='round';x.beginPath();S.forEach((s,i)=>i?x.lineTo(mx(s.x),mz(s.z)):x.moveTo(mx(s.x),mz(s.z)));x.closePath();x.stroke();
@@ -121,7 +144,7 @@ function kartStart(){
   KT.idx=((Math.round(ps[0]/SP)%N)+N)%N;KT.tot=Math.round(ps[0]/SP);
   camAng=GS.psi;
   MAXV=22;ACCM=2.2;GRIPM=1.7;
-  let a=0;KT.ai=[];SLOTS.forEach((sl,i)=>{if(i===PSLOT)return;const c=AICOL[a],m=mkKart(c[0],c[1]);m.visible=true;scene.add(m);KT.ai.push({m,s:sl[0],lat:sl[1],v:0,skill:[1,.95,.9][a],name:c[2]});a++});
+  let a=0;KT.ai=[];SLOTS.forEach((sl,i)=>{if(i===PSLOT)return;const c=AICOL[a],m=mkKart(c[0],c[1],c[3]);m.visible=true;scene.add(m);KT.ai.push({m,s:sl[0],lat:sl[1],v:0,skill:[1.02,.98,.94][a],name:c[2]});a++});
   setLabels();toast('GET READY!');showBig('3',900);beep(440,.15,'square',.08);KT.lastN=3});
 }
 function kartEnd(){
@@ -150,10 +173,10 @@ function tickPlayer(dt){
 function tickAI(dt){const pd=KT.tot*SP;
  for(const a of KT.ai){if(KT.state==='cd'){a.v=0}else{
   const i0=Math.floor(((a.s%LEN)+LEN)%LEN/SP);let tv=1e9;for(let k=0;k<12;k++)tv=Math.min(tv,S[(i0+k)%N].vm);
-  tv*=a.skill;const gap=a.s-pd;if(gap>70)tv*=.93;else if(gap<-50)tv*=1.06;
+  tv*=a.skill;const gap=a.s-pd;if(gap>60)tv*=.95;else if(gap<-25)tv*=1.1;else if(gap<0)tv*=1.04;
   if(tv>a.v)a.v=Math.min(tv,a.v+9*dt);else a.v=Math.max(tv,a.v-24*dt);a.s+=a.v*dt}
   const p=posAt(a.s,a.lat);a.m.position.set(p.x,G0+.08,p.z);a.m.rotation.y=p.psi;
-  for(const w of a.m.userData.fw)w.rotation.y=0;
+  {a.spin=(a.spin||0)+a.v*dt/.24;let da=posAt(a.s+4,a.lat).psi-p.psi;da=Math.atan2(Math.sin(da),Math.cos(da));const st=clamp(da*1.4,-.5,.5);for(const w of a.m.userData.fw)w.rotation.y=st;for(const w of a.m.userData.wh)w.rotation.x=a.spin}
   // bump the player
   const dx=GS.x-p.x,dz=GS.z-p.z,dd=Math.hypot(dx,dz);if(dd<1.75&&dd>1e-3){const ux=dx/dd,uz=dz/dd,o=1.75-dd;GS.x+=ux*o*.6;GS.z+=uz*o*.6;const vn=GS.vx*ux+GS.vz*uz;if(vn<0){GS.vx-=vn*ux*1.1;GS.vz-=vn*uz*1.1}a.v*=.97}}
  let rank=1;for(const a of KT.ai)if(a.s>pd)rank++;if(KT.state!=='fin')KT.rank=rank}
@@ -175,7 +198,7 @@ function kartTick(dt){
  if(!KT.on)return step0(dt);
  if(KT.state==='cd'){GS.vx=GS.vz=GS.vf=GS.speed=0}else step0(dt);
  try{kartTick(dt)}catch(e){if(!KT.err){KT.err=1;console.error('kart',e)}}}}
-{const uc0=updateCar;updateCar=function(){uc0();if(KT.on){kartM.position.copy(car.position);kartM.rotation.copy(car.rotation);for(const w of kartM.userData.fw)w.rotation.y=GS.steer*.5}}}
+{const uc0=updateCar;updateCar=function(){uc0();if(KT.on){kartM.position.copy(car.position);kartM.rotation.copy(car.rotation);for(const w of kartM.userData.fw)w.rotation.y=GS.steer*.5;for(const w of kartM.userData.wh)w.rotation.x=GS_SPIN}}}
 {const ctx0=ctx;ctx=function(){
  if(KT.on)return{label:KT.state==='fin'?'LEAVE TRACK':'QUIT RACE',fn:kartQuit};
  if(!GS.inside){const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z;if(GS.onFoot?Math.hypot(px-(KIOSK.x+3),pz-KIOSK.z)<5:(px>PARK.x0-3&&px<PARK.x1+3&&pz>PARK.z0-3&&pz<PARK.z1+3))return{label:'GO KARTING £'+FEE,fn:kartStart}}
