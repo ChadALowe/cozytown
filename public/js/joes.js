@@ -33,9 +33,12 @@ for(const bx of BAYS){
  box(BW+.7,.3,.3,bx,G+2.85,Z0+.22,0xe8c21a,false);box(.35,2.9,.3,bx-BW/2-.17,G,Z0+.22,0xe8c21a,false);box(.35,2.9,.3,bx+BW/2+.17,G,Z0+.22,0xe8c21a,false);
  for(let i=0;i<6;i++)box(.35,.3,.31,bx-BW/2-.17,G+.1+i*.5,Z0+.22,0x1a1a1a,false),box(.35,.3,.31,bx+BW/2+.17,G+.1+i*.5,Z0+.22,0x1a1a1a,false);
  box(BW,.1,.5,bx,G,Z0+.42,0x4a4a50)}
-// fascia banner over the bays
-{const fx=(BAYS[0]+BAYS[1])/2;const t=cvs(512,72,(x,w,h)=>{x.fillStyle='#0a3ca0';x.fillRect(0,0,w,h);x.fillStyle='#f6d020';x.fillRect(0,0,w,8);x.fillRect(0,h-8,w,8);x.fillStyle='#fff';x.font='bold 30px monospace';x.textAlign='center';x.textBaseline='middle';x.fillText("JOE'S GARAGE",w*.3,h/2);x.fillStyle='#f6d020';x.font='bold 18px monospace';x.fillText('TUNING · TYRES · MOT',w*.76,h/2-8);x.fillText('EXHAUSTS · BRAKES',w*.76,h/2+14)});
- plane(BAYS[1]-BAYS[0]+BW+1.2,1.1,fx,G+3.75,Z0+1.15,t,0)}
+// full-width fascia banner (replaces the old red strip)
+{const t=cvs(1024,96,(x,w,h)=>{x.fillStyle='#0a3ca0';x.fillRect(0,0,w,h);x.fillStyle='#f6d020';x.fillRect(0,0,w,9);x.fillRect(0,h-9,w,9);
+ x.fillStyle='#fff';x.font='bold 54px monospace';x.textAlign='center';x.textBaseline='middle';x.fillText("JOE'S GARAGE",w*.27,h/2+1);
+ x.fillStyle='#f6d020';x.font='bold 24px monospace';x.fillText('TUNING · TYRES · MOT · EXHAUSTS',w*.7,h/2-13);x.fillText('BRAKES · SERVICING · BODY KITS',w*.7,h/2+17);
+ x.fillStyle='#f6d020';x.fillRect(w*.5-3,14,6,h-28)});
+ plane(22.7,1.3,CX,G+3.72,Z0+1.22,t,0)}
 // roadside pylon sign
 {const px=CX-12.8,pz=-6.6;box(.35,6.5,.35,px,G,pz,0x55565c);
  const t=cvs(128,160,(x,w,h)=>{x.fillStyle='#0a3ca0';x.fillRect(0,0,w,h);x.fillStyle='#f6d020';x.fillRect(4,4,w-8,6);x.fillRect(4,h-10,w-8,6);x.fillStyle='#fff';x.font='bold 21px monospace';x.textAlign='center';x.fillText('JOE\'S',w/2,40);x.fillText('GARAGE',w/2,66);x.fillStyle='#f6d020';x.font='bold 15px monospace';for(const[i,l]of['MOT','TYRES','TUNING','EXHAUSTS'].entries())x.fillText(l,w/2,96+i*17)});
