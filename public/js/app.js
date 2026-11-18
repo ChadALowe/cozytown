@@ -842,13 +842,13 @@ function updMusic(dt){if(!AC||!snd||!musOn||menuOpen)return;musT-=dt;if(musT>0)r
 var CARI=0,FU={uTint:{value:new THREE.Vector3(1,1,1)}},fiesRecolor=function(){};
 const fies=new THREE.Group();fies.visible=false;car.add(fies);
 {const img=new Image(),tex=new THREE.Texture(img);tex.flipY=false;tex.generateMipmaps=true;tex.minFilter=THREE.LinearMipmapLinearFilter;tex.magFilter=THREE.LinearFilter;
- const cv=document.createElement('canvas');cv.width=cv.height=1254;const cx=cv.getContext('2d'),bodyTex=new THREE.CanvasTexture(cv);bodyTex.flipY=false;bodyTex.minFilter=THREE.LinearMipmapLinearFilter;bodyTex.magFilter=THREE.LinearFilter;
+ const cv=document.createElement('canvas');cv.width=cv.height=1024;const cx=cv.getContext('2d'),bodyTex=new THREE.CanvasTexture(cv);bodyTex.flipY=false;bodyTex.minFilter=THREE.LinearMipmapLinearFilter;bodyTex.magFilter=THREE.LinearFilter;
  let orig=null,mk=null,lk=null,out=null;const LUT=new Float32Array(256);for(let i=0;i<256;i++)LUT[i]=Math.pow(i/255,1.6)*1.08;
  const sm=(a,b,x)=>{const t=Math.min(1,Math.max(0,(x-a)/(b-a)));return t*t*(3-2*t)};
- fiesRecolor=function(){if(!orig)return;const d=out.data,o=orig.data,t=FU.uTint.value,n=1254*1254;for(let i=0;i<n;i++){const m=mk[i]/255,q=i*4;if(m<.004){d[q]=o[q];d[q+1]=o[q+1];d[q+2]=o[q+2];continue}const L=LUT[lk[i]]*255;d[q]=o[q]+(t.x*L-o[q])*m;d[q+1]=o[q+1]+(t.y*L-o[q+1])*m;d[q+2]=o[q+2]+(t.z*L-o[q+2])*m}cx.putImageData(out,0,0);bodyTex.needsUpdate=true};
+ fiesRecolor=function(){if(!orig)return;const d=out.data,o=orig.data,t=FU.uTint.value,n=1024*1024;for(let i=0;i<n;i++){const m=mk[i]/255,q=i*4;if(m<.004){d[q]=o[q];d[q+1]=o[q+1];d[q+2]=o[q+2];continue}const L=LUT[lk[i]]*255;d[q]=o[q]+(t.x*L-o[q])*m;d[q+1]=o[q+1]+(t.y*L-o[q+1])*m;d[q+2]=o[q+2]+(t.z*L-o[q+2])*m}cx.putImageData(out,0,0);bodyTex.needsUpdate=true};
  const mImg=new Image();let rd=0;
- const build=()=>{if(++rd<2)return;tex.needsUpdate=true;cx.drawImage(img,0,0);FU.uTint.value.set(...paintC);orig=cx.getImageData(0,0,1254,1254);out=cx.createImageData(1254,1254);for(let i=3;i<out.data.length;i+=4)out.data[i]=255;
-  const mc=document.createElement('canvas');mc.width=mc.height=1254;const mx=mc.getContext('2d');mx.drawImage(mImg,0,0);const md=mx.getImageData(0,0,1254,1254).data,n=1254*1254;mk=new Uint8Array(n);lk=new Uint8Array(n);
+ const build=()=>{if(++rd<2)return;tex.needsUpdate=true;cx.drawImage(img,0,0);FU.uTint.value.set(...paintC);orig=cx.getImageData(0,0,1024,1024);out=cx.createImageData(1024,1024);for(let i=3;i<out.data.length;i+=4)out.data[i]=255;
+  const mc=document.createElement('canvas');mc.width=mc.height=1024;const mx=mc.getContext('2d');mx.drawImage(mImg,0,0);const md=mx.getImageData(0,0,1024,1024).data,n=1024*1024;mk=new Uint8Array(n);lk=new Uint8Array(n);
   for(let i=0;i<n;i++){const l=(.299*orig.data[i*4]+.587*orig.data[i*4+1]+.114*orig.data[i*4+2])/255;lk[i]=Math.round(Math.min(1,l)*255);mk[i]=md[i*4]}fiesRecolor()};
  img.onload=build;mImg.onload=build;img.src=FZ_IMG;mImg.src=FZ_MASK;
  // hull from silhouette stations
