@@ -1745,7 +1745,7 @@ function dartBoardImg(S){const c=document.createElement('canvas');c.width=c.heig
 const DZ={k:0,on:0,tp:null,look:null,fov:46,bc:null,mesh:null,darts:[],pend:null};
 const DR=.34;
 (function(){const st=document.createElement('style');st.textContent='body.dz #hud,body.dz #pedals,body.dz #pad,body.dz #top,body.dz #topbtns,body.dz #bUse,body.dz #speed,body.dz #mph,body.dz #sta,body.dz #hnhud,body.dz #cfhud,body.dz #arrow{display:none!important}';document.head.appendChild(st)})();
-function dzTarget(){if(DZ.fn)return DZ.fn();const th=Math.tan(DZ.fov*Math.PI/360),a=Math.max(.3,cam.aspect||1.6),nw=DR*1.22*1.03,nh=.86*1.04,d=Math.max(1.0,nw/(th*a),nh/th);DZ.dist=Math.min(d,3.9);const p=SG.localToWorld(new THREE.Vector3(-4.12+PDX+DZ.dist,1.2,.6));if(DZ.bc){DZ.look=DZ.bc.clone();DZ.look.y=p.y}return p}
+function dzTarget(){if(DZ.fn)return DZ.fn();const th=Math.tan(DZ.fov*Math.PI/360),a=Math.max(.3,cam.aspect||1.6),nw=DR*1.22*1.03,nh=((cam.aspect||1.6)>1.3?.78:.86*1.04),d=Math.max(1.0,nw/(th*a),nh/th);DZ.dist=Math.min(d,3.9);const p=SG.localToWorld(new THREE.Vector3(-4.12+PDX+DZ.dist,1.2,.6));if(DZ.bc){DZ.look=DZ.bc.clone();DZ.look.y=p.y}return p}
 function mkDartMesh(col){const g=new THREE.Group(),m=c=>new THREE.MeshBasicMaterial({color:c}),bx=(x,y,z,c,px,py,pz)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(x,y,z),m(c));q.position.set(px||0,py||0,pz||0);g.add(q)};
  bx(.012,.012,.07,0xb8b8c0,0,0,-.035);bx(.004,.004,.04,0xd8d8e0,0,0,.02);bx(.006,.006,.06,0x303030,0,0,-.09);bx(.04,.002,.04,col,0,0,-.13);bx(.002,.04,.04,col,0,0,-.13);return g}
 function dartsOpen(){if(DG||!window.DBOARD)return;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;document.body.classList.add('dz');man.visible=false;if(window.DMAN)DMAN.visible=false;
