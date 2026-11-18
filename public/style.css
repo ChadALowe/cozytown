@@ -66,3 +66,5 @@ details.hw[open] summary{background:#1b2140}
 .shrow button{min-height:44px;min-width:max(64px,12vmin);background:#1b2140;color:#fff;border:2px solid #4a5590;border-radius:6px;font:800 max(13px,2.8vmin) ui-monospace,monospace;padding:0 1.6vmin}
 .shrow button.on{background:#ffe14a;color:#101428;border-color:#fff}
 @media (max-height:460px){.card{padding:1.6vmin 3vmin}.mb{margin:.8vmin 0}.card h1{font-size:max(26px,9vmin)}}
+
+#go:disabled{background:#555;opacity:.75}

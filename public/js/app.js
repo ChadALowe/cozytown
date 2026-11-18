@@ -10,7 +10,7 @@ const scene=new THREE.Scene();
 const cam=new THREE.PerspectiveCamera(num('fov',32),1,0.05,3000);
 const ax=R.capabilities.getMaxAnisotropy();
 const tex={};let ps=false,smooth=Q.get('smooth')!=='0';
-function loadTex(k){return new Promise(r=>{const i=new Image();i.onload=()=>{const t=new THREE.Texture(i);t.needsUpdate=true;t.generateMipmaps=true;t.anisotropy=ax;t.wrapS=t.wrapT=THREE.ClampToEdgeWrapping;tex[k]=t;r()};i.src=IM[k]})}
+function loadTex(k){return new Promise(r=>{let tries=0;const go=()=>{const i=new Image();i.onload=()=>{const t=new THREE.Texture(i);t.needsUpdate=true;t.generateMipmaps=true;t.anisotropy=ax;t.wrapS=t.wrapT=THREE.ClampToEdgeWrapping;tex[k]=t;r()};i.onerror=()=>{if(++tries<3)setTimeout(go,600*tries);else{const c=document.createElement('canvas');c.width=c.height=2;const t=new THREE.Texture(c);t.needsUpdate=true;tex[k]=t;r()}};i.src=IM[k]};go()})}
 function filt(){for(const k in tex){const t=tex[k];t.minFilter=ps?THREE.NearestFilter:THREE.LinearMipmapLinearFilter;t.magFilter=(ps||!smooth)?THREE.NearestFilter:THREE.LinearFilter;t.needsUpdate=true}}
 const U={tS:{value:null},tT:{value:null},tF:{value:null},tR:{value:null},uTint:{value:new THREE.Vector3(1,1,1)},uPS:{value:0},uRes:{value:new THREE.Vector2(320,240)},
  sd:{value:new THREE.Vector4(C.side.s,C.side.axf,C.side.gy,C.side.W)},sH:{value:C.side.H},
@@ -4293,4 +4293,4 @@ Promise.all(['side','top','front','rear','mask','paint'].map(loadTex)).then(()=>
  try{if(localStorage.getItem('c1save'))$('cont').style.display='inline-block'}catch(e){}
  $('cont').onclick=()=>{if(loadGame())$('go').onclick()};
  if(Q.has('sim')){const n=Math.round(+Q.get('sim')*60);for(let i=0;i<n;i++){if(Q.has('padat')&&i===Math.round(+Q.get('padat')*60))inp.pad=+Q.get('pad2');step(1/60);if(GS.onFoot)stepFoot(1/60)}camAng=(GS.onFoot?P:GS).psi}
- window.GS=GS;requestAnimationFrame(loop);window.READY=true});
+ window.GS=GS;{const g=$('go');g.disabled=false;g.textContent=GS.started?'▶ RESUME':'▶ START'}requestAnimationFrame(loop);window.READY=true});
