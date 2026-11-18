@@ -1138,7 +1138,7 @@ const clkEl=document.createElement('div');clkEl.style.cssText='position:absolute
 function setClock(i){GT=[12,18,22][i]||12}
 function hash(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h}
 /* shop hours */
-const HRS={"THE ROYAL OAK":[11,23.5],CAFE:[8,16],"FRANKIE'S FISH & CHIPS":[11,21.5],BAKERY:[7,16],NEWSAGENT:[6.5,19],'CO-OP':[7,21],DELI:[8,17],HAIRDRESSER:[9,17]};
+const HRS={"THE ROYAL OAK":[9,23.5],CAFE:[8,16],"FRANKIE'S FISH & CHIPS":[9,21.5],BAKERY:[7,16],NEWSAGENT:[6.5,19],'CO-OP':[7,21],DELI:[8,17],HAIRDRESSER:[9,17]};
 const SUNC=['POST OFFICE','BUTCHER','ESTATE AGENT','BOOKSHOP','VET','CHEMIST','HAIRDRESSER','DELI','BAKERY'];
 function shopOpen(o){const h=HRS[o.t]||[8,18],sun=dow()===6&&SUNC.includes(o.t),ok=!sun&&GT>=h[0]&&GT<h[1];return{open:ok,msg:sun?' (SUNDAY)':' · OPENS '+fmtH(h[0])}}
 function shopLabel(o){return shopOpen(o).open?(o.pub?'ENTER PUB':'ENTER SHOP'):'CLOSED'}
@@ -2324,7 +2324,7 @@ function poolClose(q){const P=PL;if(!P)return;cancelAnimationFrame(P.raf);remove
 {const u0=updCozy;updCozy=function(dt){u0(dt);{const w=GS.inside&&SHOPCUR?(SHOPCUR.o.pub?6.3:(SHOPCUR.o.rx||4.2)):4.2;if(RX!==w)RX=w}}}
 {const s0=cozySave,l0=cozyLoad;cozySave=function(){const o=s0();o.pl=POOLS;return o};cozyLoad=function(z){l0(z);if(z&&z.pl)POOLS=z.pl}}
 /* ---- village showroom, Joe's garage (upgrades + spray booth), bowling alley building ---- */
-Object.assign(HRS,{'VILLAGE MOTORS':[9,18],"JOE'S GARAGE":[8,17.5],'STRIKE BOWL':[11,23.5]});
+Object.assign(HRS,{'VILLAGE MOTORS':[9,18],"JOE'S GARAGE":[8,17.5],'STRIKE BOWL':[9,23.5]});
 TH['VILLAGE MOTORS']={wall:0xf4f4f8,fl:'tile',cnt:0x20242c,top:0x888890,sh:0x2a3a5a};
 TH["JOE'S GARAGE"]={wall:0xc4c2ba,fl:'stone',cnt:0x6a2a1a,top:0x9a9a9a,sh:0x2a4a8a};
 TH['STRIKE BOWL']={wall:0x5a4a7a,fl:'wood',cnt:0x2a1a4a,top:0xffd040,sh:0x8a2a8a};
