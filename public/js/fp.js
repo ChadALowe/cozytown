@@ -43,7 +43,7 @@ const CK=[
 ];
 
 // image-based cockpit (made from supplied artwork) for cars that have it
-const IMG={0:{dash:'assets/c1-dash.webp',wheel:'assets/c1-wheel.webp',W:1376,H:768,wc:[880,545],wd:260,
+const IMG={0:{dash:'assets/c1-dash.webp',wheel:'assets/c1-wheel.webp',W:1376,H:768,wc:[880,585],wd:350,ly:545,
  dials:[{k:'spd',c:[865,368],len:52,th:3.6,a0:154,sw:229,mx:150},{k:'rpm',c:[1065,384],len:21,th:2.6,a0:158,sw:210}]}};
 let imgBox=null,imgNeedles=null;
 function buildImg(i){const c=IMG[i];ckI=i;
@@ -52,7 +52,7 @@ function buildImg(i){const c=IMG[i];ckI=i;
  h+=`<img id="fpWheel" src="${c.wheel}" style="position:absolute;left:${c.wc[0]-c.wd/2}px;top:${c.wc[1]-c.wd/2}px;width:${c.wd}px;height:${c.wd}px">`;
  dash.innerHTML=h+'</div>';wheel=dash.querySelector('#fpWheel');imgBox=dash.querySelector('#fpBox');needles=null;
  imgNeedles=[...dash.querySelectorAll('.fn')].map((e,n)=>[c.dials[n],e])}
-function fitImg(){if(!imgBox)return;const c=IMG[ckI];if(!c)return;const W=innerWidth,H=innerHeight,s=.37*H/(c.wc[1]-265),tx=(W-c.W*s)/2,ty=.95*H-c.wc[1]*s;
+function fitImg(){if(!imgBox)return;const c=IMG[ckI];if(!c)return;const W=innerWidth,H=innerHeight,s=.37*H/(c.ly-265),tx=(W-c.W*s)/2,ty=.95*H-c.ly*s;
  imgBox.style.transform=`translate(${tx}px,${ty}px) scale(${s})`;
  let L=dash.querySelector('#fpL'),R=dash.querySelector('#fpR');
  if(!L){dash.insertAdjacentHTML('afterbegin','<div id="fpL" style="position:absolute;left:0;background:#131313"></div><div id="fpR" style="position:absolute;right:0;background:#171717"></div>');L=dash.querySelector('#fpL');R=dash.querySelector('#fpR')}
