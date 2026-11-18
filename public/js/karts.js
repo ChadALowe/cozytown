@@ -72,7 +72,8 @@ scene.add(B.mesh(mRoad));scene.add(B2.mesh(mObj));
 
 /* ---------- kart model ---------- */
 const kmc={};function km(hex){if(kmc[hex])return kmc[hex];const c=new THREE.Color(hex),m=wmat([c.r,c.g,c.b],{vertexColors:false});m.color.copy(c);return kmc[hex]=m}
-function mkKart(col,hcol,num){const g=new THREE.Group();
+const KPM=hmat(null,1);
+function mkKart(col,hcol,num,seed,helm){const g=new THREE.Group();
  const bx=(w,h,d,x,y,z,m,rx)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);q.position.set(x,y,z);if(rx)q.rotation.x=rx;g.add(q);return q};
  const body=km(col),dark=km(0x1c1c20),grey=km(0x80808a),white=km(0xf2f2f2),chrome=km(0xc8ccd4),suit=km(hcol),black=km(0x0c0c0e),glove=km(0x2a2a30);
  const tn=txtTex(64,64,'#f4f4f4','#111',String(num||1),44),nm=new THREE.MeshBasicMaterial({map:tn,side:THREE.DoubleSide});
@@ -86,7 +87,7 @@ function mkKart(col,hcol,num){const g=new THREE.Group();
  // side pods with stripes and number plates
  for(const sx of[-1,1]){bx(.22,.3,1.3,sx*.58,.42,-.05,body);bx(.22,.14,.5,sx*.58,.36,.7,body);bx(.05,.04,1.1,sx*.58,.59,-.05,white);plate(.28,.28,sx*.7,.45,.0,sx*Math.PI/2)}
  // seat, back rest, rear plate
- bx(.62,.08,.5,0,.34,-.1,dark);bx(.74,.5,.14,0,.62,-.42,dark,-.18);bx(.5,.18,.1,0,.9,-.5,dark);plate(.3,.3,0,.72,-.5,Math.PI,0);
+ bx(.62,.08,.5,0,.34,-.1,dark);bx(.74,.36,.14,0,.52,-.44,dark,-.18);bx(.4,.12,.1,0,.74,-.5,dark);plate(.26,.26,0,.6,-.52,Math.PI,0);
  // engine, air filter, exhaust, brake light
  bx(.56,.34,.44,0,.52,-.9,grey);bx(.4,.18,.3,0,.74,-.9,dark);
  {const f=new THREE.Mesh(new THREE.CylinderGeometry(.13,.13,.1,8),chrome);f.position.set(-.1,.88,-.88);g.add(f)}
@@ -97,21 +98,24 @@ function mkKart(col,hcol,num){const g=new THREE.Group();
  bx(.5,.1,.14,0,.55,.52,body);
  // wheels (front pivots steer; all spin)
  g.userData.fw=[];g.userData.wh=[];
- for(const[sx,sz,r,w]of[[-1,1,.22,.2],[1,1,.22,.2],[-1,-1,.26,.3],[1,-1,.26,.3]]){const p=new THREE.Group();p.position.set(sx*(sz>0?.58:.64),r,sz*(sz>0?.78:-.72));
+ for(const[sx,sz,r,w]of[[-1,1,.22,.2],[1,1,.22,.2],[-1,-1,.26,.3],[1,-1,.26,.3]]){const p=new THREE.Group();p.position.set(sx*(sz>0?.58:.64),r,(sz>0?.78:-.72));
   const t=new THREE.Mesh(new THREE.CylinderGeometry(r,r,w,12).rotateZ(Math.PI/2),dark);p.add(t);
   const h=new THREE.Mesh(new THREE.CylinderGeometry(r*.55,r*.55,w+.03,8).rotateZ(Math.PI/2),chrome);t.add(h);
   const n=new THREE.Mesh(new THREE.BoxGeometry(w+.05,.05,r*.8),white);n.position.y=r*.28;t.add(n);
   g.add(p);g.userData.wh.push(t);if(sz>0)g.userData.fw.push(p)}
- // driver
- bx(.44,.52,.28,0,.86,-.18,suit,-.12);bx(.5,.12,.3,0,1.08,-.2,suit);
- for(const sx of[-1,1]){bx(.1,.1,.46,sx*.27,.9,.1,suit,.55);bx(.1,.1,.12,sx*.18,.84,.3,glove);bx(.14,.12,.5,sx*.13,.45,.3,suit);bx(.13,.1,.22,sx*.13,.4,.62,black)}
- {const hl=new THREE.Mesh(new THREE.SphereGeometry(.22,10,8),km(hcol===0xffd820?0xe03030:0xf4f4f4));hl.position.set(0,1.32,-.14);g.add(hl);
-  bx(.32,.1,.12,0,1.3,.04,black);bx(.05,.03,.34,0,1.53,-.14,white)}
+ // driver: the same person model the villagers use, seated in a racing suit with a helmet
+ {const rgb=h=>[(h>>16&255)/255,(h>>8&255)/255,(h&255)/255],suitC=rgb(hcol),sp=pSpec(seed||1,{ts:1,tc:suitC,bc:suitC.map(v=>v*.8),scarf:null,gl:false,bag:0,bp:false,old:false,hs:0});
+  const pv=new THREE.Group(),sc=sp.h*.82;pv.position.set(0,.5,-.16);pv.rotation.x=-.12;g.add(pv);
+  const pm=mkPerson(sp,KPM,pv);pm.position.y=-.92*sc;pm.scale.setScalar(sc);
+  pm.l1.rotation.x=pm.l2.rotation.x=-1.38;pm.a1.rotation.x=pm.a2.rotation.x=-1.25;
+  const hm=new THREE.Mesh(new THREE.SphereGeometry(.14,10,8),km(helm||0xd02020));hm.position.set(0,1.72,0);hm.scale.set(1,1.04,1.08);pm.add(hm);
+  const vz=new THREE.Mesh(new THREE.BoxGeometry(.18,.055,.08),black);vz.position.set(0,1.72,.125);pm.add(vz);
+  const hs=new THREE.Mesh(new THREE.BoxGeometry(.03,.02,.27),white);hs.position.set(0,1.865,0);pm.add(hs)}
  const sh=new THREE.Mesh(new THREE.CircleGeometry(1,16).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.28}));sh.scale.set(.95,1,1.3);sh.position.y=.03;g.add(sh);
  return g}
-const kartM=mkKart(0xd02828,0xffd820,7);kartM.visible=false;scene.add(kartM);
-const AICOL=[[0x2860d8,0xf4f4f4,'BLUEBELL',23],[0x28a848,0xff9020,'MOSS',5],[0x9030c8,0x20d0e0,'PLUM',88]];
-for(const[i,y]of[[0,-20.5],[1,-26.5]]){const k=mkKart(i?0xffd820:0x2860d8,i?0xd02828:0xf4f4f4,i?42:11);k.position.set(-107.5,G0+.08,y);k.rotation.y=Math.PI/2;scene.add(k)}
+const kartM=mkKart(0xd02828,0xffd820,7,41,0xd02020);kartM.visible=false;scene.add(kartM);
+const AICOL=[[0x2860d8,0xf4f4f4,'BLUEBELL',23,7,0x2860d8],[0x28a848,0xff9020,'MOSS',5,19,0x1a1a1e],[0x9030c8,0x20d0e0,'PLUM',88,33,0xf4f4f4]];
+for(const[i,y]of[[0,-20.5],[1,-26.5]]){const k=mkKart(i?0xffd820:0x2860d8,i?0xd02828:0xf4f4f4,i?42:11,i?12:3,i?0x1a1a1e:0xf4f4f4);k.position.set(-107.5,G0+.08,y);k.rotation.y=Math.PI/2;scene.add(k)}
 
 /* ---------- minimap ---------- */
 {const x=mb.getContext('2d');x.strokeStyle='#6a6a72';x.lineWidth=1.8;x.lineJoin='round';x.beginPath();S.forEach((s,i)=>i?x.lineTo(mx(s.x),mz(s.z)):x.moveTo(mx(s.x),mz(s.z)));x.closePath();x.stroke();
@@ -144,7 +148,7 @@ function kartStart(){
   KT.idx=((Math.round(ps[0]/SP)%N)+N)%N;KT.tot=Math.round(ps[0]/SP);
   camAng=GS.psi;
   MAXV=22;ACCM=2.2;GRIPM=1.7;
-  let a=0;KT.ai=[];SLOTS.forEach((sl,i)=>{if(i===PSLOT)return;const c=AICOL[a],m=mkKart(c[0],c[1],c[3]);m.visible=true;scene.add(m);KT.ai.push({m,s:sl[0],lat:sl[1],v:0,skill:[1.02,.98,.94][a],name:c[2]});a++});
+  let a=0;KT.ai=[];SLOTS.forEach((sl,i)=>{if(i===PSLOT)return;const c=AICOL[a],m=mkKart(c[0],c[1],c[3],c[4],c[5]);m.visible=true;scene.add(m);KT.ai.push({m,s:sl[0],lat:sl[1],v:0,skill:[1.02,.98,.94][a],name:c[2]});a++});
   setLabels();toast('GET READY!');showBig('3',900);beep(440,.15,'square',.08);KT.lastN=3});
 }
 function kartEnd(){
