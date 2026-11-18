@@ -1,7 +1,8 @@
 /* ---- TUNING GARAGE: car selector, paint (incl. custom colour), performance parts, nitrous, underglow ---- */
 (function(){
-const TN={brk:0,trb:0,nos:0,tank:0,neon:{},nown:{},cust:null,custOn:0};window.TN=TN;
+const TN={brk:0,trb:0,nos:0,tank:0,neon:{},nown:{},cust:null,custOn:0,fin:{},fown:{},rim:{},rown:{}};window.TN=TN;
 try{const s=JSON.parse(localStorage.getItem('tune1')||'null');if(s)Object.assign(TN,s)}catch(e){}
+for(const k of['fin','fown','rim','rown','neon','nown'])if(!TN[k])TN[k]={};
 const save=()=>{try{localStorage.setItem('tune1',JSON.stringify(TN))}catch(e){}};
 const $q=(s,r)=>(r||document).querySelector(s);
 
@@ -40,6 +41,65 @@ addEventListener('keydown',e=>{if(e.key==='n'||e.key==='N')nosDown()});addEventL
   fx.style.opacity=(NOS.on&&NOS.ch>0&&TN.nos&&!GS.onFoot)?1:0}}
 // saved custom colour comes back after a reload
 {let t=0;const w=setInterval(()=>{if(window.READY===true||++t>200){clearInterval(w);if(TN.custOn&&TN.cust){paintC=TN.cust;applyPaint()}neonNow()}},100)}
+
+
+/* ======== paint finishes (colour grading on top of the car's tint) ======== */
+const FINS=['GLOSS','MATTE','CANDY','PEARL'];let finPrev=null;
+const FIN=()=>finPrev!=null?finPrev:(TN.fin[CARI]|0);
+function finRGB(c,f){const l=.3*c[0]+.59*c[1]+.11*c[2],cl=v=>Math.max(0,Math.min(1,v));
+ if(f===1)return c.map(v=>cl((v+(l-v)*.4)*.82));
+ if(f===2)return c.map(v=>cl((l+(v-l)*1.5)*.86));
+ if(f===3)return[cl(c[0]*.7+.32),cl(c[1]*.7+.3),cl(c[2]*.7+.36)];
+ return c}
+{const ap=applyPaint;applyPaint=function(){const r=paintC;paintC=finRGB(r,FIN());try{ap()}finally{paintC=r}}}
+
+/* ======== wheels: rim overlays, rim size, ride height ======== */
+const RDES=['STOCK','5 SPOKE','6 SPOKE','MESH','TURBINE','SPLIT STAR','DEEP DISH'];
+const RCOL=[['SILVER','#c9ccd2'],['GUNMETAL','#454a55'],['BLACK','#17171b'],['GOLD','#d9ab2b'],['WHITE','#f2f2f2'],['RED','#d01a2e'],['BLUE','#2060d8'],['CHROME','#eaf6ff']];
+const RSZ=[.66,.78,.9],RSZN=['SMALL','MEDIUM','LARGE'],RHT=[-.07,-.035,0,.04],RHTN=['SLAMMED','LOW','STOCK','LIFTED'];
+const RDEF={d:0,c:0,s:1,h:2};let rp=null;
+const RIM=()=>rp||TN.rim[CARI]||RDEF;
+function drawRim(d,col,N){const c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d'),m=N/2,R=m-1;
+ x.fillStyle='#101014';x.beginPath();x.arc(m,m,R,0,7);x.fill();
+ x.fillStyle=col;x.strokeStyle=col;x.lineCap='round';
+ const ring=(r,w)=>{x.lineWidth=w;x.beginPath();x.arc(m,m,r,0,7);x.stroke()};
+ const spokes=(n,w0,w1,twist)=>{for(let i=0;i<n;i++){x.save();x.translate(m,m);x.rotate(i*6.2832/n);x.beginPath();x.moveTo(-w0*N,0);x.lineTo(-w1*N,R*.86);x.lineTo(w1*N,R*.86+(twist||0));x.lineTo(w0*N,0);x.fill();x.restore()}};
+ if(d===1){spokes(5,.05,.085);ring(R*.93,N*.06)}
+ else if(d===2){spokes(6,.025,.04);ring(R*.93,N*.05)}
+ else if(d===3){x.lineWidth=Math.max(1,N*.025);for(let r=.3;r<.9;r+=.2)ring(R*r,x.lineWidth);for(let i=0;i<14;i++){x.save();x.translate(m,m);x.rotate(i*6.2832/14);x.beginPath();x.moveTo(0,R*.12);x.lineTo(0,R*.9);x.stroke();x.restore()}ring(R*.93,N*.07)}
+ else if(d===4){for(let i=0;i<12;i++){x.save();x.translate(m,m);x.rotate(i*6.2832/12);x.beginPath();x.moveTo(-N*.02,R*.1);x.quadraticCurveTo(R*.5,R*.45,R*.18,R*.9);x.lineTo(R*.3,R*.9);x.quadraticCurveTo(R*.75,R*.45,N*.03,R*.1);x.fill();x.restore()}ring(R*.93,N*.06)}
+ else if(d===5){for(let i=0;i<10;i++){const a=i*6.2832/10;for(const o of[-.13,.13]){x.save();x.translate(m,m);x.rotate(a+o);x.beginPath();x.moveTo(-N*.02,0);x.lineTo(-N*.035,R*.88);x.lineTo(N*.035,R*.88);x.lineTo(N*.02,0);x.fill();x.restore()}}ring(R*.93,N*.05)}
+ else if(d===6){x.beginPath();x.arc(m,m,R*.9,0,7);x.fill();x.fillStyle='rgba(0,0,0,.35)';for(const r of[.7,.45]){x.beginPath();x.arc(m,m,R*r,0,7);x.lineWidth=N*.035;x.strokeStyle='rgba(0,0,0,.35)';x.stroke()}x.fillStyle='#101014';for(let i=0;i<5;i++){const a=i*6.2832/5;x.beginPath();x.arc(m+Math.cos(a)*R*.3,m+Math.sin(a)*R*.3,N*.04,0,7);x.fill()}}
+ x.fillStyle=col;x.beginPath();x.arc(m,m,R*.17,0,7);x.fill();x.fillStyle='#101014';x.beginPath();x.arc(m,m,R*.07,0,7);x.fill();
+ if(col==='#eaf6ff'){const g=x.createLinearGradient(0,0,N,N);g.addColorStop(0,'rgba(255,255,255,.55)');g.addColorStop(.5,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(80,110,160,.4)');x.globalCompositeOperation='source-atop';x.fillStyle=g;x.fillRect(0,0,N,N)}
+ return c}
+const rmats={};
+function rimMat(d,c){const k=d+':'+c;if(!rmats[k]){const t=new THREE.CanvasTexture(drawRim(d,RCOL[c][1],64));t.magFilter=t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;const m=new THREE.MeshBasicMaterial({map:t,alphaTest:.5,transparent:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2});rmats[k]=m}return rmats[k]}
+const RT={}; // per car: {kids:[{g,y0}], wheels:[{piv,y0,hold,ov,sx,xo,R,c1}], grp}
+function rimTargets(i){
+ if(RT[i]&&RT[i].w.length)return RT[i];
+ const o={w:[],kids:[],grp:null};
+ if(i===0){for(const w of wheels)o.w.push({piv:w,y0:w.position.y,hold:w,sx:w.position.x>0?1:-1,xo:.086,R:.28,c1:1});
+  for(const k of c1Kids)if(!wheels.includes(k))o.kids.push({g:k,y0:k.position.y})}
+ else{const g=i===1?fies:i===2?van:i===3?lrv:(window.NC&&NC.cars[i]&&NC.cars[i].grp);if(!g)return o;o.grp={g,y0:g.position.y};
+  g.traverse(m=>{if(m.isMesh&&m.geometry.type==='CylinderGeometry'){const sp=m.parent;let dx=0;for(const s of sp.children)if(s.geometry&&s.geometry.type==='CircleGeometry'){s.geometry.computeBoundingBox();dx=s.geometry.boundingBox.max.x||s.geometry.boundingBox.min.x}
+   if(!dx)return;const piv=sp.parent;o.w.push({piv,y0:piv.position.y,hold:sp,sx:dx>0?1:-1,xo:Math.abs(dx)+.004,R:m.geometry.parameters.radiusTop,c1:0})}})}
+ RT[i]=o;return o}
+let rimRetry=0;
+function rimsApply(){const o=rimTargets(CARI),r=RIM(),dy=RHT[r.h]||0;
+ if(!o.w.length){if(CARI>=4&&rimRetry++<8)setTimeout(rimsApply,1200);return}
+ rimRetry=0;
+ if(o.grp)o.grp.g.position.y=o.grp.y0+dy;for(const k of o.kids)k.g.position.y=k.y0+dy;
+ for(const w of o.w){w.piv.position.y=w.c1?w.y0:w.y0-dy;
+  if(!w.ov){const g=new THREE.CircleGeometry(w.R,20);g.rotateY(w.sx>0?Math.PI/2:-Math.PI/2);g.translate(w.sx*w.xo,0,0);w.ov=new THREE.Mesh(g,rimMat(1,0));w.ov.frustumCulled=false;w.hold.add(w.ov)}
+  w.ov.visible=r.d>0;if(r.d>0){w.ov.material=rimMat(r.d,r.c);const f=RSZ[r.s];w.ov.scale.set(1,f,f)}}}
+
+
+{const uc=updCozy;updCozy=function(dt){uc(dt);
+  const l=U.uLight.value;for(const k in rmats)rmats[k].color.setRGB(l.x,l.y,l.z);
+  if(CARI===0&&RT[0])for(const w of RT[0].w)if(w.ov)w.ov.rotation.x=-GS_SPIN}}
+{const s0=setCar;setCar=function(i){s0(i);rimsApply()}}
+setTimeout(rimsApply,800);setTimeout(rimsApply,7000);
 
 /* ======== tuning screen ======== */
 const css=document.createElement('style');css.textContent=`
@@ -82,7 +142,7 @@ const css=document.createElement('style');css.textContent=`
 @media (max-height:420px) and (min-aspect-ratio:1/1){.tnGrid{grid-template-columns:repeat(5,1fr)}#tnPanel{width:min(48vw,500px)}.tnRow{padding:6px 8px;margin-bottom:4px}#tnBuy{padding:9px 12px}#tnName{top:46px}}
 `;document.head.appendChild(css);
 const root=document.createElement('div');root.id='tn';document.body.appendChild(root);
-const TABS=[['cars','CARS'],['paint','PAINT'],['perf','PERFORMANCE'],['neon','UNDERGLOW'],['wheels','WHEELS',1],['body','BODY KITS',1],['vinyl','VINYLS',1]];
+const TABS=[['cars','CARS'],['paint','PAINT'],['perf','PERFORMANCE'],['neon','UNDERGLOW'],['wheels','WHEELS'],['body','BODY KITS',1],['vinyl','VINYLS',1]];
 const PERF=[
  {k:'eng',n:'ENGINE',d:['STOCK','STAGE 1','STAGE 2','STAGE 3'],p:()=>ENGP,max:3,get:()=>ENG,set:v=>{ENG=v}},
  {k:'trb',n:'TURBO',d:['NONE','STAGE 1','STAGE 2','STAGE 3'],p:()=>[90,160,260],max:3,get:()=>TN.trb|0,set:v=>{TN.trb=v}},
@@ -124,19 +184,27 @@ function carBtn(){const i=CARI,own=OWN.car[i],cur=i===S.commit.car;
 /* ---- tab: paint ---- */
 const pName=i=>(CARI===3&&!i?'STOCK GREEN':CARI>=4&&!i?'STOCK SILVER':PN[i]);
 function hsl(h,s,l){const a=s*Math.min(l,1-l),f=n=>{const k=(n+h*12)%12;return l-a*Math.max(-1,Math.min(k-3,9-k,1))};return[f(0),f(8),f(4)]}
-function tabPaint(){const B=$q('#tnBody');B.innerHTML='<div class="tnH">COLOURS · £'+PAINTP+' EACH, FREE ONCE OWNED</div><div class="tnGrid"></div><div class="tnH">CUSTOM MIX · £15</div><div id="tnCu"></div>';
+function tabPaint(){const B=$q('#tnBody');B.innerHTML='<div class="tnH">COLOURS · £'+PAINTP+' EACH, FREE ONCE OWNED</div><div class="tnGrid"></div><div class="tnH">CUSTOM MIX · £15</div><div id="tnCu"></div><div class="tnH">FINISH · £30 EACH, FREE ONCE OWNED</div><div class="tnGrid" id="tnFin"></div>';
  const g=B.querySelector('.tnGrid');
  PCOL.forEach((c,i)=>{const d=document.createElement('div'),cur=S.commit.paint===c[1],sel=paintC===c[1];d.className='tnSw'+(sel?' sel':'')+(cur?' cur':'');d.style.background=c[0];d.innerHTML=(OWN.paint[i]?'':'<span class="p">£'+PAINTP+'</span>')+pName(i).replace('STOCK ','');
   d.onclick=()=>{paintC=c[1];applyPaint();S.sel=i;tabPaint();paintBtn();gv(.9,1.3,6.4,30)};g.appendChild(d)});
  const cu=B.querySelector('#tnCu');cu.innerHTML=['HUE','SAT','LIGHT'].map((l,k)=>`<div class="tnSl"><span>${l}</span><input type="range" min="0" max="100" value="${Math.round(S.sl[k]*100)}" data-k="${k}"></div>`).join('');
  cu.querySelectorAll('input').forEach(inp=>{inp.oninput=()=>{S.sl[+inp.dataset.k]=inp.value/100;const c=hsl(S.sl[0],S.sl[1],.12+S.sl[2]*.76);paintC=c;applyPaint();S.sel='c';paintBtn()}});
+ const fg=B.querySelector('#tnFin');
+ FINS.forEach((n,i)=>{const d=document.createElement('div'),cur=(TN.fin[CARI]|0)===i,sel=FIN()===i,rgb=finRGB(paintC,i).map(v=>Math.round(v*255));d.className='tnSw'+(sel?' sel':'')+(cur?' cur':'');d.style.background='rgb('+rgb+')';d.style.gridColumn='span 1';
+  d.innerHTML=(i===0||TN.fown[CARI+':'+i]?'':'<span class="p">£30</span>')+n;d.onclick=()=>{finPrev=i;applyPaint();tabPaint();gv(.9,1.3,6.4,30)};fg.appendChild(d)});
  paintBtn()}
 function paintBtn(){
- const ix=PCOL.findIndex(c=>c[1]===paintC),same=paintC===S.commit.paint;
- if(ix>=0){const own=OWN.paint[ix];setMsg(pName(ix)+(own?' · OWNED':' · £'+PAINTP));
-  if(same)buyBtn('WEARING',null,1);else buyBtn(own?'PAINT IT':'BUY £'+PAINTP,()=>{if(!own&&!pay(PAINTP))return;OWN.paint[ix]=1;S.commit.paint=paintC;TN.custOn=0;save();setMsg('SPRAYED '+pName(ix));flash(1);tabPaint();head()},!own&&cash<PAINTP)}
- else{setMsg('CUSTOM MIX · £15');if(same)buyBtn('WEARING',null,1);else buyBtn('BUY £15',()=>{if(!pay(15))return;TN.cust=paintC;TN.custOn=1;S.commit.paint=paintC;save();setMsg('CUSTOM COLOUR SAVED');flash(1);tabPaint();head()},cash<15)}
- head()}
+ const ix=PCOL.findIndex(c=>c[1]===paintC),fin=FIN(),cf=TN.fin[CARI]|0,cc=paintC!==S.commit.paint,fc=fin!==cf;
+ let cost=0;if(cc)cost+=ix>=0?(OWN.paint[ix]?0:PAINTP):15;if(fc&&fin&&!TN.fown[CARI+':'+fin])cost+=30;
+ const nm=(ix>=0?pName(ix):'CUSTOM MIX')+' · '+FINS[fin];
+ head();
+ if(!cc&&!fc){setMsg(nm+' · ON YOUR CAR');buyBtn('WEARING',null,1);return}
+ setMsg(nm+(cost?' · £'+cost:' · OWNED'));
+ buyBtn(cost?'BUY £'+cost:'PAINT IT',()=>{if(cost&&!pay(cost))return;
+  if(cc){if(ix>=0){OWN.paint[ix]=1;TN.custOn=0}else{TN.cust=paintC;TN.custOn=1}S.commit.paint=paintC}
+  if(fc){TN.fin[CARI]=fin;if(fin)TN.fown[CARI+':'+fin]=1;finPrev=null}
+  save();setMsg('SPRAYED!');flash(1);tabPaint();head()},cash<cost)}
 
 /* ---- tab: performance ---- */
 function tabPerf(){const B=$q('#tnBody');B.innerHTML='';
@@ -151,6 +219,25 @@ function perfSel(init){const it=PERF[S.sel],lv=it.get(),nx=lv<it.max?it.p()[lv]:
  if(lv>=it.max){setMsg(it.n+' · MAXED OUT');buyBtn('MAXED',null,1);return}
  setMsg(it.n+' · '+it.d[lv+1]+' · £'+nx+(it.k==='nos'?' · BUTTON APPEARS WHILE DRIVING':''));
  buyBtn('BUY £'+nx,()=>{if(!pay(nx))return;it.set(lv+1);applyUpg();NOS.ch=nosCap();save();setMsg(it.n+' UPGRADED!');flash(1);tabPerf();perfSel()},cash<nx)}
+
+/* ---- tab: wheels ---- */
+const rimThumb={};const thumb=(d,c)=>{const k=d+':'+c;return rimThumb[k]||(rimThumb[k]=drawRim(d,RCOL[c][1],48).toDataURL())};
+function rimCost(){const r=RIM(),c=TN.rim[CARI]||RDEF;let t=0;if(r.d>0){if(r.d!==c.d&&!TN.rown['d'+r.d])t+=70;if(r.c!==c.c&&!TN.rown['c'+r.c]&&r.c)t+=10}if(r.s!==c.s||r.h!==c.h)t+=20;return t}
+function rimChanged(){const r=RIM(),c=TN.rim[CARI]||RDEF;return r.d!==c.d||r.c!==c.c||r.s!==c.s||r.h!==c.h}
+function rimSet(k,v){const r=Object.assign({},RIM());r[k]=v;rp=r;rimsApply();tabWheels(1)}
+function tabWheels(keep){const B=$q('#tnBody'),top=B.scrollTop,r=RIM(),c=TN.rim[CARI]||RDEF;
+ B.innerHTML='<div class="tnH">RIM DESIGN · £70, FREE ONCE OWNED</div><div class="tnGrid" id="rd"></div><div class="tnH">RIM COLOUR · £10, SILVER FREE</div><div class="tnGrid" id="rc"></div><div class="tnH">STANCE · £20 TO CHANGE</div><div id="rs"></div>';
+ const gd=B.querySelector('#rd'),gc=B.querySelector('#rc');
+ RDES.forEach((n,i)=>{const d=document.createElement('div');d.className='tnSw'+(r.d===i?' sel':'')+(c.d===i?' cur':'');d.style.background=i?'#0c1020 url('+thumb(i,r.c)+') center/78% no-repeat':'#101830';d.style.imageRendering='pixelated';d.innerHTML=(i&&!TN.rown['d'+i]?'<span class="p">£70</span>':'')+n.replace('SPLIT ','');d.onclick=()=>rimSet('d',i);gd.appendChild(d)});
+ RCOL.forEach((n,i)=>{const d=document.createElement('div');d.className='tnSw'+(r.c===i?' sel':'')+(c.c===i?' cur':'');d.style.background=n[1];d.style.color=['#f2f2f2','#eaf6ff','#c9ccd2','#d9ab2b'].includes(n[1])?'#000':'#fff';d.style.textShadow='none';d.innerHTML=(i&&!TN.rown['c'+i]?'<span class="p" style="color:#a50">£10</span>':'')+n[0];d.onclick=()=>rimSet('c',i);gc.appendChild(d)});
+ B.querySelector('#rs').innerHTML=`<div class="tnSl"><span style="width:62px">SIZE</span><input type="range" min="0" max="2" step="1" value="${r.s}" id="rsS"><b style="width:62px;color:#fff">${RSZN[r.s]}</b></div><div class="tnSl"><span style="width:62px">HEIGHT</span><input type="range" min="0" max="3" step="1" value="${r.h}" id="rsH"><b style="width:62px;color:#fff">${RHTN[r.h]}</b></div>`;
+ B.querySelector('#rsS').onchange=e=>rimSet('s',+e.target.value);B.querySelector('#rsH').onchange=e=>rimSet('h',+e.target.value);
+ B.querySelector('#rsS').oninput=e=>{rp=Object.assign({},RIM(),{s:+e.target.value});rimsApply()};B.querySelector('#rsH').oninput=e=>{rp=Object.assign({},RIM(),{h:+e.target.value});rimsApply()};
+ if(keep)B.scrollTop=top;wheelsBtn()}
+function wheelsBtn(){const r=RIM(),cost=rimCost();head();
+ if(!rimChanged()){setMsg((r.d?RDES[r.d]+' · '+RCOL[r.c][0]+' · ':'STOCK WHEELS · ')+RSZN[r.s]+' · '+RHTN[r.h]);buyBtn('FITTED',null,1);return}
+ setMsg((r.d?RDES[r.d]+' · '+RCOL[r.c][0]:'STOCK WHEELS')+' · '+RSZN[r.s]+' · '+RHTN[r.h]+(cost?' · £'+cost:''));
+ buyBtn(cost?'BUY £'+cost:'FIT IT',()=>{if(cost&&!pay(cost))return;if(r.d)TN.rown['d'+r.d]=1;if(r.d&&r.c)TN.rown['c'+r.c]=1;TN.rim[CARI]=Object.assign({},r);rp=null;save();setMsg('WHEELS FITTED!');flash(1);tabWheels(1);head()},cash<cost)}
 
 /* ---- tab: underglow ---- */
 function tabNeon(){const B=$q('#tnBody');B.innerHTML='<div class="tnH">UNDERGLOW · £45 PER COLOUR, FREE ONCE OWNED</div><div class="tnGrid"></div>';
@@ -171,12 +258,13 @@ const VIEWS={'34':[.62,1.5,6.6,30],front:[0,.9,7.5,28],side:[1.5708,.9,8,28],rea
 function tabs(){const T=$q('#tnTabs');T.innerHTML='';for(const[k,l,soon]of TABS){const b=document.createElement('div');b.className='t pe'+(S.tab===k?' on':'')+(soon?' soon':'');b.textContent=l;b.onclick=()=>go(k);T.appendChild(b)}}
 function go(k){
  // leaving a tab: drop any un-bought preview
- if(S.tab==='paint'&&paintC!==S.commit.paint&&k!=='paint'){paintC=S.commit.paint;applyPaint()}
+ if(S.tab==='paint'&&k!=='paint'){paintC=S.commit.paint;finPrev=null;applyPaint()}
+ if(S.tab==='wheels'&&k!=='wheels'){rp=null;rimsApply()}
  if(S.tab==='neon'&&k!=='neon'){neonPrev=null;neonNow()}
  S.tab=k;S.msg='';tabs();$q('#tnBody').scrollTop=0;
  GAL.lt=k==='neon'?'NIGHT':'STUDIO';GAL.spin=k==='cars'?1:0;
- if(k==='cars')gv(...VIEWS['34']);else if(k==='paint')gv(.9,1.3,6.4,30);else if(k==='perf')gv(.2,.9,6.8,28);else if(k==='neon')gv(.5,.25,5.5,40);
- ({cars:tabCars,paint:tabPaint,perf:()=>{S.sel=0;tabPerf()},neon:tabNeon}[k]||(()=>tabSoon((TABS.find(t=>t[0]===k)||[])[1])))();
+ if(k==='cars')gv(...VIEWS['34']);else if(k==='paint')gv(.9,1.3,6.4,30);else if(k==='perf')gv(.2,.9,6.8,28);else if(k==='neon')gv(.5,.25,5.5,40);else if(k==='wheels')gv(1.25,.35,5.2,34);
+ ({cars:tabCars,paint:tabPaint,perf:()=>{S.sel=0;tabPerf()},neon:tabNeon,wheels:tabWheels}[k]||(()=>tabSoon((TABS.find(t=>t[0]===k)||[])[1])))();
  if(k==='cars'||k==='paint'||k==='neon')head()}
 function build(){
  root.innerHTML=`<div id="tnBack" class="tnPill pe">◀ BACK</div><div id="tnCash"></div><div id="tnName"></div><div id="tnStats"></div>
@@ -196,7 +284,7 @@ function openTune(tab){
 function closeTune(){
  if(!on)return;on=0;
  // undo anything previewed but not bought
- if(paintC!==S.commit.paint){paintC=S.commit.paint;applyPaint()}
+ paintC=S.commit.paint;finPrev=null;rp=null;applyPaint();
  neonPrev=null;GAL.sv.car=S.commit.car;GAL.sv.paint=S.commit.paint;
  root.style.display='none';galUI.classList.remove('tuning');save();
  closeGallery();neonNow();
