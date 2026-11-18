@@ -98,7 +98,7 @@ function bootP(){return[GS.x-Math.sin(GS.psi)*2.3,GS.z-Math.cos(GS.psi)*2.3]}
 const CYC=1.5;let lastIdle=0;
 function updDepot(dt){
  const want=!!PJ.acc&&!JOB.on;
- BBEAM.visible=want&&!PJ.load;DBEAM.forEach((g,i)=>{if(DEPOTS[i]===DEP)g.visible=!JOB.on&&!want});
+ BBEAM.visible=want&&!PJ.load;DBEAM.forEach(g=>g.visible=false);
  let moving=0,carry=0,wx=50.8,wz=15.6,fx=BAY.x,fz=BAY.z;
  if(want){
   if(inBay()){
