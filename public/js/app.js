@@ -2827,7 +2827,7 @@ function bkTvDraw(tv){const st=bkSt(tv.c,bkNow()),g=tv.g,w=tv.cv.width,h=tv.cv.h
 var BKTV=null,BKTT=0;
 const BKTVX=[-4.3,4.3,0];
 function buildBets(o){IA.splice(0,IA.length,LEAVE_IA());IROOM.splice(0,IROOM.length,[-9,9,-4.2,-2.9],[5.4,6.5,-1.6,1.6],[-6.4,-5.0,1.1,1.8]);
- BKTV=[0,1,2].map(c=>{const big=c===2,tw=big?2.3:1.7,th=big?1.3:.96,x=BKTVX[c],y=big?.85:1.0,f=big?cvT(768,432):cvT(512,288),g=f.cv.getContext('2d');
+ BKTV=[0,1,2].map(c=>{const big=c===2,tw=big?2.3:1.7,th=big?1.3:.96,x=BKTVX[c],y=big?.85:1.0,f=big?cvT(768,432):cvT(640,360),g=f.cv.getContext('2d');
   gbox(SG,x,y-.06,-RZ+.04,tw+.12,th+.12,.06,0x111114);const m=new THREE.Mesh(new THREE.PlaneGeometry(tw,th),new THREE.MeshBasicMaterial({map:f.tx,fog:false}));m.position.set(x,y+th/2-.06+.06,-RZ+.08);SG.add(m);
   sPlane(1.5,.26,x,y-.28,-RZ+.04,0,txtTex(256,44,'#20242c','#ffe040',BK.CH[c].k==='FOOTBALL'?'LIVE FOOTBALL':BK.CH[c].k==='HORSES'?'HORSE RACING':'GREYHOUND RACING',24));return{c,cv:f.cv,g,tx:f.tx,mesh:m,tw,th,x,y}});
  BKTV.forEach(bkTvDraw);
