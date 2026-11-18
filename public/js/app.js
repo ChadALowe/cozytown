@@ -1638,7 +1638,7 @@ function ccol(x,z,r){COL.push([x,z,r]);FC.push([x,z,r])}
  for(let i=0;i<3;i++)pbox(B,tx-.6+i*.6,FGY+.9,tz,.4,.3,.4,[.85,.85,.9]);ccol(tx,tz,1.2);
  // fences: paddock x -170..-138, z 145..205 (gap at yard side east)
  const post=(x,z)=>pbox(B,x,FGY,z,.13,1.15,.13,[.5,.36,.2]),rail=(x,z,l,ry)=>{boxR(B,x,z,0,FGY+.45,0,l,.08,.06,[.55,.42,.25],ry);boxR(B,x,z,0,FGY+.85,0,l,.08,.06,[.55,.42,.25],ry)};
- const fence=(x0,z0,x1,z1)=>{const L=Math.hypot(x1-x0,z1-z0),n=Math.ceil(L/3),ang=Math.atan2(x1-x0,z1-z0);for(let i=0;i<=n;i++)post(x0+(x1-x0)*i/n,z0+(z1-z0)*i/n);for(let i=0;i<n;i++){const mx=x0+(x1-x0)*(i+.5)/n,mz=z0+(z1-z0)*(i+.5)/n;const q=Math.hypot(x1-x0,z1-z0)/n;pbox(B,mx,FGY+.4,mz,Math.abs(Math.cos(ang))*q+.06,.08,Math.abs(Math.sin(ang))*q+.06,[.55,.42,.25]);pbox(B,mx,FGY+.8,mz,Math.abs(Math.cos(ang))*q+.06,.08,Math.abs(Math.sin(ang))*q+.06,[.55,.42,.25])}};
+ const fence=(x0,z0,x1,z1)=>{const L=Math.hypot(x1-x0,z1-z0),n=Math.ceil(L/3),ang=Math.atan2(x1-x0,z1-z0);for(let i=0;i<=n;i++)post(x0+(x1-x0)*i/n,z0+(z1-z0)*i/n);for(let i=0;i<n;i++){const mx=x0+(x1-x0)*(i+.5)/n,mz=z0+(z1-z0)*(i+.5)/n;const q=Math.hypot(x1-x0,z1-z0)/n;pbox(B,mx,FGY+.4,mz,Math.abs(Math.sin(ang))*q+.06,.08,Math.abs(Math.cos(ang))*q+.06,[.55,.42,.25]);pbox(B,mx,FGY+.8,mz,Math.abs(Math.sin(ang))*q+.06,.08,Math.abs(Math.cos(ang))*q+.06,[.55,.42,.25])}};
  fence(-170,145,-138,145);fence(-170,205,-138,205);fence(-170,145,-170,205);fence(-138,145,-138,160);fence(-138,172,-138,205);
  // crop field south of yard
  for(let i=0;i<14;i++){const z=198+i*2.4,c=i%2?[.3,.22,.14]:[.34,.55,.16];pbox(B,-102,FGY,z,64,.18,1.4,i%2?[.28,.2,.12]:[.3,.55,.2])}
