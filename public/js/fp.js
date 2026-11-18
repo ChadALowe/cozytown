@@ -3,8 +3,8 @@
 CAMS.push({d:0,h:1.2,f:76,fp:1});
 const FPI=CAMS.length-1,HGT=[1.12,1.08,1.5,1.45,.92,1.2],SEAT=-.34;
 const dash=document.createElement('div');
-dash.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:1;display:none;overflow:hidden';
-document.body.appendChild(dash);
+dash.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:0;display:none;overflow:hidden';
+{const h=document.getElementById('hud');h?h.parentNode.insertBefore(dash,h):document.body.appendChild(dash)}
 // helpers for drawing dash detail in screen-% coordinates
 const R=(x,y,w,h,bg,rad,ex)=>`<div style="position:absolute;left:${x}%;top:${y}%;width:${w}%;height:${h}%;background:${bg};border-radius:${rad||0};${ex||''}"></div>`;
 const DL=(x,y,d,k,face,tick,red)=>`<div class="fd" data-k="${k}" style="position:absolute;left:${x}%;top:${y}%;width:${d}vmin;height:${d}vmin;margin:-${d/2}vmin 0 0 -${d/2}vmin;border-radius:50%;background:radial-gradient(circle,${face} 0 66%,transparent 67%),repeating-conic-gradient(from -2deg,${tick} 0 1.4deg,transparent 1.4deg 13deg),${face};box-shadow:0 0 0 .5vmin #050505,inset 0 0 1.2vmin #000">${red?`<div style="position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 130deg,transparent 0 215deg,#c8281c 215deg 255deg,transparent 255deg);-webkit-mask:radial-gradient(circle,transparent 0 76%,#000 77% 86%,transparent 87%);mask:radial-gradient(circle,transparent 0 76%,#000 77% 86%,transparent 87%)"></div>`:''}<i style="position:absolute;left:50%;top:50%;width:44%;height:.45vmin;margin-top:-.22vmin;background:#e8431f;transform-origin:0 50%;transform:rotate(130deg);box-shadow:0 0 .5vmin #000"></i><b style="position:absolute;left:50%;top:50%;width:18%;height:18%;margin:-9% 0 0 -9%;border-radius:50%;background:#222"></b></div>`;
