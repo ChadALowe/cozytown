@@ -16,10 +16,11 @@ function build(cfg){
  NC.cars[cfg.id]=S;
  let rd=0;
  const loaded=()=>{if(++rd<2)return;tex.needsUpdate=true;
-  const c=document.createElement('canvas');c.width=IW;c.height=IH;const x=c.getContext('2d');
-  x.drawImage(img,0,0);S.orig=x.getImageData(0,0,IW,IH).data;
-  x.clearRect(0,0,IW,IH);x.drawImage(mImg,0,0);const md=x.getImageData(0,0,IW,IH).data;
-  const n=IW*IH,o=S.orig;S.mask=new Uint8Array(n);S.lum=new Float32Array(n);
+  const W=S.W=img.naturalWidth||IW,H=S.H=img.naturalHeight||IH; // textures may be smaller than the CAL (original) size; UVs stay normalised
+  const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.drawImage(img,0,0,W,H);S.orig=x.getImageData(0,0,W,H).data;
+  x.clearRect(0,0,W,H);x.drawImage(mImg,0,0,W,H);const md=x.getImageData(0,0,W,H).data;
+  const n=W*H,o=S.orig;S.mask=new Uint8Array(n);S.lum=new Float32Array(n);
   for(let i=0;i<n;i++){S.mask[i]=md[i*4];S.lum[i]=(.299*o[i*4]+.587*o[i*4+1]+.114*o[i*4+2])/255}
   S.ready=1;S.paint()};
  S.load=function(){if(S.started)return;S.started=1;img.onload=loaded;mImg.onload=loaded;img.src=cfg.img;mImg.src=cfg.mask};
@@ -71,7 +72,7 @@ function build(cfg){
    piv.add(new THREE.Mesh(new THREE.CylinderGeometry(R_*.985,R_*.985,.22,16).rotateZ(Math.PI/2),tm));piv.add(disc(sx,dm));g.add(piv)}
   return g};
  /* ---- paint ---- */
- S.recol=function(rgb){const o=S.orig,n=IW*IH,c=document.createElement('canvas');c.width=IW;c.height=IH;const x=c.getContext('2d'),id=x.createImageData(IW,IH),d=id.data,Lr=C.Lref,mk=S.mask,lm=S.lum;
+ S.recol=function(rgb){const W=S.W,H=S.H,o=S.orig,n=W*H,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d'),id=x.createImageData(W,H),d=id.data,Lr=C.Lref,mk=S.mask,lm=S.lum;
   const R=rgb[0]*255,G=rgb[1]*255,B=rgb[2]*255;
   for(let i=0,q=0;i<n;i++,q+=4){const m=mk[i]/255;d[q+3]=255;if(m<.004){d[q]=o[q];d[q+1]=o[q+1];d[q+2]=o[q+2];continue}
    let f=lm[i]/Lr;f=f<.12?.12:f>1.45?1.45:f;let r=R*f,g=G*f,b=B*f;if(r>255)r=255;if(g>255)g=255;if(b>255)b=255;
