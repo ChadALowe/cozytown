@@ -160,13 +160,13 @@ function wrapGrid(H,mode,side,x0,x1,y0,y1,z0,z1,nu,nv,uflip,off){off=off==null?.
 function skirtGeo(H,side,za,zb,yb,yt,off,nu,nv){
  const P=[],Q=[],ok=[];
  for(let j=0;j<=nv;j++)for(let i=0;i<=nu;i++){const z=zb+(za-zb)*i/nu,y=yt+(yb-yt)*j/nv;let r=cast(H,side*(H.hw+2),y,z,-side,0,0);if(r&&Math.abs(r.n.x)<.35)r=null;
-  if(r){const o=r.p.clone().addScaledVector(r.n,off);P.push(o.x,o.y,o.z);Q.push(r.p.x,r.p.y,r.p.z)}else{P.push(0,0,0);Q.push(0,0,0)}ok.push(!!r)}
+  if(r){const e=i/nu,tp=Math.min(1,Math.min(e,1-e)*7),t=j/nv,o=r.p.clone().addScaledVector(r.n,.006+off*Math.pow(t,.8)*(.15+.85*tp));P.push(o.x,o.y,o.z);Q.push(r.p.x,r.p.y,r.p.z)}else{P.push(0,0,0);Q.push(0,0,0)}ok.push(!!r)}
  const I=[],add=(a,b,c,d,flip)=>flip?I.push(a,c,b,b,c,d):I.push(a,b,c,b,d,c);
  for(let j=0;j<nv;j++)for(let i=0;i<nu;i++){const a=j*(nu+1)+i,b=a+1,c=a+nu+1,d=c+1;if(ok[a]&&ok[b]&&ok[c]&&ok[d])add(a,b,c,d,side>0)}
  const n=P.length/3;let pp=P.slice(),base=nv*(nu+1);
  for(let i=0;i<=nu;i++)pp.push(Q[(base+i)*3],Q[(base+i)*3+1],Q[(base+i)*3+2]);
  for(let i=0;i<nu;i++){const a=base+i,b=a+1,c=n+i,d=n+i+1;if(ok[a]&&ok[b])add(a,b,c,d,side<0)}
- const col=new Float32Array(pp.length).fill(.85);
+ const col=new Float32Array(pp.length);for(let j=0;j<=nv;j++)for(let i=0;i<=nu;i++){const e=i/nu,sh=1-.38*Math.pow(j/nv,1.2)-.1*(1-Math.min(1,Math.min(e,1-e)*8));const k=(j*(nu+1)+i)*3;col[k]=col[k+1]=col[k+2]=sh}for(let i=0;i<=nu;i++){const k=(n+i)*3;col[k]=col[k+1]=col[k+2]=.35}
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pp,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setIndex(I);return g}
 const dtex={};
 function drawDecal(kind,part,col,n){const k=kind+part+col+n;if(dtex[k])return dtex[k];
@@ -189,7 +189,7 @@ const dmat=(t)=>{const m=new THREE.MeshBasicMaterial({map:t,transparent:true,alp
 // face-shaded box so parts read as solid shapes
 const FS=[.82,.7,1,.45,.9,.74];
 function pbx(w,h,d,x,y,z,mat,rx,ry,rz){const g=new THREE.BoxGeometry(w,h,d),c=new Float32Array(g.attributes.position.count*3);for(let f=0;f<6;f++)for(let v=0;v<4;v++){const i=(f*4+v)*3;c[i]=c[i+1]=c[i+2]=FS[f]}g.setAttribute('color',new THREE.BufferAttribute(c,3));const m=new THREE.Mesh(g,mat);m.position.set(x,y,z);m.rotation.set(rx||0,ry||0,rz||0);kitG.add(m);return m}
-const pmats={};
+const pmats={},pm2={};function dmatS(ci){if(!pm2[ci]){const m=pmat(ci).clone();m.side=THREE.DoubleSide;m.userData={part:ci};pm2[ci]=m;kmats.push(m)}return pm2[ci]}
 function pmat(ci){const k=ci;if(!pmats[k]){const m=new THREE.MeshBasicMaterial({vertexColors:true});m.userData={part:ci};pmats[k]=m;kmats.push(m)}return pmats[k]}
 const lens=new THREE.MeshBasicMaterial({color:0xfff6d0}),vent=new THREE.MeshBasicMaterial({color:0x08080a}),chrome=new THREE.MeshBasicMaterial({color:0xd8dce4});
 function buildParts(H,K){
@@ -220,8 +220,8 @@ function buildParts(H,K){
  // side skirts: hug the sill between the wheel arches
  if(K.sk>=1){const ws=rimTargets(CARI).w.map(w=>w.piv.position.z),zf=Math.max(...ws),zr=Math.min(...ws),R=(rimTargets(CARI).w[0]||{R:.3}).R,za=zf-R*1.3,zb=zr+R*1.3;
   let yb=.3;for(let y=.08;y<.7;y+=.02){const r=cast(H,hw+2,y,(za+zb)/2,-1,0,0);if(r&&Math.abs(r.n.x)>.3){yb=y;break}}
-  const h=K.sk===2?.26:.19,off=K.sk===2?.075:.05;
-  for(const s of[-1,1]){const g=skirtGeo(H,s,za,zb,yb,yb+h,off,16,3);const m=new THREE.Mesh(g,M);m.frustumCulled=false;kitG.add(m)}}
+  const h=K.sk===2?.15:.11,off=K.sk===2?.11:.075;yb-=.015;
+  for(const s of[-1,1]){const g=skirtGeo(H,s,za,zb,yb,yb+h,off,24,5);const m=new THREE.Mesh(g,dmatS(K.c));m.frustumCulled=false;kitG.add(m)}}
  // rear diffuser
  if(K.rr>=1){pbx(hw*1.2,.05,.34,0,.19,zrL+.2,M,.12);if(K.rr===2){for(let i=-2;i<=2;i++)pbx(.025,.1,.32,i*hw*.26,.15,zrL+.2,M,.12);pbx(hw*1.3,.04,.26,0,.11,zrL+.16,M)}}
  // roof
