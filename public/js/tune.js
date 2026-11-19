@@ -56,7 +56,7 @@ function finRGB(c,f){const l=.3*c[0]+.59*c[1]+.11*c[2],cl=v=>Math.max(0,Math.min
 /* ======== wheels: rim overlays, rim size, ride height ======== */
 const RDES=['STOCK','5 SPOKE','6 SPOKE','MESH','TURBINE','SPLIT STAR','DEEP DISH'];
 const RCOL=[['SILVER','#c9ccd2'],['GUNMETAL','#454a55'],['BLACK','#17171b'],['GOLD','#d9ab2b'],['WHITE','#f2f2f2'],['RED','#d01a2e'],['BLUE','#2060d8'],['CHROME','#eaf6ff']];
-const RSZ=[.66,.78,.9],RSZN=['SMALL','MEDIUM','LARGE'],RHT=[-.07,-.035,0,.04],RHTN=['SLAMMED','LOW','STOCK','LIFTED'];
+const RSZ=[.66,.78,.9],RSZN=['SMALL','MEDIUM','LARGE'],RHT=[0,0,0,0],RHTN=['SLAMMED','LOW','STOCK','LIFTED'];
 const RDEF={d:0,c:0,s:1,h:2};let rp=null;
 const RIM=()=>rp||TN.rim[CARI]||RDEF;
 function drawRim(d,col,N){const c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d'),m=N/2,R=m-1;
@@ -143,18 +143,31 @@ function cast(H,ox,oy,oz,dx,dy2,dz){const dy=bodyDY();_o.set(ox,oy+dy,oz);car.lo
  const hs=RC.intersectObjects(H.m,false);if(!hs.length)return null;const h=hs[0],p=car.worldToLocal(h.point.clone());p.y-=dy;
  const n=h.face.normal.clone().transformDirection(h.object.matrixWorld);n.transformDirection(new THREE.Matrix4().copy(car.matrixWorld).invert());return{p,n}}
 const topY=(H,x,z)=>{const r=cast(H,x,H.y1+2,z,0,-1,0);return r?r.p.y:null};
-function wrapGrid(H,mode,side,x0,x1,y0,y1,z0,z1,nu,nv,uflip){ // returns geometry conforming to the hull
+function wrapGrid(H,mode,side,x0,x1,y0,y1,z0,z1,nu,nv,uflip,off){off=off==null?.014:off; // returns geometry conforming to the hull
  const P=[],U=[],ok=[];
  for(let j=0;j<=nv;j++)for(let i=0;i<=nu;i++){const fu=i/nu,fv=j/nv;let r=null;
   if(mode==='side'){const z=z1+(z0-z1)*fu,y=y1+(y0-y1)*fv;r=cast(H,side*(H.hw+2),y,z,-side,0,0);if(r&&Math.abs(r.n.x)<.4)r=null}
   else{const x=x0+(x1-x0)*fu,z=z1+(z0-z1)*fv;r=cast(H,x,H.y1+2,z,0,-1,0);if(r&&r.n.y<.5)r=null}
-  if(r){r.p.addScaledVector(r.n,.014);P.push(r.p.x,r.p.y,r.p.z)}else P.push(0,0,0);ok.push(!!r);
+  if(r){r.p.addScaledVector(r.n,off);P.push(r.p.x,r.p.y,r.p.z)}else P.push(0,0,0);ok.push(!!r);
   U.push(uflip?1-fu:fu,1-fv)}
  const I=[],jump=(a,b)=>mode==='side'?Math.abs(P[a*3]-P[b*3])>.14:Math.abs(P[a*3+1]-P[b*3+1])>.2;
  for(let j=0;j<nv;j++)for(let i=0;i<nu;i++){const a=j*(nu+1)+i,b=a+1,c=a+nu+1,d=c+1;if(!(ok[a]&&ok[b]&&ok[c]&&ok[d]))continue;if(jump(a,b)||jump(a,c)||jump(b,d)||jump(c,d))continue;
   // flip winding for the side that faces the opposite way
   if(mode==='side'&&side>0)I.push(a,c,b,b,c,d);else I.push(a,b,c,b,d,c)}
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(U,2));g.setIndex(I);return g}
+
+// side skirt: a shell that hugs the sill between the wheel arches, with a bottom lip
+function skirtGeo(H,side,za,zb,yb,yt,off,nu,nv){
+ const P=[],Q=[],ok=[];
+ for(let j=0;j<=nv;j++)for(let i=0;i<=nu;i++){const z=zb+(za-zb)*i/nu,y=yt+(yb-yt)*j/nv;let r=cast(H,side*(H.hw+2),y,z,-side,0,0);if(r&&Math.abs(r.n.x)<.35)r=null;
+  if(r){const o=r.p.clone().addScaledVector(r.n,off);P.push(o.x,o.y,o.z);Q.push(r.p.x,r.p.y,r.p.z)}else{P.push(0,0,0);Q.push(0,0,0)}ok.push(!!r)}
+ const I=[],add=(a,b,c,d,flip)=>flip?I.push(a,c,b,b,c,d):I.push(a,b,c,b,d,c);
+ for(let j=0;j<nv;j++)for(let i=0;i<nu;i++){const a=j*(nu+1)+i,b=a+1,c=a+nu+1,d=c+1;if(ok[a]&&ok[b]&&ok[c]&&ok[d])add(a,b,c,d,side>0)}
+ const n=P.length/3;let pp=P.slice(),base=nv*(nu+1);
+ for(let i=0;i<=nu;i++)pp.push(Q[(base+i)*3],Q[(base+i)*3+1],Q[(base+i)*3+2]);
+ for(let i=0;i<nu;i++){const a=base+i,b=a+1,c=n+i,d=n+i+1;if(ok[a]&&ok[b])add(a,b,c,d,side<0)}
+ const col=new Float32Array(pp.length).fill(.85);
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pp,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setIndex(I);return g}
 const dtex={};
 function drawDecal(kind,part,col,n){const k=kind+part+col+n;if(dtex[k])return dtex[k];
  const W=part==='top'?128:512,Hh=part==='top'?256:128,c=document.createElement('canvas');c.width=W;c.height=Hh;const x=c.getContext('2d');x.fillStyle=col;x.strokeStyle=col;
@@ -192,17 +205,23 @@ function buildParts(H,K){
  const zb=(z1-.12+zBn0)/2,yb=topY(H,0,zb)??yBon,lb=z1-.12-zBn0;
  const rl=cast(H,0,.3,z0-6,0,0,1),fl=cast(H,0,.24,z1+6,0,0,-1),zrL=rl?rl.p.z:z0,zfL=fl?fl.p.z:z1;
  const sx=(()=>{const r=cast(H,hw+2,H.y1*.2,(z0+z1)/2,-1,0,0);return r?r.p.x:hw})();
- // spoilers: on the roof edge of hatches/estates, on the boot lid of saloons and roadsters
- const hatch=(zRr-z0)<L*.24,zS=hatch?zRr+.06:z0+L*.13,yS=hatch?yRoof:(topY(H,0,zS)??yDeck);
- const sw=hatch?Math.min(hw*1.7,rhw*2+.06):hw*1.7;
- if(K.sp===1)pbx(sw,.045,.2,0,yS+.03,zS,M);
- if(K.sp===2){pbx(sw,.05,.34,0,yS+.07,zS,M,-.28);for(const s of[-1,1])pbx(.03,.12,.3,s*(sw/2-.01),yS+.06,zS,M)}
- if(K.sp>=3){const big=K.sp===4,hgt=big?.45:.26,ch=big?.5:.38;pbx(sw,.05,ch,0,yS+hgt,zS,M,-.08);if(big)pbx(sw,.07,.06,0,yS+hgt+.07,zS-.2,M);
-  for(const s of[-1,1]){pbx(.05,hgt,.07,s*sw*.3,yS+hgt/2,zS+.02,M);pbx(.025,.15,ch+.04,s*(sw/2-.01),yS+hgt+.03,zS,M)}}
+ // spoilers are mounted on the surface that is really there: first flat, high surface found scanning forward from the tail
+ let zS=z0+L*.13,yM=topY(H,0,zS)??yDeck;
+ for(let i=0;i<=80;i++){const z=z0+.03+i*.03,r=cast(H,0,H.y1+2,z,0,-1,0);if(r&&r.n.y>.8&&r.p.y>H.y1*.62){zS=z+.16;yM=topY(H,0,zS)??r.p.y;break}}
+ const sxM=(()=>{const r=cast(H,hw+2,yM-.03,zS,-1,0,0);return r?Math.abs(r.p.x):hw*.8})(),sw=Math.min(hw*1.7,sxM*2+.04);
+ const sy=x=>topY(H,x,zS)??yM,slope=(()=>{const a=topY(H,0,zS-.15),b=topY(H,0,zS+.15);return a!=null&&b!=null?Math.atan2(a-b,.3):0})();
+ if(K.sp===1)pbx(sw,.05,.22,0,yM+.01,zS,M,-slope);
+ if(K.sp===2){pbx(sw,.05,.34,0,yM+.05,zS-.03,M,-slope-.3);for(const s of[-1,1])pbx(.035,.13,.3,s*(sw/2-.02),yM+.05,zS-.02,M,-slope)}
+ if(K.sp>=3){const big=K.sp===4,hgt=big?.42:.26,ch=big?.5:.38,ux=sw*.3,yTop=Math.max(sy(ux),sy(-ux),yM)+hgt;
+  pbx(sw,.05,ch,0,yTop,zS-.02,M,-.08);if(big)pbx(sw,.07,.06,0,yTop+.07,zS-.22,M);
+  for(const s of[-1,1]){const yb=sy(s*ux)-.04,hh=yTop-yb;pbx(.05,hh,.08,s*ux,yb+hh/2,zS,M);pbx(.025,.15,ch+.04,s*(sw/2-.01),yTop+.03,zS-.02,M)}}
  // front
  if(K.fr>=1){pbx(hw*1.8,.04,.3,0,.17,zfL-.02,M);if(K.fr===2){for(const s of[-1,1]){pbx(.03,.18,.22,s*hw*.9,.3,zfL-.1,M,0,s*.3);pbx(.03,.1,.2,s*hw*.7,.22,zfL-.04,M,0,s*-.25)}pbx(hw*1.6,.05,.1,0,.2,zfL+.1,M)}}
- // side skirts
- if(K.sk>=1){const lo=cast(H,hw+2,.3,(z0+z1)/2,-1,0,0),sl=lo?Math.max(sx,Math.abs(lo.p.x)):sx,w=K.sk===2?.15:.1,h=K.sk===2?.22:.17;for(const s of[-1,1])pbx(w,h,L*.4,s*(sl+w/2+.01),.27,(z0+z1)/2,M)}
+ // side skirts: hug the sill between the wheel arches
+ if(K.sk>=1){const ws=rimTargets(CARI).w.map(w=>w.piv.position.z),zf=Math.max(...ws),zr=Math.min(...ws),R=(rimTargets(CARI).w[0]||{R:.3}).R,za=zf-R*1.3,zb=zr+R*1.3;
+  let yb=.3;for(let y=.08;y<.7;y+=.02){const r=cast(H,hw+2,y,(za+zb)/2,-1,0,0);if(r&&Math.abs(r.n.x)>.3){yb=y;break}}
+  const h=K.sk===2?.26:.19,off=K.sk===2?.075:.05;
+  for(const s of[-1,1]){const g=skirtGeo(H,s,za,zb,yb,yb+h,off,16,3);const m=new THREE.Mesh(g,M);m.frustumCulled=false;kitG.add(m)}}
  // rear diffuser
  if(K.rr>=1){pbx(hw*1.2,.05,.34,0,.19,zrL+.2,M,.12);if(K.rr===2){for(let i=-2;i<=2;i++)pbx(.025,.1,.32,i*hw*.26,.15,zrL+.2,M,.12);pbx(hw*1.3,.04,.26,0,.11,zrL+.16,M)}}
  // roof
@@ -400,21 +419,21 @@ function perfSel(init){const it=PERF[S.sel],lv=it.get(),nx=lv<it.max?it.p()[lv]:
 
 /* ---- tab: wheels ---- */
 const rimThumb={};const thumb=(d,c)=>{const k=d+':'+c;return rimThumb[k]||(rimThumb[k]=drawRim(d,RCOL[c][1],48).toDataURL())};
-function rimCost(){const r=RIM(),c=TN.rim[CARI]||RDEF;let t=0;if(r.d>0){if(r.d!==c.d&&!TN.rown['d'+r.d])t+=70;if(r.c!==c.c&&!TN.rown['c'+r.c]&&r.c)t+=10}if(r.s!==c.s||r.h!==c.h)t+=20;return t}
-function rimChanged(){const r=RIM(),c=TN.rim[CARI]||RDEF;return r.d!==c.d||r.c!==c.c||r.s!==c.s||r.h!==c.h}
+function rimCost(){const r=RIM(),c=TN.rim[CARI]||RDEF;let t=0;if(r.d>0){if(r.d!==c.d&&!TN.rown['d'+r.d])t+=70;if(r.c!==c.c&&!TN.rown['c'+r.c]&&r.c)t+=10}if(r.s!==c.s)t+=20;return t}
+function rimChanged(){const r=RIM(),c=TN.rim[CARI]||RDEF;return r.d!==c.d||r.c!==c.c||r.s!==c.s}
 function rimSet(k,v){const r=Object.assign({},RIM());r[k]=v;rp=r;rimsApply();tabWheels(1)}
 function tabWheels(keep){const B=$q('#tnBody'),top=B.scrollTop,r=RIM(),c=TN.rim[CARI]||RDEF;
- B.innerHTML='<div class="tnH">RIM DESIGN · £70, FREE ONCE OWNED</div><div class="tnGrid" id="rd"></div><div class="tnH">RIM COLOUR · £10, SILVER FREE</div><div class="tnGrid" id="rc"></div><div class="tnH">STANCE · £20 TO CHANGE</div><div id="rs"></div>';
+ B.innerHTML='<div class="tnH">RIM DESIGN · £70, FREE ONCE OWNED</div><div class="tnGrid" id="rd"></div><div class="tnH">RIM COLOUR · £10, SILVER FREE</div><div class="tnGrid" id="rc"></div><div class="tnH">RIM SIZE · £20 TO CHANGE</div><div id="rs"></div>';
  const gd=B.querySelector('#rd'),gc=B.querySelector('#rc');
  RDES.forEach((n,i)=>{const d=document.createElement('div');d.className='tnSw'+(r.d===i?' sel':'')+(c.d===i?' cur':'');d.style.background=i?'#0c1020 url('+thumb(i,r.c)+') center/78% no-repeat':'#101830';d.style.imageRendering='pixelated';d.innerHTML=(i&&!TN.rown['d'+i]?'<span class="p">£70</span>':'')+n.replace('SPLIT ','');d.onclick=()=>rimSet('d',i);gd.appendChild(d)});
  RCOL.forEach((n,i)=>{const d=document.createElement('div');d.className='tnSw'+(r.c===i?' sel':'')+(c.c===i?' cur':'');d.style.background=n[1];d.style.color=['#f2f2f2','#eaf6ff','#c9ccd2','#d9ab2b'].includes(n[1])?'#000':'#fff';d.style.textShadow='none';d.innerHTML=(i&&!TN.rown['c'+i]?'<span class="p" style="color:#a50">£10</span>':'')+n[0];d.onclick=()=>rimSet('c',i);gc.appendChild(d)});
- B.querySelector('#rs').innerHTML=`<div class="tnSl"><span style="width:62px">SIZE</span><input type="range" min="0" max="2" step="1" value="${r.s}" id="rsS"><b style="width:62px;color:#fff">${RSZN[r.s]}</b></div><div class="tnSl"><span style="width:62px">HEIGHT</span><input type="range" min="0" max="3" step="1" value="${r.h}" id="rsH"><b style="width:62px;color:#fff">${RHTN[r.h]}</b></div>`;
- B.querySelector('#rsS').onchange=e=>rimSet('s',+e.target.value);B.querySelector('#rsH').onchange=e=>rimSet('h',+e.target.value);
- B.querySelector('#rsS').oninput=e=>{rp=Object.assign({},RIM(),{s:+e.target.value});rimsApply()};B.querySelector('#rsH').oninput=e=>{rp=Object.assign({},RIM(),{h:+e.target.value});rimsApply()};
+ B.querySelector('#rs').innerHTML=`<div class="tnSl"><span style="width:62px">SIZE</span><input type="range" min="0" max="2" step="1" value="${r.s}" id="rsS"><b style="width:62px;color:#fff">${RSZN[r.s]}</b></div>`;
+ B.querySelector('#rsS').onchange=e=>rimSet('s',+e.target.value);
+ B.querySelector('#rsS').oninput=e=>{rp=Object.assign({},RIM(),{s:+e.target.value});rimsApply()};
  if(keep)B.scrollTop=top;wheelsBtn()}
 function wheelsBtn(){const r=RIM(),cost=rimCost();head();
- if(!rimChanged()){setMsg((r.d?RDES[r.d]+' · '+RCOL[r.c][0]+' · ':'STOCK WHEELS · ')+RSZN[r.s]+' · '+RHTN[r.h]);buyBtn('FITTED',null,1);return}
- setMsg((r.d?RDES[r.d]+' · '+RCOL[r.c][0]:'STOCK WHEELS')+' · '+RSZN[r.s]+' · '+RHTN[r.h]+(cost?' · £'+cost:''));
+ if(!rimChanged()){setMsg((r.d?RDES[r.d]+' · '+RCOL[r.c][0]+' · ':'STOCK WHEELS · ')+RSZN[r.s]);buyBtn('FITTED',null,1);return}
+ setMsg((r.d?RDES[r.d]+' · '+RCOL[r.c][0]:'STOCK WHEELS')+' · '+RSZN[r.s]+(cost?' · £'+cost:''));
  buyBtn(cost?'BUY £'+cost:'FIT IT',()=>{if(cost&&!pay(cost))return;if(r.d)TN.rown['d'+r.d]=1;if(r.d&&r.c)TN.rown['c'+r.c]=1;TN.rim[CARI]=Object.assign({},r);rp=null;save();setMsg('WHEELS FITTED!');flash(1);tabWheels(1);head()},cash<cost)}
 
 /* ---- tab: body kits ---- */
