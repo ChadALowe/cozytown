@@ -22,12 +22,44 @@ const BERTH=[5.8,-21],ARR=[0,40];
 const cvx=(w,h,fn)=>{const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.minFilter=THREE.LinearFilter;t.generateMipmaps=false;return t};
 const rmc={};const rm=hex=>{if(rmc[hex])return rmc[hex];const c=new THREE.Color(hex),m=wmat([c.r,c.g,c.b],{vertexColors:false});m.color.copy(c);return rmc[hex]=m};
 const near=(u,v,r)=>{const p=GS.onFoot?P:GS;return Math.hypot(p.x-HX-u,p.z-HZ-v)<r};
-function mkBoat(t){const T=BT[t],g=new THREE.Group(),bx=(w,h,d,x,y,z,m,ry)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);q.position.set(x,y,z);if(ry)q.rotation.y=ry;g.add(q);return q};
- const hull=rm(T.col),wh=rm(0xf4f4f0),dk=rm(0x22262c),wd=rm(0x8a5a2a);
- if(t===0){bx(1.7,.6,4.2,0,.35,0,hull);bx(1.1,.5,1.2,0,.45,2.4,hull).rotation.x=.0;bx(1.5,.1,3.6,0,.68,-.2,wd);bx(.2,.5,.2,0,.9,-1.7,dk);bx(.5,.7,.5,0,.5,-2.3,dk)}
- else if(t===1){bx(2.6,.9,6.6,0,.5,0,hull);bx(1.7,.8,2.2,0,1.3,3.7,hull);bx(1.9,1.3,2.0,0,1.5,-.6,wh);bx(2.0,.15,2.2,0,2.2,-.6,dk);bx(.15,2.2,.15,0,2.6,-1.4,dk);bx(2.4,.1,2.6,0,.95,-3,wd);bx(.7,.6,.7,0,.6,-3.5,dk)}
- else if(t===2){bx(2.3,.55,6.2,0,.4,0,hull);bx(1.4,.45,2,0,.5,3.5,hull);bx(1.6,.5,1.5,0,.9,-.4,dk);bx(1.4,.08,1.3,0,1.2,-.4,wh);bx(1.9,.3,.5,0,.7,-2.9,dk);for(const s of[-1,1])bx(.35,.5,5.4,s*1.2,.55,.1,wh)}
- else{bx(3.6,1.2,9.4,0,.7,0,hull);bx(2.3,1.0,3,0,1.9,4,hull);bx(2.6,1.8,2.8,0,2.0,-1.2,wh);bx(2.8,.2,3,0,3.0,-1.2,dk);bx(.2,4.2,.2,0,4.6,0,dk);bx(.2,.2,3.4,0,5.8,-.6,dk).rotation.y=.0;bx(3.2,.18,3.6,0,1.3,-4,wd);bx(.2,3,.2,-1.4,3.2,-4.3,dk);bx(.2,3,.2,1.4,3.2,-4.3,dk);bx(3,.2,.2,0,4.7,-4.3,dk)}
+function mkBoat(t){const T=BT[t],g=new THREE.Group();
+ const M=(x)=>rm(x),hullC=T.col,wh=M(0xf4f4f0),dk=M(0x22262c),wd=M(0x9a6a34),wd2=M(0x6a4624),gl=M(0x1c3248),rd=M(0xd02828),og=M(0xf07818),gy=M(0x8a9098),yl=M(0xf0c830);
+ const bx=(w,h,d,x,y,z,m,ry,rx)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);q.position.set(x,y,z);if(ry)q.rotation.y=ry;if(rx)q.rotation.x=rx;g.add(q);return q};
+ const cy=(r,h,x,y,z,m,rz,rx,sg,r2)=>{const q=new THREE.Mesh(new THREE.CylinderGeometry(r2==null?r:r2,r,h,sg||12),m);q.position.set(x,y,z);if(rz)q.rotation.z=rz;if(rx)q.rotation.x=rx;g.add(q);return q};
+ const sp=(r,x,y,z,m,sx,sy,sz)=>{const q=new THREE.Mesh(new THREE.SphereGeometry(r,12,9),m);q.position.set(x,y,z);q.scale.set(sx||1,sy||1,sz||1);g.add(q);return q};
+ const layer=(L,Wd,h,y0,m,sq)=>{const hf=Wd/2,sh=new THREE.Shape();sh.moveTo(-hf*.82,-L/2);sh.lineTo(hf*.82,-L/2);sh.lineTo(hf,-L*.28);sh.quadraticCurveTo(hf*1.02,L*.18,sq?hf*.12:0,L/2);sh.quadraticCurveTo(-hf*1.02,L*.18,-hf,-L*.28);sh.lineTo(-hf*.82,-L/2);
+  const ge=new THREE.ExtrudeGeometry(sh,{depth:h,bevelEnabled:false,curveSegments:8});ge.rotateX(Math.PI/2);ge.translate(0,h+y0,0);const q=new THREE.Mesh(ge,m);g.add(q);return q};
+ const rail=(L,Wd,y,z0)=>{for(const sd of[-1,1]){bx(.06,.06,L,sd*Wd/2,y+.7,z0,wh);for(let k=0;k<=5;k++)bx(.06,.7,.06,sd*Wd/2,y+.35,z0-L/2+k*L/5,wh)}};
+ const ring=(x,y,z,ry)=>{const q=new THREE.Mesh(new THREE.TorusGeometry(.26,.09,6,14),og);q.position.set(x,y,z);q.rotation.y=ry||0;g.add(q)};
+ const motor=(x,z,sc)=>{bx(.34*sc,.7*sc,.5*sc,x,.85,z,dk);bx(.4*sc,.18*sc,.56*sc,x,1.25*sc*.8+.3,z,M(0xc83030));cy(.05*sc,.9*sc,x,.35,z-.1*sc,gy);bx(.12*sc,.3*sc,.5*sc,x,-.08,z-.12*sc,dk)};
+ if(t===0){/* dinghy */
+  layer(4.6,1.9,.55,.0,M(0x2a4a7a));layer(4.6,1.95,.12,.5,wh);bx(1.3,.06,2.8,0,.55,-.15,wd);bx(1.7,.1,.4,0,.82,.4,wd2);bx(1.7,.1,.4,0,.82,-.7,wd2);bx(.1,.4,.1,0,.9,1.55,og);
+  for(const sd of[-1,1]){bx(.12,.5,2.2,sd*.88,.75,-.3,wh).rotation.z=sd*.0;cy(.05,.6,sd*1.05,.9,.6,wd2,Math.PI/2);}
+  motor(0,-2.3,1);ring(.7,.95,.3,Math.PI/2);bx(.5,.3,.5,.0,.7,1.9,rd);bx(.3,.08,.5,0,.72,-1.7,og)}
+ else if(t===1){/* fishing boat */
+  layer(7.8,2.9,.7,.0,M(0x14284a));layer(7.8,3.0,.2,.7,rd);layer(7.8,2.9,.55,.9,M(hullC));layer(7.8,3.05,.1,1.45,wh);
+  bx(2.6,.08,3.4,0,1.2,-2.3,wd);bx(2.0,.08,1.8,0,1.2,2.4,wd);
+  bx(2.2,1.7,2.4,0,2.3,.4,wh);bx(2.3,.14,2.6,0,3.2,.4,dk);bx(2.24,.5,.06,0,2.5,1.62,gl);bx(.06,.5,1.8,1.12,2.5,.4,gl);bx(.06,.5,1.8,-1.12,2.5,.4,gl);bx(1.5,.5,.06,0,2.5,-.8,gl);
+  bx(.18,.9,.18,.6,3.7,.1,dk);cy(.1,2.8,0,4.3,-.3,dk);bx(1.7,.08,.1,0,5.0,-.3,dk);sp(.4,0,3.55,-.7,wh,1,.8,1);bx(.3,.3,.3,0,5.65,-.3,yl);
+  cy(.22,1.2,-.7,3.7,-.6,M(0xd8c040),0,0,10);bx(.5,.12,.5,-.7,4.35,-.6,dk);
+  rail(3.2,2.8,1.4,-2.4);rail(1.4,2.8,1.4,2.6);ring(0,1.7,-3.7,0);ring(-1.1,2.1,.4,Math.PI/2);
+  cy(.5,.8,.9,1.55,-3.0,M(0xd8b070),0,0,14);bx(.8,.5,.8,-.8,1.5,-2.8,wd2);bx(.8,.5,.8,-.8,2.0,-2.8,wd);bx(.14,1.6,.14,.9,2.0,-4,dk);bx(.14,.14,1.2,.9,2.7,-3.5,dk);
+  bx(.3,.3,.3,0,1.35,3.6,gy);cy(.07,.7,1.0,1.7,3.2,dk);bx(.06,.9,.06,-1.0,1.8,2.5,rd)}
+ else if(t===2){/* RIB */
+  layer(6.4,2.2,.5,.0,M(0x40444c));layer(6.2,1.7,.1,.5,gy);bx(1.2,.06,3.2,0,.62,-.3,M(0x202428));
+  for(const sd of[-1,1]){const x=sd*1.0;cy(.46,3.6,x,.85,-.8,M(hullC),0,Math.PI/2,14);sp(.46,x,.85,-2.6,M(hullC));sp(.46,x,.85,1.0,M(hullC));cy(.42,1.4,sd*.7,.9,1.9,M(hullC),0,Math.PI/2+sd*.35,12);cy(.07,2.6,x,1.05,-.9,gy,0,Math.PI/2,6)}
+  bx(.9,.9,.9,0,.95,.4,dk);bx(.8,.04,.7,0,1.45,.1,gl).rotation.x=-.4;bx(.9,.5,.7,0,.9,-1.4,M(0x303640));bx(.9,.18,.7,0,1.2,-1.4,rd);cy(.08,.4,0,1.55,.45,gy);bx(1.2,.05,.05,0,1.75,.45,gy);
+  motor(.55,-3.1,1.1);motor(-.55,-3.1,1.1);bx(.1,.5,.1,0,1.3,2.1,yl);bx(.4,.05,.7,0,.95,2.2,gy)}
+ else{/* trawler */
+  layer(10.6,3.9,.9,.0,M(0x5a1818));layer(10.6,4.05,.7,.9,M(hullC));layer(10.6,4.1,.14,1.6,wh);bx(3.3,.08,4.4,0,1.55,-3.0,M(0x6a7078));bx(2.6,.08,2.4,0,1.55,3.5,M(0x6a7078));
+  bx(3.2,2.4,3.0,0,2.9,.9,wh);bx(3.4,.18,3.2,0,4.2,.9,dk);bx(3.3,.6,.06,0,3.5,2.43,gl);bx(.06,.6,2.4,1.62,3.5,.9,gl);bx(.06,.6,2.4,-1.62,3.5,.9,gl);bx(2.2,1.2,.06,0,3.5,-.6,gl);
+  bx(2.2,1.2,2.0,0,4.9,.5,wh);bx(2.3,.14,2.1,0,5.55,.5,dk);bx(2.0,.5,.06,0,5.1,1.52,gl);bx(.06,.5,1.6,1.05,5.1,.5,gl);bx(.06,.5,1.6,-1.05,5.1,.5,gl);
+  cy(.14,3,0,7.1,.1,dk);bx(2.4,.08,.1,0,8.2,.1,dk);bx(.14,.3,.14,0,8.7,.1,yl);sp(.5,.8,5.9,.2,wh,1,.8,1);sp(.3,-.8,5.8,.4,M(0xe8e090));
+  cy(.45,1.4,-1.0,5.9,-.5,M(0xd8c040),0,0,12);cy(.5,.2,-1.0,6.7,-.5,dk);bx(1.0,.3,1.0,-1.0,5.5,-.5,hullC);
+  bx(.2,5,.2,-1.7,4,-3.7,dk);bx(.2,5,.2,1.7,4,-3.7,dk);bx(3.6,.2,.2,0,6.5,-3.7,dk);bx(.14,2,.14,0,5.4,-3.2,dk).rotation.x=-.35;
+  cy(.7,1.8,0,2.4,-1.8,M(0xd8a040),Math.PI/2,0,14);cy(.9,.2,1.1,2.4,-1.8,dk,Math.PI/2);cy(.9,.2,-1.1,2.4,-1.8,dk,Math.PI/2);
+  for(let k=0;k<4;k++)sp(.32,-1.4+k*.9,1.95,-4.4,og);
+  rail(8.0,3.9,1.6,-.4);ring(1.7,2.5,-.2,Math.PI/2);ring(-1.7,2.5,-.2,Math.PI/2);bx(.5,.5,.5,0,1.9,4.6,gy);cy(.5,.7,0,1.9,5.0,M(0x3a3a3a),0,0,10);bx(2.0,.5,.8,0,.6,-5.3,M(0x3a3a3a))}
  return g}
 /* ---------------- build the harbour (lazily) */
 let built=0,seaTex=null,boatM=null,shoals=[],crates=[],extra=[];
