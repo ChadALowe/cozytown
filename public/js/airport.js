@@ -43,9 +43,9 @@ function mkPlane(){const L=36,R=1.95,g=new THREE.Group(),FU={};
   /* door outline (front left) */
   c.strokeStyle='#7a8490';c.lineWidth=2;c.strokeRect(W*.31-17,(1-.757)*H-26,34,52);c.strokeRect(W*.69-17,(1-.757)*H-26,34,52)});
  tx.anisotropy=8;
- const prof=[];const N=70;for(let i=0;i<=N;i++){const t=i/N;let r;if(t<.16){const s=t/.16;r=R*(.14+.86*Math.pow(Math.sin(s*Math.PI/2),.9))}else if(t>.82){const s=(t-.82)/.18;r=R*Math.sqrt(Math.max(.02,1-s*s*.985))}else r=R;prof.push(new THREE.Vector2(r,(t-.5)*L))}
+ const prof=[];const N=160;for(let i=0;i<=N;i++){const t=i/N;let r;if(t<.16){const s=t/.16;r=R*(.14+.86*(1-Math.pow(1-s,2.4)))}else if(t>.82){const s=(t-.82)/.18;r=R*(1-.97*Math.pow(s,2.2))}else r=R;prof.push(new THREE.Vector2(r,(t-.5)*L))}
  prof.push(new THREE.Vector2(.01,L/2+.25));
- const fg=new THREE.LatheGeometry(prof,48);fg.rotateX(Math.PI/2);const fus=new THREE.Mesh(fg,pm(0xffffff,{map:tx,shininess:70}));g.add(fus);
+ const fg=new THREE.LatheGeometry(prof,48);fg.deleteAttribute("normal");fg.computeVertexNormals();fg.rotateX(Math.PI/2);const fus=new THREE.Mesh(fg,pm(0xffffff,{map:tx,shininess:25,specular:0x1c1c1c}));g.add(fus);
  /* wings, stabilisers */
  const wingGeo=(span,zl0,zl1,zt0,zt1,th)=>{const s=new THREE.Shape();s.moveTo(0,-zl0);s.lineTo(span,-zl1);s.lineTo(span,-zt1);s.lineTo(0,-zt0);s.closePath();const ge=new THREE.ExtrudeGeometry(s,{depth:th,bevelEnabled:true,bevelThickness:.05,bevelSize:.05,bevelSegments:1});ge.rotateX(-Math.PI/2);return ge};
  const wmat_=pm(0xd2d8e0,{shininess:30}),wg=wingGeo(17.5,2.6,-6.2,-6.4,-9.8,.34);
