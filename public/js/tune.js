@@ -3,7 +3,7 @@
 const TN={brk:0,trb:0,nos:0,tank:0,neon:{},nown:{},cust:null,custOn:0,fin:{},fown:{},rim:{},rown:{},kit:{},kown:{},vin:{},vown:{}};window.TN=TN;
 try{const s=JSON.parse(localStorage.getItem('tune1')||'null');if(s)Object.assign(TN,s)}catch(e){}
 for(const k of['fin','fown','rim','rown','neon','nown','kit','kown','vin','vown'])if(!TN[k])TN[k]={};
-const save=()=>{try{localStorage.setItem('tune1',JSON.stringify(TN))}catch(e){}};
+const canon=a=>{const c=PCOL.find(c=>c[1].every((v,i)=>Math.abs(v-a[i])<1e-6));return c?c[1]:a.slice()};const save=()=>{try{localStorage.setItem('tune1',JSON.stringify(TN))}catch(e){}};
 const $q=(s,r)=>(r||document).querySelector(s);
 
 /* ======== game hooks ======== */
@@ -20,7 +20,7 @@ const NOS={ch:100,on:0};const nosCap=()=>100*(1+.5*(TN.tank|0));
 const NEON=[['OFF',null],['ICE BLUE',0x2a8cff],['CYAN',0x19e3ff],['LIME',0x39ff3a],['PINK',0xff2d95],['PURPLE',0xa23bff],['RED',0xff2a2a],['AMBER',0xffa21a],['WHITE',0xffffff]];
 const gtex=(()=>{const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,6,64,64,64);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.45,'rgba(255,255,255,.7)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,128,128);return new THREE.CanvasTexture(c)})();
 const neonM=new THREE.Mesh(new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:gtex,color:0x19e3ff,transparent:true,opacity:.95,depthWrite:false,blending:THREE.AdditiveBlending}));
-neonM.position.y=.05;neonM.visible=false;neonM.renderOrder=3;car.add(neonM);
+neonM.position.y=.14;neonM.material.polygonOffset=true;neonM.material.polygonOffsetFactor=-8;neonM.material.polygonOffsetUnits=-8;neonM.visible=false;neonM.renderOrder=3;car.add(neonM);
 const CW=[1.9,1.9,2,2,1.9,2],CL=[3.7,4,4.5,4.1,4.1,4.8];
 let neonPrev=null;
 function neonSet(i){const n=NEON[i|0]||NEON[0];neonM.visible=!!n[1];if(n[1]){neonM.material.color.setHex(n[1]);neonM.scale.set(CW[CARI]+1.7,1,CL[CARI]+1.9)}}
@@ -40,7 +40,7 @@ addEventListener('keydown',e=>{if(e.key==='n'||e.key==='N')nosDown()});addEventL
    const p=Math.round(100*NOS.ch/nosCap());nb.style.background='linear-gradient(to top,#2a7cff '+p+'%,#0b1a30 '+p+'%)';nb.style.opacity=NOS.ch>8?1:.55}
   fx.style.opacity=(NOS.on&&NOS.ch>0&&TN.nos&&!GS.onFoot)?1:0}}
 // saved custom colour comes back after a reload
-{let t=0;const w=setInterval(()=>{if(window.READY===true||++t>200){clearInterval(w);if(TN.custOn&&TN.cust){paintC=TN.cust;applyPaint()}neonNow()}},100)}
+{let t=0;const w=setInterval(()=>{if(window.READY===true||++t>200){clearInterval(w);if(TN.pnt){paintC=canon(TN.pnt);applyPaint()}neonNow()}},100)}
 
 
 /* ======== paint finishes (colour grading on top of the car's tint) ======== */
@@ -399,7 +399,7 @@ function paintBtn(){
  if(!cc&&!fc){setMsg(nm+' · ON YOUR CAR');buyBtn('WEARING',null,1);return}
  setMsg(nm+(cost?' · £'+cost:' · OWNED'));
  buyBtn(cost?'BUY £'+cost:'PAINT IT',()=>{if(cost&&!pay(cost))return;
-  if(cc){if(ix>=0){OWN.paint[ix]=1;TN.custOn=0}else{TN.cust=paintC;TN.custOn=1}S.commit.paint=paintC}
+  if(cc){if(ix>=0){OWN.paint[ix]=1;TN.custOn=0}else{TN.cust=paintC;TN.custOn=1}S.commit.paint=paintC;TN.pnt=paintC.slice();save()}
   if(fc){TN.fin[CARI]=fin;if(fin)TN.fown[CARI+':'+fin]=1;finPrev=null}
   save();setMsg('SPRAYED!');flash(1);tabPaint();head()},cash<cost)}
 
@@ -522,7 +522,7 @@ function closeTune(){
  paintC=S.commit.paint;finPrev=null;rp=null;kp=null;vp=null;applyPaint();kitApply();
  neonPrev=null;GAL.sv.car=S.commit.car;GAL.sv.paint=S.commit.paint;
  if(window.JOEBAY){GAL.sv.x=JOEBAY.x;GAL.sv.z=JOEBAY.z;GAL.sv.psi=JOEBAY.psi;window.JOEBAY=null}
- root.style.display='none';galUI.classList.remove('tuning');if(TG)TG.visible=false;save();
+ root.style.display='none';galUI.classList.remove('tuning');if(TG)TG.visible=false;TN.pnt=S.commit.paint.slice();save();
  closeGallery();neonNow();
  if(TN.custOn&&TN.cust&&paintC===TN.cust)applyPaint()}
 window.openTune=openTune;window.closeTune=closeTune;window.TNon=()=>on;
@@ -537,3 +537,5 @@ window.openTune=openTune;window.closeTune=closeTune;window.TNon=()=>on;
 {const o0=openShop;openShop=function(m){if(m==='garage2'){toast('DRIVE YOUR CAR INTO A BAY AT JOES GARAGE');return}o0.apply(this,arguments)}}
 garagePaint=function(){toast('DRIVE YOUR CAR INTO A BAY AT JOES GARAGE')};
 })();
+
+{const lg=loadGame;loadGame=function(){const r=lg.apply(this,arguments);if(r&&TN.pnt){paintC=canon(TN.pnt);try{applyPaint()}catch(e){}}neonNow();return r}}
