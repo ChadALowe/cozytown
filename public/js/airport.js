@@ -20,8 +20,8 @@ function warmTick(){for(const k in MAPS){const m=MAPS[k];if(!m.chunks.length)con
 /* sliced loader: m.gen is a generator that yields between pieces of work */
 function pump(m,ms){if(m.built)return true;if(!m.it)m.it=m.gen(m);const t0=performance.now();for(;;){const r=m.it.next();if(r.done){m.built=1;m.it=null;return true}if(performance.now()-t0>ms)return false}}
 /* ---------------------------------------------------------------- lights for the (Phong) aircraft */
-const AL=new THREE.Group(),dl=new THREE.DirectionalLight(0xfff0d8,1.05),hl=new THREE.HemisphereLight(0xcfe4ff,0x6a7a58,.8);AL.add(dl,dl.target,hl);AL.visible=false;scene.add(AL);
-function lightTOD(){const T=TOD[todI];dl.color.setRGB(T.sun[0],T.sun[1],T.sun[2]);dl.intensity=todI===2?.35:todI===1?.9:1.1;hl.color.setRGB(.8*T.tint[0]+.2,.88*T.tint[1]+.12,T.tint[2]*.95+.05);hl.intensity=todI===2?.45:.8;const d=new THREE.Vector3(...T.sd).normalize();dl.position.copy(d).multiplyScalar(300);dl.target.position.set(0,0,0)}
+const AL=new THREE.Group(),dl=new THREE.DirectionalLight(0xfff0d8,.78),hl=new THREE.HemisphereLight(0xcfe4ff,0x8a94a0,.62);AL.add(dl,dl.target,hl);AL.visible=false;scene.add(AL);
+function lightTOD(){const T=TOD[todI];dl.color.setRGB(T.sun[0],T.sun[1],T.sun[2]);dl.intensity=todI===2?.3:todI===1?.7:.8;hl.color.setRGB(.8*T.tint[0]+.2,.88*T.tint[1]+.12,T.tint[2]*.95+.05);hl.intensity=todI===2?.4:.5;const d=new THREE.Vector3(...T.sd).normalize();dl.position.copy(d).multiplyScalar(300);dl.target.position.set(0,0,0)}
 /* ---------------------------------------------------------------- the aircraft */
 const LIV={body:'#f4f6f8',belly:'#9aa4b0',stripe:'#1d56b8',tail:'#c8202c',name:'COZY AIR'};
 function mkPlane(){const L=36,R=1.95,g=new THREE.Group(),FU={};
@@ -47,8 +47,8 @@ function mkPlane(){const L=36,R=1.95,g=new THREE.Group(),FU={};
  prof.push(new THREE.Vector2(.01,L/2+.25));
  const fg=new THREE.LatheGeometry(prof,48);fg.rotateX(Math.PI/2);const fus=new THREE.Mesh(fg,pm(0xffffff,{map:tx,shininess:70}));g.add(fus);
  /* wings, stabilisers */
- const wingGeo=(span,zl0,zl1,zt0,zt1,th)=>{const s=new THREE.Shape();s.moveTo(0,-zl0);s.lineTo(span,-zl1);s.lineTo(span,-zt1);s.lineTo(0,-zt0);s.closePath();const ge=new THREE.ExtrudeGeometry(s,{depth:th,bevelEnabled:false});ge.rotateX(-Math.PI/2);return ge};
- const wmat_=pm(0xdde2e8),wg=wingGeo(17.5,2.6,-6.2,-6.4,-9.8,.34);
+ const wingGeo=(span,zl0,zl1,zt0,zt1,th)=>{const s=new THREE.Shape();s.moveTo(0,-zl0);s.lineTo(span,-zl1);s.lineTo(span,-zt1);s.lineTo(0,-zt0);s.closePath();const ge=new THREE.ExtrudeGeometry(s,{depth:th,bevelEnabled:true,bevelThickness:.05,bevelSize:.05,bevelSegments:1});ge.rotateX(-Math.PI/2);return ge};
+ const wmat_=pm(0xd2d8e0,{shininess:30}),wg=wingGeo(17.5,2.6,-6.2,-6.4,-9.8,.34);
  for(const sd of[1,-1]){const w=new THREE.Mesh(wg,wmat_);w.position.set(sd*1.2,-.85,0);w.rotation.z=sd*.055;w.scale.x=sd;g.add(w);
   const tp=new THREE.Mesh(new THREE.BoxGeometry(.18,1.6,1.8),pm(LIV.stripe));tp.position.set(sd*18.5,.3,-9.2);tp.rotation.z=sd*-.25;tp.rotation.x=.1;g.add(tp);
   const st=new THREE.Mesh(wingGeo(6.4,-13.4,-17.4,-18.4,-19.2,.22),wmat_);st.position.set(sd*.6,.75,0);st.rotation.z=sd*.04;st.scale.x=sd;g.add(st);
