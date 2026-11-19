@@ -454,7 +454,7 @@ for(let a=0;a<4;a++){const ang=a*1.5708+1.4,x=GRC[0]+Math.cos(ang)*(GRR-3.5),z=G
 function tree(x,z,s,col){const K=ck(x,z),y=Y0-.1;pcyl(K.o,x,y,z,.28*s,2.6*s,5,[.35,.24,.14]);col=col||mix3([.12,.34,.12],[.2,.46,.16],rnd());poct(K.o,x,y+3.4*s,z,2.3*s,2*s,2.3*s,col,.3);poct(K.o,x+.8*s,y+2.7*s,z+.5*s,1.5*s,1.3*s,1.5*s,shd(col,1.1),.3)}
 function conifer(x,z,s){const K=ck(x,z),c=mix3([.08,.28,.14],[.12,.36,.18],rnd());pcyl(K.o,x,Y0-.1,z,.25*s,1.8*s,5,[.35,.24,.14]);for(let q=0;q<3;q++)pcone(K.o,x,Y0+(1.2+q*1.4)*s,z,(2.1-q*.55)*s,2.5*s,7,c,rnd()*6)}
 /* kart track zone: trees here are still generated (keeps the random world identical) but drawn into a throwaway chunk and given no collider */
-var KZN=0;function kartZone(x,z){return x>-150&&x<-40&&z>-96&&z<-6}
+var KZN=0;function kartZone(x,z){return(x>-150&&x<-40&&z>-96&&z<-6)||(x>96&&x<232&&z>116&&z<234)} // 2nd rect = the casino grounds (south-east, past the end of Back Lane)
 {const ck0=ck,KDUM=new Proxy({},{get:(t,k)=>t[k]||(t[k]=new Builder(3))});ck=function(x,z){return KZN?KDUM:ck0(x,z)}}
 function inAnyBld(x,z,m){const me={x,z,rot:0,hw:m,hd:m};for(const p of PLACED)if(Math.hypot(p.x-x,p.z-z)<p.hw+p.hd+m*2&&obbHit(me,p))return true;return false}
 for(let a=0;a<7;a++){const ang=a*.9+.3,rr=8+(a%3)*7;tree(GRC[0]+Math.cos(ang)*rr,GRC[1]+Math.sin(ang)*rr,1.15);COL.push([GRC[0]+Math.cos(ang)*rr,GRC[1]+Math.sin(ang)*rr,.7])}
@@ -4263,7 +4263,7 @@ function updateCam(dt){
  const T=GS.onFoot?P:GS,sp=GS.onFoot?0:GS.speed;
  const m=menuOpen?{d:8.5,h:2.4,f:50}:GS.inside?{d:4.4,h:3.9,f:60}:GS.onFoot?{d:4.4,h:1.9,f:62}:CAMS[camMode];
  if(menuOpen)camAng+=dt*.4;else if(CAMD.hold>0&&!GS.inside){CAMD.hold-=dt*(Math.abs(T.speed||0)>1.2?3:1)}else{let da=T.psi-camAng;da=Math.atan2(Math.sin(da),Math.cos(da));camAng+=da*Math.min(1,dt*(GS.onFoot?4:3.2));CAMD.el-=CAMD.el*Math.min(1,dt*2)}
- let d=m.d+sp*.06;if(!GS.inside&&!menuOpen&&!GAL.on)d=camClip(T,d,dt);let px=T.x-Math.sin(camAng)*d,pz=T.z-Math.cos(camAng)*d;if(GS.inside&&SG.visible&&SHOPCUR&&SHOPCUR.o&&(SHOPCUR.o.t==='NEON ARCADE'||SHOPCUR.o.t==='BULLSEYE RANGE')){px=clamp(px,IX-RX+.5,IX+RX-.5);pz=clamp(pz,IZ-RZ+.5,IZ+RZ-.5)}const py=GS.inside?T.y+m.h:Math.max(T.y+m.h+(window.CUP||0)+(GS.inside?0:CAMD.el),hAt(px,pz)+1.2);
+ let d=m.d+sp*.06;if(!GS.inside&&!menuOpen&&!GAL.on)d=camClip(T,d,dt);let px=T.x-Math.sin(camAng)*d,pz=T.z-Math.cos(camAng)*d;if(GS.inside&&SG.visible&&SHOPCUR&&SHOPCUR.o&&(SHOPCUR.o.t==='NEON ARCADE'||SHOPCUR.o.t==='BULLSEYE RANGE'||SHOPCUR.o.casino)){px=clamp(px,IX-RX+.5,IX+RX-.5);pz=clamp(pz,IZ-RZ+.5,IZ+RZ-.5)}const py=GS.inside?T.y+m.h:Math.max(T.y+m.h+(window.CUP||0)+(GS.inside?0:CAMD.el),hAt(px,pz)+1.2);
  cam.position.set(px,py,pz);if(window.DBGC){const c=window.DBGC,a=T.psi+c[0];cam.position.set(T.x+Math.sin(a)*c[1],T.y+c[2],T.z+Math.cos(a)*c[1]);cam.lookAt(T.x+(c[5]||0)*Math.sin(a+1.5708),T.y+c[3],T.z+(c[5]||0)*Math.cos(a+1.5708));cam.fov=c[4]||30;cam.updateProjectionMatrix();skyG.position.copy(cam.position);return}cam.lookAt(T.x+Math.sin(camAng)*2.5,T.y+(GS.onFoot?1.2:1.1),T.z+Math.cos(camAng)*2.5);
  const tf=m.f+sp*.3;if(Math.abs(tf-fovNow)>.05){fovNow=lerp(fovNow,tf,Math.min(1,dt*4));cam.fov=fovNow;cam.updateProjectionMatrix()}
  skyG.position.copy(cam.position)}
