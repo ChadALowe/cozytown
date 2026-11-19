@@ -242,7 +242,7 @@ function buildInterior(){const G=new THREE.Group(),H=IHT,RX_=IRX,RZ_=IRZ;
  rail(0,1.25,.14,0x1a0a10);rail(0,.25,.2,0x0a0406);rail(1.25,.14,.22,0xe8bf4a);rail(H-.35,.35,.26,0xe8bf4a);rail(H-.55,.2,.18,0xb8892a);
  for(const x of[-8,-4,0,4,8])bxI(x,0,-RZ_+.2,.7,H-.35,.3,0xb8892a);for(const x of[-8,-4.5,4.5,8])bxI(x,0,RZ_-.2,.7,H-.35,.3,0xb8892a);
  for(let z=-RZ_+4;z<RZ_-1;z+=4){for(const sx of[-1,1])bxI(sx*(RX_-.2),0,z,.3,H-.35,.7,0xb8892a)}
- const spots=[];for(let x=-8;x<=8;x+=5.5)spots.push([x,-RZ_+.45,0]);for(const z of[-5.5,-1.5,2.5,5.5])spots.push([-RX_+.45,z,1],[RX_-.45,z,1]);for(const x of[-8,8])spots.push([x,RZ_-.45,0]);
+ const spots=[];for(let x=-8;x<=8;x+=5.5)spots.push([x,-RZ_+.45,0]);for(const z of[-5.5,-3.4,2.5,5.5])spots.push([-RX_+.45,z,1],[RX_-.45,z,1]);for(const x of[-8,8])spots.push([x,RZ_-.45,0]);
  for(const[x,z]of spots){bxI(x,2.2,z,.3,.5,.3,0xe8bf4a);bxI(x,2.7,z,.22,.5,.22,0xfff0b0);bxI(x,3.2,z,.36,.12,.36,0xe8bf4a)}
  // grand double doors (the exit) on the south wall
  const doorT=ptex(32,64,c=>{c.fillStyle='#3a0a14';c.fillRect(0,0,32,64);c.fillStyle='#e8bf4a';c.fillRect(0,0,32,2);c.fillRect(0,0,2,64);c.fillRect(30,0,2,64);c.fillRect(15,0,2,64);c.fillStyle='#ffe9b0';c.fillRect(3,3,11,26);c.fillRect(18,3,11,26);c.fillStyle='#c8a050';c.fillRect(3,15,11,1);c.fillRect(18,15,11,1);c.fillStyle='#6a1420';c.fillRect(3,34,11,26);c.fillRect(18,34,11,26);c.fillStyle='#e8bf4a';c.fillRect(12,36,2,10);c.fillRect(18,36,2,10)},false);

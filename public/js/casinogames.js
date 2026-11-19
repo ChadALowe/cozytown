@@ -12,7 +12,7 @@ const colOf=n=>n===0?'g':REDS.has(n)?'r':'b',HEX={g:'#0e8a3a',r:'#c01428',b:'#15
 const GG=new THREE.Group(),PEOPLE=[];let built=false;
 const WG={aw:0,idx:0,ab:0,r:.39,y:0},HIST=[];                    // wheel angle, resting pocket, ball angle / radius / lift
 const WX=-7.55,WZ=-4.4,TY=.9,RTX=-6.2,RTZ=-4.4;                   // wheel centre, table-top height, roulette table centre
-const BX=6.2,BZ=-5.0;                                              // blackjack table: flat (dealer) edge centre
+let BX=6.2,BZ=-5.0;                                              // blackjack table: flat (dealer) edge centre
 const SLOTZ=[.9,1.95,3.0];
 /* ---------- tiny helpers ---------- */
 function bxg(x,y,z,w,h,d,hex,P){const g=new THREE.BoxGeometry(w,h,d),col=new Float32Array(g.attributes.position.count*3),F=[.82,.7,1,.45,.9,.74];for(let f=0;f<6;f++)for(let v=0;v<4;v++){const i=(f*4+v)*3;col[i]=col[i+1]=col[i+2]=F[f]}g.setAttribute('color',new THREE.BufferAttribute(col,3));const m=new THREE.Mesh(g,fmc(hex));m.position.set(x,y+h/2,z);(P||GG).add(m);return m}
@@ -23,7 +23,11 @@ function wall(w,h,x,y,z,ry,tex){const m=new THREE.Mesh(new THREE.PlaneGeometry(w
 function mk(tag,css,txt,par){const e=document.createElement(tag);if(css)e.style.cssText=css;if(txt!=null)e.textContent=txt;if(par)par.appendChild(e);return e}
 const BTN='font:bold 13px monospace;border:2px solid #f5e6a0;border-radius:8px;color:#fff;background:#333;padding:6px 10px;touch-action:manipulation;pointer-events:auto;';
 const money=n=>'£'+Math.round(n);
-const refreshCash=()=>{try{cashUI()}catch(e){}};
+const CHS={chips:0,pts:0,wag:0,win:0,jp:1000,comp:0};
+const wager=n=>{CHS.wag+=n;CHS.pts+=n/10};const won=n=>{if(n>0)CHS.win+=n};
+const needChips=()=>{if(CHS.chips>=1)return false;toast('NO CHIPS - BUY SOME AT THE CAGE');return true};
+{const s0=cozySave,l0=cozyLoad;cozySave=function(){const o=s0();o.cs=CHS;return o};cozyLoad=function(z){l0(z);if(z&&z.cs)Object.assign(CHS,z.cs)}}
+const refreshCash=()=>{};
 function sign(t,w,bg,fg){return cvx(512,Math.round(512*.25*w/2),(g,W,H)=>{g.fillStyle=bg;g.fillRect(0,0,W,H);g.strokeStyle=fg;g.lineWidth=6;g.strokeRect(6,6,W-12,H-12);g.fillStyle=fg;g.font='900 '+Math.round(H*.55)+'px Impact,"Arial Black",Arial,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(t,W/2,H/2+3)})}
 /* ---------- textures ---------- */
 function wheelFace(){return cvx(512,512,g=>{g.translate(256,256);g.fillStyle='#2a1608';g.beginPath();g.arc(0,0,256,0,TAU);g.fill();
@@ -56,17 +60,8 @@ function buildGames(){built=true;
  const tur=new THREE.Mesh(new THREE.ConeGeometry(.07,.13,10),bmat({color:0xf0c030}));tur.position.y=.065;wr.add(tur);const kn=new THREE.Mesh(new THREE.SphereGeometry(.024,8,6),bmat({color:0xfff0a0}));kn.position.y=.14;wr.add(kn);
  const ball=new THREE.Mesh(new THREE.SphereGeometry(.021,10,8),bmat({color:0xffffff}));GG.add(ball);WG.ball=ball;
  /* chips on the felt */
- const stack=(x,z,cols)=>cols.forEach((c,i)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.022,.022,.008,12),bmat({color:c}));m.position.set(x,TY+.012+i*.009,z);GG.add(m)});
  stack(-4.4,RTZ+.55,[0xd02020,0xd02020,0xf0f0f0,0xd02020]);stack(-4.9,RTZ-.5,[0x2050c0,0x2050c0,0x2050c0]);stack(-5.6,RTZ+.45,[0x20a040,0xf0f0f0,0x20a040,0x20a040,0x20a040]);
- /* blackjack table (half-round, flat edge to the dealer) */
- const hb=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.7,.82,30,1,false,-Math.PI/2,Math.PI),bmat({color:0x2a160a}));hb.position.set(BX,.41,BZ);GG.add(hb);
- bxg(BX,.0,BZ,3.4,.82,.04,0x2a160a);
- const ht=new THREE.Mesh(new THREE.CylinderGeometry(1.76,1.76,.08,30,1,false,-Math.PI/2,Math.PI),bmat({color:0x4a2812}));ht.position.set(BX,.86,BZ);GG.add(ht);bxg(BX,.82,BZ,3.52,.08,.04,0x4a2812);
- const felt=new THREE.Mesh(new THREE.CircleGeometry(1.62,32,Math.PI,Math.PI).rotateX(-Math.PI/2),bmat({map:cvx(512,512,(g)=>{g.fillStyle='#146a34';g.fillRect(0,0,512,512);g.strokeStyle='#e8d8a0';g.lineWidth=5;g.beginPath();g.arc(256,256,246,0,Math.PI);g.stroke();g.lineWidth=2;g.beginPath();g.arc(256,256,226,0,Math.PI);g.stroke();
-  g.fillStyle='#e8d8a0';g.textAlign='center';g.textBaseline='middle';g.font='bold 22px Georgia,serif';g.fillText('BLACKJACK PAYS 3 TO 2',256,318);g.font='15px Georgia,serif';g.fillText('DEALER MUST STAND ON 17',256,346);g.strokeStyle='#f0c030';g.lineWidth=3;g.beginPath();g.arc(256,440,34,0,TAU);g.stroke();
-  g.strokeStyle='#e8d8a0';g.lineWidth=2;g.strokeRect(190,268-58,132,0);g.strokeStyle='rgba(232,216,160,.5)';g.strokeRect(210,262,92,18)})}));felt.position.set(BX,.906,BZ);GG.add(felt);
- const shoe=bxg(BX+1.28,.9,BZ+.22,.22,.12,.3,0x1a1a20);shoe.rotation.y=.4;
- stack(BX-1.1,BZ+.5,[0xf0f0f0,0xf0f0f0,0xd02020]);stack(BX+.9,BZ+.6,[0x20a040,0x20a040,0x2050c0]);
+ bjTable(6.2,-5.0,'#146a34');
  /* fruit machines along both side walls */
  for(const sd of[-1,1])SLOTZ.forEach((z,i)=>{const wx=sd*10.42,fx=sd*10.1,col=[0xa01818,0x1a4aa0,0x6a1a8a][(i+(sd>0?1:0))%3];
   bxg(wx,0,z,.62,1.9,.9,col);bxg(wx,0,z,.7,.3,.96,0x2a2a30);bxg(wx,1.9,z,.7,.1,.96,0xe8bf4a);bxg(fx,.95,z,.14,.1,.8,0x222228);
@@ -81,19 +76,31 @@ function buildGames(){built=true;
  /* the staff */
  const sp1=pSpec(8841,{f:true,hs:1,ts:1,gl:false,scarf:null,bp:false,bag:0,old:false,tc:[.12,.05,.1],sk:PSK[1]}),sp2=pSpec(3321,{f:false,hs:0,ts:1,beard:false,gl:false,scarf:null,bp:false,bag:0,old:false,tc:[.1,.1,.14],sk:PSK[2]});
  PEOPLE.push(personIn(sp1,-5.2,-5.7,0),personIn(sp2,BX,BZ-.45,0))}
+const stack=(x,z,cols)=>cols.forEach((c,i)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.022,.022,.008,12),bmat({color:c}));m.position.set(x,TY+.012+i*.009,z);GG.add(m)});
+function bjTable(BX,BZ,fc){
+ /* blackjack table (half-round, flat edge to the dealer) */
+ const hb=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.7,.82,30,1,false,-Math.PI/2,Math.PI),bmat({color:0x2a160a}));hb.position.set(BX,.41,BZ);GG.add(hb);
+ bxg(BX,.0,BZ,3.4,.82,.04,0x2a160a);
+ const ht=new THREE.Mesh(new THREE.CylinderGeometry(1.76,1.76,.08,30,1,false,-Math.PI/2,Math.PI),bmat({color:0x4a2812}));ht.position.set(BX,.86,BZ);GG.add(ht);bxg(BX,.82,BZ,3.52,.08,.04,0x4a2812);
+ const felt=new THREE.Mesh(new THREE.CircleGeometry(1.62,32,Math.PI,Math.PI).rotateX(-Math.PI/2),bmat({map:cvx(512,512,(g)=>{g.fillStyle=fc;g.fillRect(0,0,512,512);g.strokeStyle='#e8d8a0';g.lineWidth=5;g.beginPath();g.arc(256,256,246,0,Math.PI);g.stroke();g.lineWidth=2;g.beginPath();g.arc(256,256,226,0,Math.PI);g.stroke();
+  g.fillStyle='#e8d8a0';g.textAlign='center';g.textBaseline='middle';g.font='bold 22px Georgia,serif';g.fillText('BLACKJACK PAYS 3 TO 2',256,318);g.font='15px Georgia,serif';g.fillText('DEALER MUST STAND ON 17',256,346);g.strokeStyle='#f0c030';g.lineWidth=3;g.beginPath();g.arc(256,440,34,0,TAU);g.stroke();
+  g.strokeStyle='#e8d8a0';g.lineWidth=2;g.strokeRect(190,268-58,132,0);g.strokeStyle='rgba(232,216,160,.5)';g.strokeRect(210,262,92,18)})}));felt.position.set(BX,.906,BZ);GG.add(felt);
+ const shoe=bxg(BX+1.28,.9,BZ+.22,.22,.12,.3,0x1a1a20);shoe.rotation.y=.4;
+ stack(BX-1.1,BZ+.5,[0xf0f0f0,0xf0f0f0,0xd02020]);stack(BX+.9,BZ+.6,[0x20a040,0x20a040,0x2050c0]);
+}
 function wheelUpdate(){const w=WG;w.rot.rotation.y=-w.aw;w.ball.position.set(WX+Math.cos(w.ab)*w.r,TY+.2+w.y,WZ+Math.sin(w.ab)*w.r)}
 /* ---------- shared: open / close a table game ---------- */
 function gOpen(camFn,fov){busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;document.body.classList.add('dz');man.visible=false;const h=document.getElementById('hud');if(h){h._dd=h.style.display;h.style.display='none'}DZ.fn=camFn;DZ.fov=fov;DZ.look=DZ.look||new THREE.Vector3();DZ.tp=camFn();DZ.on=1}
 function gClose(){DZ.fn=null;DZ.fov=46;DZ.on=0;document.body.classList.remove('dz');man.visible=true;const h=document.getElementById('hud');if(h)h.style.display=h._dd||'';DZ.exit=1}
 const wv=a=>SG.localToWorld(new THREE.Vector3(a[0],a[1],a[2]));
-function chipRow(par,vals,sel,fn){const els=[];vals.forEach(v=>{const b=mk('button',BTN+'border-radius:50%;width:min(8.5vh,40px);height:min(8.5vh,40px);padding:0;font-size:12px;background:'+({1:'#e8e8e8',5:'#d02020',10:'#2050c0',25:'#20a040',100:'#222'}[v]||'#888')+';'+(v===1?'color:#222;':''),'£'+v,par);b.onclick=e=>{e.stopPropagation();els.forEach(x=>x.style.outline='');b.style.outline='3px solid #ffe060';fn(v)};if(v===sel)b.style.outline='3px solid #ffe060';els.push(b)});return els}
+function chipRow(par,vals,sel,fn){const els=[];vals.forEach(v=>{const b=mk('button',BTN+'border-radius:50%;width:min(8.5vh,40px);height:min(8.5vh,40px);padding:0;font-size:12px;background:'+({1:'#e8e8e8',5:'#d02020',10:'#2050c0',25:'#20a040',100:'#222',500:'#7a1a8a',250:'#a06a10'}[v]||'#888')+';'+(v===1?'color:#222;':''),'£'+v,par);b.onclick=e=>{e.stopPropagation();els.forEach(x=>x.style.outline='');b.style.outline='3px solid #ffe060';fn(v)};if(v===sel)b.style.outline='3px solid #ffe060';els.push(b)});return els}
 /* =================================================== ROULETTE =================================================== */
 let RG=null;
 function rouCam(){DZ.look.copy(wv(RG.cl));return wv(RG.cp)}
 function rouMult(k,n){if(k==='n'+n)return 36;switch(k){case'red':return colOf(n)==='r'?2:0;case'black':return colOf(n)==='b'?2:0;case'odd':return n>0&&n%2?2:0;case'even':return n>0&&n%2===0?2:0;case'low':return n>=1&&n<=18?2:0;case'high':return n>=19?2:0;
  case'd1':return n>=1&&n<=12?3:0;case'd2':return n>=13&&n<=24?3:0;case'd3':return n>=25?3:0;case'c1':return n>0&&n%3===1?3:0;case'c2':return n>0&&n%3===2?3:0;case'c3':return n>0&&n%3===0?3:0}return 0}
 const rouTotal=()=>Object.values(RG.bets).reduce((a,b)=>a+b,0);
-function rouOpen(){if(RG||busy)return;rouStart()}
+function rouOpen(){if(RG||busy||needChips())return;rouStart()}
 function rouStart(){
  const R=RG={ph:'bet',bets:{},stack:[],chip:5,rebet:null,res:null,t:0,cells:{},last:performance.now(),cp:[-6.0,2.75,-1.3],cl:[-6.0,.55,-3.4],tcp:null,tcl:null,msgT:0};
  gOpen(rouCam,52);R.tcp=R.cp.slice();R.tcl=R.cl.slice();
@@ -116,16 +123,16 @@ function rouStart(){
  R.tot=mk('div','color:#ffe890;min-width:84px;text-align:center',null,ctl);R.bSp=mk('button',BTN+'background:#2a8a3a;font-size:15px;padding:7px 18px','SPIN',ctl);R.bSp.onclick=()=>rouSpin();
  R.kd=e=>{if(e.key==='Escape')rouClose()};addEventListener('keydown',R.kd);
  rouRefresh();rouHist();R.raf=requestAnimationFrame(rouLoop)}
-function rouRefresh(){const R=RG;if(!R)return;R.bal.textContent='CASH '+money(cash);for(const k in R.cells){const v=R.bets[k]||0,b=R.cells[k].b;b.style.display=v?'block':'none';b.textContent=v||''}
+function rouRefresh(){const R=RG;if(!R)return;R.bal.textContent='CHIPS '+money(CHS.chips);for(const k in R.cells){const v=R.bets[k]||0,b=R.cells[k].b;b.style.display=v?'block':'none';b.textContent=v||''}
  const t=rouTotal(),bet=R.ph==='bet';R.tot.textContent=t?'BET '+money(t):'PLACE BETS';R.bSp.style.opacity=bet&&t?1:.4;R.bClr.style.opacity=R.bUn.style.opacity=bet&&t?1:.4;R.bRe.style.opacity=bet&&R.rebet&&!t?1:.4;R.lv.style.opacity=bet?1:.35}
 function rouHist(){const R=RG;R.hist.textContent='';HIST.slice(-12).forEach(n=>{mk('span','display:inline-block;min-width:22px;padding:1px 3px;margin:0 1px;border-radius:9px;background:'+HEX[colOf(n)]+';border:1px solid #e8c050;font-size:11px',String(n),R.hist)})}
 function rouMsg(t,ms){RG.msg.textContent=t;RG.msgT=ms||0}
-function rouBet(k){const R=RG;if(!R||R.ph!=='bet')return;if(cash<R.chip){toast('NOT ENOUGH CASH');return}R.big.style.display='none';cash-=R.chip;R.bets[k]=(R.bets[k]||0)+R.chip;R.stack.push([k,R.chip]);beep(760,.05,'square',.04);refreshCash();rouRefresh()}
-function rouUndo(){const R=RG;if(!R||R.ph!=='bet'||!R.stack.length)return;const[k,v]=R.stack.pop();R.bets[k]-=v;if(!R.bets[k])delete R.bets[k];cash+=v;refreshCash();rouRefresh()}
-function rouClear(){const R=RG;if(!R||R.ph!=='bet')return;cash+=rouTotal();R.bets={};R.stack=[];refreshCash();rouRefresh()}
-function rouRebet(){const R=RG;if(!R||R.ph!=='bet'||!R.rebet||rouTotal())return;const t=R.rebet.stack.reduce((a,b)=>a+b[1],0);if(cash<t){toast('NOT ENOUGH CASH');return}R.big.style.display='none';cash-=t;R.bets=Object.assign({},R.rebet.bets);R.stack=R.rebet.stack.map(a=>a.slice());beep(760,.05,'square',.04);refreshCash();rouRefresh()}
+function rouBet(k){const R=RG;if(!R||R.ph!=='bet')return;if(CHS.chips<R.chip){toast('NOT ENOUGH CHIPS');return}R.big.style.display='none';CHS.chips-=R.chip;R.bets[k]=(R.bets[k]||0)+R.chip;R.stack.push([k,R.chip]);beep(760,.05,'square',.04);refreshCash();rouRefresh()}
+function rouUndo(){const R=RG;if(!R||R.ph!=='bet'||!R.stack.length)return;const[k,v]=R.stack.pop();R.bets[k]-=v;if(!R.bets[k])delete R.bets[k];CHS.chips+=v;refreshCash();rouRefresh()}
+function rouClear(){const R=RG;if(!R||R.ph!=='bet')return;CHS.chips+=rouTotal();R.bets={};R.stack=[];refreshCash();rouRefresh()}
+function rouRebet(){const R=RG;if(!R||R.ph!=='bet'||!R.rebet||rouTotal())return;const t=R.rebet.stack.reduce((a,b)=>a+b[1],0);if(CHS.chips<t){toast('NOT ENOUGH CHIPS');return}R.big.style.display='none';CHS.chips-=t;R.bets=Object.assign({},R.rebet.bets);R.stack=R.rebet.stack.map(a=>a.slice());beep(760,.05,'square',.04);refreshCash();rouRefresh()}
 function rouSpin(){const R=RG;if(!R||R.ph!=='bet')return;if(!rouTotal()){toast('PLACE A BET FIRST');return}R.big.style.display='none';R.rebet={bets:Object.assign({},R.bets),stack:R.stack.map(a=>a.slice())};
- R.res=Math.floor(Math.random()*37);R.idx=WO.indexOf(R.res);R.ph='spin';R.sp=1;R.t=0;R.w0=10.5+Math.random()*2;WG.ab=WG.aw+Math.random()*TAU;WG.r=.575;WG.y=0;R.tcp=[WX,1.95,WZ+.95];R.tcl=[WX,.92,WZ-.02];rouMsg('NO MORE BETS!');beep(300,.2,'sawtooth',.05);rouRefresh()}
+ wager(rouTotal());R.res=Math.floor(Math.random()*37);R.idx=WO.indexOf(R.res);R.ph='spin';R.sp=1;R.t=0;R.w0=10.5+Math.random()*2;WG.ab=WG.aw+Math.random()*TAU;WG.r=.575;WG.y=0;R.tcp=[WX,1.95,WZ+.95];R.tcl=[WX,.92,WZ-.02];rouMsg('NO MORE BETS!');beep(300,.2,'sawtooth',.05);rouRefresh()}
 function rouStep(dt){const R=RG;WG.aw+=dt*(R.ph==='spin'?1.25:.5);
  if(R.ph==='spin'){R.t+=dt;const T1=5.0,T2=2.6;
   if(R.sp===1){const u=Math.min(1,R.t/T1),w=2.4+(R.w0-2.4)*Math.pow(1-u,1.5);WG.ab-=w*dt;WG.r=.575;if(R.t>=T1){R.sp=2;R.t2=0;R.relS=WG.ab-WG.aw;const pa=(R.idx+.5)/37*TAU,k=Math.ceil((pa-R.relS+1.5*TAU)/TAU);R.relE=pa-TAU*k;R.lastP=-1}}
@@ -135,7 +142,7 @@ function rouStep(dt){const R=RG;WG.aw+=dt*(R.ph==='spin'?1.25:.5);
   else if(R.sp===3){WG.ab=WG.aw+(R.idx+.5)/37*TAU;R.t3+=dt;if(R.t3>.9)rouPay()}}
  else WG.ab=WG.aw+(WG.idx+.5)/37*TAU;
  wheelUpdate()}
-function rouPay(){const R=RG,n=R.res;let ret=0;for(const k in R.bets)ret+=R.bets[k]*rouMult(k,n);const stake=rouTotal();cash+=ret;HIST.push(n);if(HIST.length>40)HIST.shift();
+function rouPay(){const R=RG,n=R.res;let ret=0;for(const k in R.bets)ret+=R.bets[k]*rouMult(k,n);const stake=rouTotal();CHS.chips+=ret;if(ret>stake)won(ret-stake);HIST.push(n);if(HIST.length>40)HIST.shift();
  R.big.textContent=String(n);R.big.style.background=HEX[colOf(n)];R.big.style.display='block';
  if(ret>stake){rouMsg(n+' '+({g:'GREEN',r:'RED',b:'BLACK'}[colOf(n)])+' - YOU WIN '+money(ret-stake)+'!');[0,1,2].forEach(i=>setTimeout(()=>beep(660+i*220,.12,'square',.06),i*110))}else if(ret===stake&&ret>0)rouMsg(n+' - YOU GET YOUR STAKE BACK');else rouMsg(n+' '+({g:'GREEN',r:'RED',b:'BLACK'}[colOf(n)])+' - HOUSE WINS');
  R.bets={};R.stack=[];R.ph='bet';R.tcp=[-6.0,2.75,-1.3];R.tcl=[-6.0,.55,-3.4];refreshCash();rouRefresh();rouHist()}
@@ -152,52 +159,53 @@ function hv(h){let t=0,a=0;for(const c of h){t+=cval(c);if(c.r==='A')a++}while(t
 function newShoe(){const s=[];for(let d=0;d<6;d++)for(const su of SUITS)for(const r of RANKS)s.push({r,s:su});for(let i=s.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[s[i],s[j]]=[s[j],s[i]]}return s}
 let SHOE=null;
 function bjCam(){DZ.look.copy(wv(BJ.cl));return wv(BJ.cp)}
-function bjOpen(){if(BJ||busy)return;if(!SHOE||SHOE.length<60)SHOE=newShoe();
- const B=BJ={ph:'bet',bet:0,chip:5,pl:[],de:[],meshes:[],cp:[BX,1.85,-3.15],cl:[BX,.9,-4.55],last:performance.now(),dbl:false,tm:[]};gOpen(bjCam,50);
+function bjOpen(vip){vip=vip===true;if(BJ||busy||needChips())return;BX=vip?0:6.2;BZ=vip?-6.3:-5.0;if(!SHOE||SHOE.length<60)SHOE=newShoe();
+ const B=BJ={vip,ph:'bet',bet:0,chip:vip?25:5,pl:[],de:[],meshes:[],cp:[BX,1.85,BZ+1.85],cl:[BX,.9,BZ+.45],last:performance.now(),dbl:false,tm:[]};gOpen(bjCam,50);
  const ov=B.ov=mk('div','position:fixed;inset:0;z-index:60;font:bold 13px monospace;color:#fff;pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none');document.body.appendChild(ov);
  const top=mk('div','position:absolute;left:0;right:0;top:6px;display:flex;justify-content:space-between;align-items:flex-start;padding:0 8px;text-shadow:2px 2px 0 #000',null,ov);
- B.bal=mk('div','font-size:16px;color:#ffe890;min-width:110px',null,top);const mid=mk('div','text-align:center;flex:1',null,top);mk('div','color:#f5e6a0;font-size:15px','BLACKJACK',mid);B.msg=mk('div','min-height:18px;color:#9fe;margin-top:2px;font-size:14px',null,mid);
+ B.bal=mk('div','font-size:16px;color:#ffe890;min-width:110px',null,top);const mid=mk('div','text-align:center;flex:1',null,top);mk('div','color:#f5e6a0;font-size:15px',vip?'HIGH ROLLER BLACKJACK':'BLACKJACK',mid);B.msg=mk('div','min-height:18px;color:#9fe;margin-top:2px;font-size:14px',null,mid);
  B.lv=mk('button',BTN+'font-size:12px;min-width:60px','LEAVE',top);B.lv.onclick=()=>bjClose();
  B.sc=mk('div','position:absolute;left:8px;top:48px;font-size:14px;text-shadow:2px 2px 0 #000;line-height:1.5',null,ov);
  const pn=mk('div','position:absolute;left:0;right:0;bottom:0;padding:8px 6px 10px;background:linear-gradient(0deg,rgba(0,0,0,.85),rgba(0,0,0,.4));display:flex;gap:8px;justify-content:center;align-items:center;flex-wrap:wrap;pointer-events:auto',null,ov);pn.onpointerdown=e=>e.stopPropagation();B.pn=pn;
  B.kd=e=>{if(e.key==='Escape')bjClose()};addEventListener('keydown',B.kd);bjUI();B.raf=requestAnimationFrame(bjLoop)}
-function bjUI(){const B=BJ;B.pn.textContent='';B.bal.textContent='CASH '+money(cash);B.lv.style.opacity=B.ph==='bet'?1:.35;
- if(B.ph==='bet'){chipRow(B.pn,[1,5,25,100],B.chip,v=>{B.chip=v});const add=mk('button',BTN+'background:#445','ADD CHIP',B.pn);add.onclick=()=>{if(cash<B.chip){toast('NOT ENOUGH CASH');return}cash-=B.chip;B.bet+=B.chip;beep(760,.05,'square',.04);refreshCash();bjUI()};
-  const clr=mk('button',BTN+'background:#7a2a2a','CLEAR',B.pn);clr.onclick=()=>{cash+=B.bet;B.bet=0;refreshCash();bjUI()};mk('div','color:#ffe890;min-width:84px;text-align:center','BET '+money(B.bet),B.pn);
+function bjUI(){const B=BJ;B.pn.textContent='';B.bal.textContent='CHIPS '+money(CHS.chips);B.lv.style.opacity=B.ph==='bet'?1:.35;
+ if(B.ph==='bet'){chipRow(B.pn,B.vip?[25,100,500]:[1,5,25,100],B.chip,v=>{B.chip=v});const add=mk('button',BTN+'background:#445','ADD CHIP',B.pn);add.onclick=()=>{if(CHS.chips<B.chip){toast('NOT ENOUGH CHIPS');return}CHS.chips-=B.chip;B.bet+=B.chip;beep(760,.05,'square',.04);refreshCash();bjUI()};
+  const clr=mk('button',BTN+'background:#7a2a2a','CLEAR',B.pn);clr.onclick=()=>{CHS.chips+=B.bet;B.bet=0;refreshCash();bjUI()};mk('div','color:#ffe890;min-width:84px;text-align:center','BET '+money(B.bet),B.pn);
   const dl=mk('button',BTN+'background:#2a8a3a;font-size:15px;padding:7px 18px','DEAL',B.pn);dl.style.opacity=B.bet?1:.4;dl.onclick=()=>bjDeal();
-  if(B.lastBet&&!B.bet){const rb=mk('button',BTN+'background:#445','REBET '+money(B.lastBet),B.pn);rb.onclick=()=>{if(cash<B.lastBet){toast('NOT ENOUGH CASH');return}cash-=B.lastBet;B.bet=B.lastBet;refreshCash();bjUI()}}}
+  if(B.lastBet&&!B.bet){const rb=mk('button',BTN+'background:#445','REBET '+money(B.lastBet),B.pn);rb.onclick=()=>{if(CHS.chips<B.lastBet){toast('NOT ENOUGH CHIPS');return}CHS.chips-=B.lastBet;B.bet=B.lastBet;refreshCash();bjUI()}}}
  else if(B.ph==='player'){const h=mk('button',BTN+'background:#2a6aa0;font-size:15px;padding:8px 18px','HIT',B.pn);h.onclick=()=>bjHit();const s=mk('button',BTN+'background:#a06a1a;font-size:15px;padding:8px 18px','STAND',B.pn);s.onclick=()=>bjStand();
-  if(B.pl.length===2&&cash>=B.bet){const d=mk('button',BTN+'background:#7a2a7a;font-size:15px;padding:8px 18px','DOUBLE',B.pn);d.onclick=()=>bjDouble()}}
- B.bal.textContent='CASH '+money(cash);bjScore()}
+  if(B.pl.length===2&&CHS.chips>=B.bet){const d=mk('button',BTN+'background:#7a2a7a;font-size:15px;padding:8px 18px','DOUBLE',B.pn);d.onclick=()=>bjDouble()}}
+ B.bal.textContent='CHIPS '+money(CHS.chips);bjScore()}
 function bjScore(){const B=BJ;if(!B)return;const p=hv(B.pl),dh=B.hole?hv(B.de.slice(0,1)):hv(B.de);B.sc.textContent=B.de.length?'DEALER '+(B.hole?cval(B.de[0])===11?'11':String(cval(B.de[0])):dh.t)+(B.pl.length?'\nYOU '+p.t+(p.soft&&p.t<21?' (soft)':'')+(B.bet?'   BET '+money(B.bet):''):''):'';B.sc.style.whiteSpace='pre'}
 function later(ms,fn){const B=BJ;B.tm.push(setTimeout(()=>{if(BJ===B)fn()},ms))}
 function cardMesh(c,fromP,toP,delay){const B=BJ,m=new THREE.Mesh(new THREE.PlaneGeometry(.1,.14).rotateX(-Math.PI/2),bmat({map:cardTex(c)}));m.userData={c,t:-delay,from:fromP,to:toP,tex:c?cardTex(c):null};m.position.set(fromP[0],fromP[1],fromP[2]);m.rotation.y=(Math.random()-.5)*.3;GG.add(m);B.meshes.push(m);return m}
 function slotPos(who,i,n){const sp=n>5?.09:.11,x0=BX-(n-1)*sp/2;return who==='p'?[x0+i*sp,TY+.014+i*.0008,BZ+.7]:[x0+i*sp,TY+.014+i*.0008,BZ+.2]}
 function reflow(who){const B=BJ,hand=who==='p'?B.pl:B.de,ms=B.meshes.filter(m=>m.userData.who===who);ms.forEach((m,i)=>{m.userData.to=slotPos(who,i,hand.length)})}
 function dealTo(who,hidden){const B=BJ,hand=who==='p'?B.pl:B.de;if(SHOE.length<12)SHOE=newShoe();const c=SHOE.pop();hand.push(c);const m=cardMesh(hidden?null:c,[BX+1.3,TY+.2,BZ+.2],slotPos(who,hand.length-1,hand.length),0);m.userData.who=who;m.userData.real=c;m.userData.hid=!!hidden;reflow(who);beep(1100,.03,'square',.03);return c}
-function bjDeal(){const B=BJ;if(B.ph!=='bet'||!B.bet)return;B.lastBet=B.bet;B.ph='deal';B.hole=true;B.msgT=0;B.msg.textContent='';B.pl=[];B.de=[];for(const m of B.meshes)GG.remove(m);B.meshes=[];bjChips();bjUI();
+function bjDeal(){const B=BJ;if(B.ph!=='bet'||!B.bet)return;B.lastBet=B.bet;wager(B.bet);B.ph='deal';B.hole=true;B.msgT=0;B.msg.textContent='';B.pl=[];B.de=[];for(const m of B.meshes)GG.remove(m);B.meshes=[];bjChips();bjUI();
  later(150,()=>{dealTo('p');bjScore()});later(600,()=>{dealTo('d');bjScore()});later(1050,()=>{dealTo('p');bjScore()});later(1500,()=>{dealTo('d',true);bjScore();
   const p=hv(B.pl).t;later(500,()=>{if(p===21){bjFinish()}else{B.ph='player';bjUI()}})})}
 function bjHit(){const B=BJ;if(B.ph!=='player')return;B.ph='deal';bjUI();dealTo('p');bjScore();later(450,()=>{const t=hv(B.pl).t;if(t>21)bjFinish();else if(t===21)bjStand(true);else{B.ph='player';bjUI()}})}
-function bjDouble(){const B=BJ;if(B.ph!=='player'||B.pl.length!==2||cash<B.bet)return;cash-=B.bet;B.bet*=2;B.dbl=true;refreshCash();B.ph='deal';bjUI();bjChips();dealTo('p');bjScore();later(550,()=>bjStand(true))}
+function bjDouble(){const B=BJ;if(B.ph!=='player'||B.pl.length!==2||CHS.chips<B.bet)return;CHS.chips-=B.bet;wager(B.bet);B.bet*=2;B.dbl=true;refreshCash();B.ph='deal';bjUI();bjChips();dealTo('p');bjScore();later(550,()=>bjStand(true))}
 function bjStand(){const B=BJ;if(!(B.ph==='player'||B.ph==='deal'))return;B.ph='dealer';bjUI();later(250,()=>bjReveal(()=>bjDealerPlay()))}
 function bjReveal(cb){const B=BJ;B.hole=false;const m=B.meshes.find(x=>x.userData.hid);if(m){m.userData.hid=false;m.material.map=cardTex(m.userData.real);m.material.needsUpdate=true;m.userData.pop=.3}beep(900,.05,'square',.04);bjScore();later(550,cb)}
 function bjDealerPlay(){const B=BJ,p=hv(B.pl).t;if(p>21||(B.pl.length===2&&p===21&&B.de.length===2)){bjFinish();return}const t=hv(B.de);if(t.t<17){dealTo('d');bjScore();later(650,bjDealerPlay)}else bjFinish()}
 function bjFinish(){const B=BJ;if(B.hole){bjReveal(bjFinish);return}const p=hv(B.pl).t,d=hv(B.de).t,pbj=B.pl.length===2&&p===21&&!B.dbl,dbj=B.de.length===2&&d===21;let ret=0,txt;
  if(p>21)txt='BUST! YOU LOSE '+money(B.bet);else if(pbj&&!dbj){ret=B.bet*2.5;txt='BLACKJACK! YOU WIN '+money(ret-B.bet)}else if(dbj&&!pbj)txt='DEALER HAS BLACKJACK';else if(d>21){ret=B.bet*2;txt='DEALER BUSTS! YOU WIN '+money(B.bet)}else if(p>d){ret=B.bet*2;txt='YOU WIN '+money(B.bet)+'!'}else if(p===d){ret=B.bet;txt='PUSH - STAKE BACK'}else txt='DEALER WINS WITH '+d;
- cash+=ret;if(ret>B.bet){[0,1,2].forEach(i=>setTimeout(()=>beep(660+i*220,.12,'square',.06),i*110))}B.msg.textContent=txt;B.bet=0;B.dbl=false;B.ph='bet';B.hole=false;bjChips();refreshCash();bjScore();bjUI()}
+ CHS.chips+=ret;if(ret>B.bet)won(ret-B.bet);if(ret>B.bet){[0,1,2].forEach(i=>setTimeout(()=>beep(660+i*220,.12,'square',.06),i*110))}B.msg.textContent=txt;B.bet=0;B.dbl=false;B.ph='bet';B.hole=false;bjChips();refreshCash();bjScore();bjUI()}
 function bjChips(){const B=BJ;if(B.chipG)GG.remove(B.chipG);B.chipG=null;if(!B.bet)return;const g=new THREE.Group(),cols=[[100,0x222222],[25,0x20a040],[5,0xd02020],[1,0xf0f0f0]];let rem=B.bet,y=0,col=0;for(const[v,c]of cols){let n=Math.floor(rem/v);rem-=n*v;n=Math.min(n,8);for(let i=0;i<n;i++){const m=new THREE.Mesh(new THREE.CylinderGeometry(.03,.03,.008,14),bmat({color:c}));m.position.set((col%3-1)*.07*0,TY+.012+y*.0085,0);g.add(m);y++}}g.position.set(BX,0,BZ+1.17);GG.add(g);B.chipG=g}
 function bjLoop(now){const B=BJ;if(!B)return;const dt=Math.min(.05,(now-B.last)/1000);B.last=now;
  for(const m of B.meshes){const u=m.userData;if(u.t<1){u.t+=dt/.32;const e=ease(clampf(u.t,0,1));if(u.t>=0){const f=u.from,t=u.to;m.position.set(lerpf(f[0],t[0],e),lerpf(f[1],t[1],e)+Math.sin(e*Math.PI)*.12,lerpf(f[2],t[2],e));m.rotation.y*=(1-Math.min(1,dt*6))}}else{m.position.x+=(u.to[0]-m.position.x)*Math.min(1,dt*10);m.position.z+=(u.to[2]-m.position.z)*Math.min(1,dt*10)}
   if(u.pop>0){u.pop-=dt;m.position.y=u.to[1]+Math.sin(Math.max(0,u.pop)/.3*Math.PI)*.05}}
  B.raf=requestAnimationFrame(bjLoop)}
-function bjClose(){const B=BJ;if(!B||(B.ph!=='bet'))return;cash+=B.bet;B.bet=0;refreshCash();cancelAnimationFrame(B.raf);B.tm.forEach(clearTimeout);removeEventListener('keydown',B.kd);for(const m of B.meshes)GG.remove(m);if(B.chipG)GG.remove(B.chipG);B.ov.remove();BJ=null;gClose()}
+function bjClose(){const B=BJ;if(!B||(B.ph!=='bet'))return;CHS.chips+=B.bet;B.bet=0;refreshCash();cancelAnimationFrame(B.raf);B.tm.forEach(clearTimeout);removeEventListener('keydown',B.kd);for(const m of B.meshes)GG.remove(m);if(B.chipG)GG.remove(B.chipG);B.ov.remove();BJ=null;gClose()}
 /* ---------- hook into the casino hall ---------- */
 {const b0=buildShop;buildShop=function(o){b0(o);if(!o||!o.casino)return;if(!built)buildGames();SG.add(GG);for(const p of PEOPLE)SG.add(p);
  IROOM.push([-8.8,-3.6,-5.5,-3.3],[4.3,8.1,-5.8,-3.4]);
  for(const sd of[-1,1])for(const z of SLOTZ)IROOM.push([Math.min(sd*10.1,sd*10.73),Math.max(sd*10.1,sd*10.73),z-.46,z+.46]);
  IA.push({r:[-7.9,-3.8,-3.3,-2.7],label:'PLAY ROULETTE',fn:rouOpen},{r:[4.7,7.7,-3.4,-2.8],label:'PLAY BLACKJACK',fn:bjOpen});
- for(const sd of[-1,1])for(const z of SLOTZ)IA.push({r:[Math.min(sd*10.1,sd*10.73),Math.max(sd*10.1,sd*10.73),z-.46,z+.46],label:'FRUIT MACHINE (£1)',fn:()=>sltOpen()})}}
+}}
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(built&&GS.inside&&SHOPCUR&&SHOPCUR.o&&SHOPCUR.o.casino&&!RG){WG.aw+=dt*.5;WG.ab=WG.aw+(WG.idx+.5)/37*TAU;WG.r=.39;WG.y=0;wheelUpdate()}}}
+window.CG={S:CHS,wager,won,needChips,gOpen,gClose,mk,BTN,bmat,cvx,bxg,flat,wall,sign,GG,wv,money,chipRow,cardTex,newShoe,cval,SLOTZ,TY,ease,lerpf,clampf,TAU,stack,bjTable,RANKS,SUITS,bjOpen,rouOpen};
 window.CASINOGAMES={rouOpen,bjOpen,WG,get RG(){return RG},get BJ(){return BJ}};
 })();
