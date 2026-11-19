@@ -230,7 +230,12 @@ function buildParts(H,K){
  if(K.rf===3){const bw=rhw*1.7;pbx(bw,.1,.14,0,yRoof+.08,zRf-.15,M);for(const i of[-3,-1,1,3])pbx(bw*.17,.07,.03,i*bw*.22,yRoof+.08,zRf-.075,lens)}
  // bonnet
  if(K.bn===1){const dl=Math.min(.5,lb*.6),bw=Math.min(.55,hw*.6);pbx(bw,.11,dl,0,yb+.05,zb,M,-.13);pbx(bw*.8,.07,.04,0,yb+.065,zb+dl/2,vent)}
- if(K.bn===2){const n=Math.max(2,Math.min(5,Math.floor(lb/.11)));for(const s of[-1,1])for(let i=0;i<n;i++){const zz=z1-.2-i*(lb-.2)/n,yy=topY(H,s*hw*.38,zz);if(yy!=null)pbx(Math.min(.36,hw*.4),.025,.04,s*hw*.38,yy+.012,zz,vent,0,0,s*.06)}}
+ if(K.bn===2){const n=Math.max(2,Math.min(5,Math.floor(lb/.11))),P=[],I=[],sw=Math.min(.34,hw*.36),seg=6;
+  for(const s of[-1,1])for(let i=0;i<n;i++){const zz=z1-.22-i*(lb-.22)/n,xc=s*hw*.34,rows=[];let ok=true;
+   for(const dz of[-.02,.02]){const row=[];for(let k=0;k<=seg;k++){const x=xc-sw/2+sw*k/seg,r=cast(H,x,H.y1+2,zz+dz,0,-1,0);if(!r||r.n.y<.82){ok=false;break}row.push(r.p.y+.013)}if(!ok)break;rows.push(row)}
+   if(!ok)continue;const o=P.length/3;for(let q=0;q<2;q++)for(let k=0;k<=seg;k++)P.push(xc-sw/2+sw*k/seg,rows[q][k],zz+(q?.02:-.02));
+   for(let k=0;k<seg;k++){const a=o+k,b2=a+1,c=a+seg+1,d=c+1;I.push(a,b2,c,b2,d,c)}}
+  if(I.length){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setIndex(I);const vm=new THREE.MeshBasicMaterial({color:0x08080a,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),m=new THREE.Mesh(g,vm);m.frustumCulled=false;kitG.add(m)}}
  // exhaust
  if(K.ex>=1){const tip=x=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.16,10).rotateX(Math.PI/2),chrome);m.position.set(x,.3,zrL+.0);kitG.add(m);const i=new THREE.Mesh(new THREE.CircleGeometry(.035,8).rotateY(Math.PI),vent);i.position.set(x,.3,zrL-.082);kitG.add(i)};
   if(K.ex===1)tip(hw*.5);else{tip(hw*.5);tip(-hw*.5)}}}
