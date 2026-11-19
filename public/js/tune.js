@@ -186,28 +186,34 @@ function buildParts(H,K){
  for(const[z,y]of smp)if(y!=null&&y>yRoof)yRoof=y;
  const zs=smp.filter(a=>a[1]!=null&&a[1]>yRoof-.06).map(a=>a[0]);if(zs.length){zRf=Math.max(...zs);zRr=Math.min(...zs)}
  const yDeck=(topY(H,0,z0+L*.1)??H.y1*.7),yBon=(topY(H,0,z1-L*.18)??H.y1*.6);
+ const roofR=cast(H,hw+2,yRoof-.12,(zRf+zRr)/2,-1,0,0),rhw=roofR?Math.min(hw,Math.abs(roofR.p.x)):hw*.85;
+ // bonnet extent: from the nose back to where the windscreen starts rising
+ let zBn0=z1-L*.25;{let yp=topY(H,0,z1-.12);for(let i=1;i<=70;i++){const z=z1-.12-i*.03,y=topY(H,0,z);if(y!=null&&yp!=null&&(y-yp)/.03>.75&&i>4){zBn0=z+.03;break}if(y!=null)yp=y}}
+ const zb=(z1-.12+zBn0)/2,yb=topY(H,0,zb)??yBon,lb=z1-.12-zBn0;
+ const rl=cast(H,0,.3,z0-6,0,0,1),fl=cast(H,0,.24,z1+6,0,0,-1),zrL=rl?rl.p.z:z0,zfL=fl?fl.p.z:z1;
  const sx=(()=>{const r=cast(H,hw+2,H.y1*.2,(z0+z1)/2,-1,0,0);return r?r.p.x:hw})();
  // spoilers: on the roof edge of hatches/estates, on the boot lid of saloons and roadsters
  const hatch=(zRr-z0)<L*.24,zS=hatch?zRr+.06:z0+L*.13,yS=hatch?yRoof:(topY(H,0,zS)??yDeck);
- if(K.sp===1)pbx(hw*1.7,.045,.2,0,yS+.03,zS,M);
- if(K.sp===2){pbx(hw*1.8,.05,.34,0,yS+.07,zS,M,-.28);for(const s of[-1,1])pbx(.03,.12,.3,s*hw*.88,yS+.06,zS,M)}
- if(K.sp>=3){const big=K.sp===4,hgt=big?.45:.26,ch=big?.5:.38;pbx(hw*1.7,.05,ch,0,yS+hgt,zS,M,-.08);if(big)pbx(hw*1.7,.07,.06,0,yS+hgt+.07,zS-.2,M);
-  for(const s of[-1,1]){pbx(.05,hgt,.07,s*hw*.5,yS+hgt/2,zS+.02,M);pbx(.025,.15,ch+.04,s*hw*.86,yS+hgt+.03,zS,M)}}
+ const sw=hatch?Math.min(hw*1.7,rhw*2+.06):hw*1.7;
+ if(K.sp===1)pbx(sw,.045,.2,0,yS+.03,zS,M);
+ if(K.sp===2){pbx(sw,.05,.34,0,yS+.07,zS,M,-.28);for(const s of[-1,1])pbx(.03,.12,.3,s*(sw/2-.01),yS+.06,zS,M)}
+ if(K.sp>=3){const big=K.sp===4,hgt=big?.45:.26,ch=big?.5:.38;pbx(sw,.05,ch,0,yS+hgt,zS,M,-.08);if(big)pbx(sw,.07,.06,0,yS+hgt+.07,zS-.2,M);
+  for(const s of[-1,1]){pbx(.05,hgt,.07,s*sw*.3,yS+hgt/2,zS+.02,M);pbx(.025,.15,ch+.04,s*(sw/2-.01),yS+hgt+.03,zS,M)}}
  // front
- if(K.fr>=1){pbx(hw*1.86,.04,.34,0,.17,z1+.04,M);if(K.fr===2){for(const s of[-1,1]){pbx(.03,.18,.22,s*hw*.9,.3,z1-.08,M,0,s*.3);pbx(.03,.1,.2,s*hw*.7,.22,z1-.02,M,0,s*-.25)}pbx(hw*1.7,.05,.1,0,.2,z1+.2,M)}}
+ if(K.fr>=1){pbx(hw*1.8,.04,.3,0,.17,zfL-.02,M);if(K.fr===2){for(const s of[-1,1]){pbx(.03,.18,.22,s*hw*.9,.3,zfL-.1,M,0,s*.3);pbx(.03,.1,.2,s*hw*.7,.22,zfL-.04,M,0,s*-.25)}pbx(hw*1.6,.05,.1,0,.2,zfL+.1,M)}}
  // side skirts
- if(K.sk>=1){const w=K.sk===2?.1:.07,h=K.sk===2?.18:.13;for(const s of[-1,1])pbx(w,h,L*.38,s*(sx+w/2-.02),.22,z0+L*.5,M)}
+ if(K.sk>=1){const lo=cast(H,hw+2,.3,(z0+z1)/2,-1,0,0),sl=lo?Math.max(sx,Math.abs(lo.p.x)):sx,w=K.sk===2?.15:.1,h=K.sk===2?.22:.17;for(const s of[-1,1])pbx(w,h,L*.4,s*(sl+w/2+.01),.27,(z0+z1)/2,M)}
  // rear diffuser
- if(K.rr>=1){pbx(hw*1.2,.05,.34,0,.19,z0+.2,M,.12);if(K.rr===2){for(let i=-2;i<=2;i++)pbx(.025,.1,.32,i*hw*.26,.15,z0+.2,M,.12);pbx(hw*1.3,.04,.26,0,.11,z0+.16,M)}}
+ if(K.rr>=1){pbx(hw*1.2,.05,.34,0,.19,zrL+.2,M,.12);if(K.rr===2){for(let i=-2;i<=2;i++)pbx(.025,.1,.32,i*hw*.26,.15,zrL+.2,M,.12);pbx(hw*1.3,.04,.26,0,.11,zrL+.16,M)}}
  // roof
- if(K.rf===1){pbx(.5,.1,.4,0,yRoof+.05,zRf-.3,M,.15);pbx(.4,.07,.04,0,yRoof+.08,zRf-.12,vent)}
+ if(K.rf===1){pbx(Math.min(.5,rhw*.9),.1,.4,0,yRoof+.05,zRf-.3,M,.15);pbx(Math.min(.4,rhw*.7),.07,.04,0,yRoof+.08,zRf-.12,vent)}
  if(K.rf===2){pbx(.03,.17,.5,0,yRoof+.08,zRr+.3,M,-.12);pbx(.05,.04,.14,0,yRoof+.01,zRr+.42,M)}
- if(K.rf===3){pbx(hw*1.3,.1,.14,0,yRoof+.08,zRf-.15,M);for(const i of[-3,-1,1,3])pbx(hw*.2,.07,.03,i*hw*.28,yRoof+.08,zRf-.075,lens)}
+ if(K.rf===3){const bw=rhw*1.7;pbx(bw,.1,.14,0,yRoof+.08,zRf-.15,M);for(const i of[-3,-1,1,3])pbx(bw*.17,.07,.03,i*bw*.22,yRoof+.08,zRf-.075,lens)}
  // bonnet
- if(K.bn===1){pbx(.5,.1,.45,0,yBon+.06,z1-L*.28,M,-.15);pbx(.4,.06,.04,0,yBon+.07,z1-L*.28+.22,vent)}
- if(K.bn===2)for(const s of[-1,1])for(let i=0;i<4;i++)pbx(.34,.02,.035,s*hw*.4,yBon+.012,z1-L*.2-i*.1,vent,0,0,s*.2);
+ if(K.bn===1){const dl=Math.min(.5,lb*.6),bw=Math.min(.55,hw*.6);pbx(bw,.11,dl,0,yb+.05,zb,M,-.13);pbx(bw*.8,.07,.04,0,yb+.065,zb+dl/2,vent)}
+ if(K.bn===2){const n=Math.max(2,Math.min(5,Math.floor(lb/.11)));for(const s of[-1,1])for(let i=0;i<n;i++){const zz=z1-.2-i*(lb-.2)/n,yy=topY(H,s*hw*.38,zz);if(yy!=null)pbx(Math.min(.36,hw*.4),.025,.04,s*hw*.38,yy+.012,zz,vent,0,0,s*.06)}}
  // exhaust
- if(K.ex>=1){const tip=x=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.16,10).rotateX(Math.PI/2),chrome);m.position.set(x,.3,z0+.02);kitG.add(m);const i=new THREE.Mesh(new THREE.CircleGeometry(.035,8).rotateY(Math.PI),vent);i.position.set(x,.3,z0-.062);kitG.add(i)};
+ if(K.ex>=1){const tip=x=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.16,10).rotateX(Math.PI/2),chrome);m.position.set(x,.3,zrL+.0);kitG.add(m);const i=new THREE.Mesh(new THREE.CircleGeometry(.035,8).rotateY(Math.PI),vent);i.position.set(x,.3,zrL-.082);kitG.add(i)};
   if(K.ex===1)tip(hw*.5);else{tip(hw*.5);tip(-hw*.5)}}}
 function buildDecals(H,V){
  if(!V.d)return;const col=VCOL[V.c][1],n=V.n;
@@ -230,6 +236,7 @@ function kitApply(now){
 {const s0=setCar;setCar=function(i){s0(i);kitApply()}}
 {const ra=rimsApply;rimsApply=function(){ra();kitG.position.y=bodyDY()}}
 setTimeout(()=>kitApply(),1500);setTimeout(()=>kitApply(),7500);
+window.TNT={kit:o=>{kp=o;kitApply(1)},vin:o=>{vp=o;kitApply(1)},hull:()=>hullOf(CARI)};
 
 /* ======== tuning screen ======== */
 /* ---- garage interior set for the tuning screen (round room so any orbit angle looks right) ---- */
