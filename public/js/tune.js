@@ -27,7 +27,7 @@ function neonSet(i){const n=NEON[i|0]||NEON[0];neonM.visible=!!n[1];if(n[1]){neo
 const neonNow=()=>neonSet(neonPrev!=null?neonPrev:TN.neon[CARI]);
 {const s0=setCar;setCar=function(i){s0(i);neonNow()}}
 const flames=[];{const REAR=[-1.8,-2,-2.3,-2.1,-2.05,-2.4];for(const sx of[-.42,.42]){const f=new THREE.Mesh(new THREE.ConeGeometry(.17,1.5,8).rotateX(-Math.PI/2).translate(0,0,-.75),new THREE.MeshBasicMaterial({color:0xff9a2a,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending}));f.userData.sx=sx;f.visible=false;car.add(f);flames.push(f)}
- flames.upd=()=>{const on=NOS.on&&NOS.ch>0&&TN.nos&&!GS.onFoot&&!GAL.on;for(const f of flames){f.visible=on;if(on){f.position.set(f.userData.sx,.4,REAR[CARI]);const k=.7+Math.random()*.7;f.scale.set(k,k,.8+Math.random()*.8);f.material.color.setHex(Math.random()<.5?0xff9a2a:0x66aaff)}}}}
+ flames.upd=()=>{const on=!!(NOS.on&&NOS.ch>0&&TN.nos&&!GS.onFoot&&!GAL.on);for(const f of flames){f.visible=on;if(on){f.position.set(f.userData.sx,.4,REAR[CARI]);const k=.7+Math.random()*.7;f.scale.set(k,k,.8+Math.random()*.8);f.material.color.setHex(Math.random()<.5?0xff9a2a:0x66aaff)}}}}
 // NOS button (sits above HAND BRAKE) + blue screen edge while boosting
 const nb=document.createElement('button');nb.id='nosBtn';nb.textContent='NOS';nb.style.cssText='position:fixed;display:none;z-index:8;border-radius:50%;border:3px solid #7cf;color:#fff;font:700 15px monospace;background:#123;box-shadow:0 0 14px #39f;touch-action:none;padding:0';document.body.appendChild(nb);
 const fx=document.createElement('div');fx.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .15s;background:radial-gradient(ellipse at center,transparent 55%,rgba(60,140,255,.45) 100%)';document.body.appendChild(fx);
@@ -255,7 +255,7 @@ function kitApply(now){
 {const s0=setCar;setCar=function(i){s0(i);kitApply()}}
 {const ra=rimsApply;rimsApply=function(){ra();kitG.position.y=bodyDY()}}
 setTimeout(()=>kitApply(),1500);setTimeout(()=>kitApply(),7500);
-window.TNT={kit:o=>{kp=o;kitApply(1)},vin:o=>{vp=o;kitApply(1)},hull:()=>hullOf(CARI)};
+window.TNT={nos:()=>NOS,kit:o=>{kp=o;kitApply(1)},vin:o=>{vp=o;kitApply(1)},hull:()=>hullOf(CARI)};
 
 /* ======== tuning screen ======== */
 /* ---- garage interior set for the tuning screen (round room so any orbit angle looks right) ---- */
