@@ -16,6 +16,15 @@ const sp=(seed,o)=>pSpec(seed,Object.assign({ts:1,gl:false,scarf:null,bp:false,b
 const bust=(p,tc)=>{const hx=((tc[0]*255|0)<<16)|((tc[1]*255|0)<<8)|(tc[2]*255|0);
  for(const sx of[-1,1]){const g=new THREE.SphereGeometry(.062,10,8),n=g.attributes.position.count;g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3).fill(1),3));
   const m=new THREE.Mesh(g,mat(hx));m.scale.set(1,1.05,.95);m.position.set(sx*.068,1.25,.1);p.up.add(m)}};
+// showgirl costume for the pole dancers: sequinned bodice, gold belt, long opera gloves and a feathered headband
+const costume=(p,acc)=>{const gold=0xe8bf4a,hx=((acc[0]*255|0)<<16)|((acc[1]*255|0)<<8)|(acc[2]*255|0);
+ const g=p.up.geometry,pos=g.attributes.position,col=g.attributes.color;g.computeBoundingBox();const top=g.boundingBox.max.y;
+ for(let i=0;i<pos.count;i++){const y=pos.getY(i);if(y>1.06&&y<1.36){const k=.82+.3*(((i*2654435761)>>>0)%7/7);col.setXYZ(i,acc[0]*k,acc[1]*k,acc[2]*k)}}col.needsUpdate=true;
+ const ring=(r,h,y,sz,hex,par,open)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,12,1,true),mat(hex));const n=m.geometry.attributes.position.count;m.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3).fill(1),3));m.material.side=THREE.DoubleSide;m.scale.z=sz;m.position.y=y;par.add(m);return m};
+ ring(.222,.05,.99,.6,gold,p.up);
+ for(const a of[p.a1,p.a2])ring(.054,.34,-.38,1,hx,a);
+ ring(.118,.035,top-.075,1,gold,p.up);
+ [[-.07,-.12],[0,-.2],[.07,-.12]].forEach(([x,t],i)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(.03,.2,.015),mat(i===1?gold:hx));const n=m.geometry.attributes.position.count;m.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3).fill(1),3));m.position.set(x,top+.02,-.06);m.rotation.z=t*1.4;p.up.add(m)})};
 const addP=(spec,x,z,ry,par,seated)=>{const p=personIn(spec,x,z,ry,seated);SG.remove(p);(par||G3).add(p);PPL.push(p);return p};
 
 /* ---------- the lounge room (built once) ---------- */
@@ -39,7 +48,7 @@ function buildLounge(){
 // pole stages: a pair of round gold-rimmed platforms flanking the stage, each with a floor-to-ceiling brass pole and a cabaret dancer
  [[-5.6,0],[5.6,1]].forEach(([x,i])=>{const z=-LZ+1.4;
   cy(.9,.3,x,0,z,0x2a1408);cy(.95,.06,x,.3,z,0xe8bf4a);cy(.04,LH-.3,x,.3,z,0xf0d060);cy(.16,.04,x,LH-.34,z,0xc99a2e);
-  const d=addP(sp(8250+i,{f:true,hs:i?13:9,ts:4,tc:i?[.1,.55,.45]:[.8,.15,.35],sk:PSK[i?2:0]}),x+.4,z,Math.PI,G3);d.position.y=.3;bust(d,i?[.1,.55,.45]:[.8,.15,.35]);POLE.push({p:d,cx:x,cz:z,ph:i*Math.PI})});
+  const d=addP(sp(8250+i,{f:true,hs:i?13:9,ts:4,tc:i?[.1,.55,.45]:[.8,.15,.35],sk:PSK[i?2:0]}),x+.4,z,Math.PI,G3);d.position.y=.3;bust(d,i?[.1,.55,.45]:[.8,.15,.35]);costume(d,i?[.1,.55,.45]:[.8,.15,.35]);POLE.push({p:d,cx:x,cz:z,ph:i*Math.PI})});
  // tables + candles + patrons
  const tbl=(x,z)=>{cy(.45,.05,x,.75,z,0x3a1a0a);cy(.05,.75,x,0,z,0xc99a2e);cy(.03,.12,x,.8,z,0xffe9a0)};
  [[-5.2,-1.2],[-5.2,1.6],[5.2,-1.2]].forEach(([x,z],i)=>{tbl(x,z);addP(sp(8300+i*3,{f:i===1,hs:i===0?19:i===1?9:18,ts:3,tc:[.1+.2*i,.1,.15],sk:PSK[i%3]}),x+.9,z,-Math.PI/2,G3);addP(sp(8301+i*3,{f:i!==1,hs:i===1?19:11,ts:4,tc:[.5,.1+.1*i,.3],sk:PSK[(i+1)%3]}),x-.9,z,Math.PI/2,G3)});
