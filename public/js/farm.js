@@ -15,7 +15,7 @@ const UP=[['w','WIDER IMPLEMENTS','PLOUGH, SEEDER AND HEADER: 6 → 9 → 12 M W
 const LAND=[800,1500],cap=()=>[8,14,22][FD.up.tk],width=()=>6+3*FD.up.w,speedK=()=>1+.12*FD.up.sp;
 const FL=FO.map(([u0,v0],i)=>({i,u0,v0,st:new Uint8Array(NC),age:new Uint8Array(NC),cr:new Uint8Array(NC),im:null,dirty:0}));
 FL[4].locked=FL[5].locked=1;FL[1].st.fill(1);FL[2].st.fill(2);FL[2].cr.fill(1);FL[2].age.fill(1);FL[3].st.fill(3);FL[3].age.fill(4);
-const FM={on:0,job:'',kind:'',crop:0,low:0,lz:0,tank:[0,0,0],cap:8,unl:0,ut:0,rd:0,built:0,toastT:0,msg:'',hudT:0,mapT:0,hint:null};
+const FM={fp:1,on:0,job:'',kind:'',crop:0,low:0,lz:0,tank:[0,0,0],cap:8,unl:0,ut:0,rd:0,built:0,toastT:0,msg:'',hudT:0,mapT:0,hint:null};
 const CS={x:0,z:0,psi:0,y:0};
 const VT={tr:{vmax:11,vw:6.2,acc:3.2,dec:7,turn:1.15,r:2.2},cb:{vmax:7.6,vw:5,acc:2.2,dec:5,turn:.82,r:3.0}};
 const JB={plough:{n:'PLOUGH',from:0,to:1,off:-3.7,done:'PLOUGHED',tg:0},sow:{n:'SEEDER',from:1,to:2,off:-4.0,done:'SOWN',tg:1},harvest:{n:'HEADER',from:3,to:0,off:6.7,done:'HARVESTED',tg:3}};
@@ -101,7 +101,7 @@ function buildVehicles(){
  /* combine harvester */
  CBG=new THREE.Group();const g=CBG;
  bx(g,3.0,1.5,6.6,0,1.6,-.4,G2);bx(g,3.3,.35,7.0,0,.75,-.4,K);bx(g,3.4,1.5,4.4,0,3.1,-2.2,G);bx(g,3.2,.14,4.1,0,3.9,-2.2,Gy);for(const s of[-1,1])bx(g,.12,1.3,4.2,s*1.66,3.1,-2.2,G2);
- bx(g,2.6,2.0,2.5,0,3.3,2.2,G);bx(g,2.9,.15,2.9,0,4.4,2.3,Yl);bx(g,2.4,1.5,.05,0,3.4,3.46,Gl);for(const s of[-1,1])bx(g,.05,1.5,2.0,s*1.31,3.4,2.2,Gl);bx(g,2.4,.4,.8,0,2.5,3.2,K);bx(g,.5,.4,.5,0,2.6,2.0,K);
+ bx(g,2.6,.2,2.5,0,2.4,2.2,G);for(const sx of[-1.25,1.25])for(const sz of[1.0,3.4])bx(g,.14,2.0,.14,sx,3.3,sz,G);for(const sx of[-1.3,1.3])bx(g,.06,.8,2.4,sx,2.8,2.2,G);bx(g,2.5,.8,.06,0,2.8,1.0,G);bx(g,2.9,.15,2.9,0,4.4,2.3,Yl);bx(g,2.4,1.5,.05,0,3.4,3.46,Gl);for(const s of[-1,1])bx(g,.05,1.5,2.0,s*1.31,3.4,2.2,Gl);bx(g,2.4,.4,.8,0,2.5,3.2,K);bx(g,.5,.4,.5,0,2.6,2.0,K);
  bx(g,2.6,1.6,2.0,0,2.7,-4.5,G2);cy(g,.14,1.3,.9,4.0,-4.8,K);cy(g,.1,.3,.9,4.75,-4.8,K);cy(g,.12,.12,0,4.7,2.3,Yl).material=mat(0xffa010);
  for(const s of[-1,1]){bx(g,.5,.2,.3,s*1.2,3.35,3.5,mat(0xfff0b0))}
  bx(g,2.4,1.4,2.4,0,1.6,4.4,G2);
@@ -115,7 +115,7 @@ function buildVehicles(){
 const hopper=()=>Wd(69,-205),pump=()=>Wd(26,-170),gate=()=>Wd(0,-244),board=()=>Wd(0,-176);
 function startJob(job,crop){if(FM.on||busy)return;fade(()=>{buildMap();CS.x=GS.x;CS.z=GS.z;CS.psi=GS.psi;CS.y=GS.y;FM.on=1;FM.job=job;FM.crop=crop||0;FM.kind=job==='harvest'?'cb':'tr';FM.low=0;FM.lz=0;FM.hint=null;const s=Wd(-36,-196);GS.x=s[0];GS.z=s[1];GS.psi=0;GS.vx=GS.vz=GS.vy=0;GS.vf=0;GS.speed=0;GS.steer=0;GS.y=Y;GS.prevGY=Y;GS.gy=Y;GS.pitch=GS.roll=GS.dp=GS.dr=0;GS.onFoot=0;man.visible=false;car.visible=false;camAng=0;toast(job==='harvest'?'COMBINE READY: LOWER THE HEADER AND DRIVE INTO RIPE CROP':job==='plough'?'LOWER THE PLOUGH AND DRIVE UP STUBBLE':'LOWER THE SEEDER AND DRIVE OVER PLOUGHED SOIL')})}
 function exitJob(){if(!FM.on||busy)return;fade(()=>{FM.on=0;FM.unl=0;hideVeh();GS.x=CS.x;GS.z=CS.z;GS.psi=CS.psi;GS.y=CS.y;GS.vx=GS.vz=GS.vy=0;GS.vf=0;GS.speed=0;GS.steer=0;GS.prevGY=GS.y;GS.pitch=GS.roll=0;GS.onFoot=1;car.visible=true;man.visible=true;const p=Wd(-36,-190);P.x=p[0];P.z=p[1];P.y=Y+.02;P.psi=0;P.speed=0;camAng=0;hud.style.display=mm.style.display='none';FM.bc.visible=false;setLabels()})}
-function hideVeh(){CBG.visible=false;PL.visible=false;SD.visible=false}
+function hideVeh(){TW.dr.visible=true;CBG.visible=false;PL.visible=false;SD.visible=false}
 function vStep(dt){const T=VT[FM.kind],fx=Math.sin(GS.psi),fz=Math.cos(GS.psi);let vf=GS.vf||0;
  const gas=(inp.gas||keys.up)&&FD.fuel>0,brk=inp.brk||keys.down,vm=(FM.low?T.vw:T.vmax)*speedK();let tg=0;
  if(gas)tg=vm;else if(brk)tg=vf>.4?0:-3;if(FM.msg==='full'&&FM.job==='harvest'&&FM.low){}
@@ -161,7 +161,7 @@ function drawMap(){const c=mm.getContext('2d');c.fillStyle='#3a5a2a';c.fillRect(
  if(FM.resume&&!GS.onFoot){const r=FM.resume;FM.resume=0;FM.on=1;FM.job=r[0];FM.crop=r[1];FM.kind=r[0]==='harvest'?'cb':'tr';CS.x=r[2];CS.z=r[3];CS.psi=r[4];CS.y=Y}else if(FM.resume)FM.resume=0;
  if(!FM.on){hud.style.display=mm.style.display='none';FM.bc.visible=false;return}
  const T=VT[FM.kind],tt=performance.now()/1000,sp=GS.vf||0;FM.cap=cap();const wsc=width()/6;PL.scale.x=SD.scale.x=hdr.scale.x=wsc;car.visible=false;man.visible=false;FM.lz+=((FM.low?1:0)-FM.lz)*Math.min(1,dt*3);
- if(FM.kind==='tr'){TRG.visible=true;TR.x=GS.x;TR.z=GS.z;TR.rot=GS.psi;TR.cl[0][0]=TR.cl[1][0]=-300;TR.cl[0][1]=TR.cl[1][1]=-300;TR.win=9;TRG.position.set(GS.x,Y,GS.z);TRG.rotation.set(GS.pitch,GS.psi,GS.roll,'YXZ');
+ if(FM.kind==='tr'){TW.dr.visible=!FM.fp;TRG.visible=true;TR.x=GS.x;TR.z=GS.z;TR.rot=GS.psi;TR.cl[0][0]=TR.cl[1][0]=-300;TR.cl[0][1]=TR.cl[1][1]=-300;TR.win=9;TRG.position.set(GS.x,Y,GS.z);TRG.rotation.set(GS.pitch,GS.psi,GS.roll,'YXZ');
   TR.spin+=sp*dt;TW.rl.rotation.x=TW.rr.rotation.x=TR.spin/.92;TW.fl.rotation.x=TW.fr.rotation.x=TR.spin/.55;TW.fl.rotation.y=TW.fr.rotation.y=GS.steer*.45;
   PL.visible=FM.job==='plough';SD.visible=FM.job==='sow';const im=FM.job==='plough'?PL:SD;im.position.y=(1-FM.lz)*.55;im.rotation.x=(1-FM.lz)*.28;if(FM.job==='sow'){seedRoll.rotation.x+=sp*dt/.4}}
  else{TRG.visible=false;CBG.visible=true;CBG.position.set(GS.x,Y,GS.z);CBG.rotation.set(GS.pitch,GS.psi,GS.roll,'YXZ');TR.spin+=sp*dt;TWH.fl.rotation.x=TWH.fr.rotation.x=TR.spin/1.2;TWH.rl.rotation.x=TWH.rr.rotation.x=TR.spin/.78;TWH.rl.rotation.y=TWH.rr.rotation.y=-GS.steer*.5;
@@ -175,7 +175,10 @@ function drawMap(){const c=mm.getContext('2d');c.fillStyle='#3a5a2a';c.fillRect(
   hL2.textContent=(job==='harvest'?'TANK '+tankSum().toFixed(1)+'/'+FM.cap+' T · ':'')+(r.tot?r.tot+' CELLS LEFT'+(r.field?' · FIELD '+(r.field.i+1):''):'NOTHING TO '+({plough:'PLOUGH',sow:'SOW',harvest:'HARVEST'})[job]+' RIGHT NOW')+' · £'+Math.round(cash)+(FD.order?' · ORDER '+FD.order.q+'T '+CR[FD.order.c].n+' BY DAY '+FD.order.by:'');mm.style.display='block'}
  FM.mapT-=dt;if(FM.mapT<=0){FM.mapT=.4;drawMap()}}}
 /* chase camera that sees over the implements */
-{const u1=updateCam;updateCam=function(dt){u1(dt);if(!FM.on||GS.onFoot||GS.inside||menuOpen)return;const cb=FM.kind==='cb',d=(cb?16:12.5)+Math.abs(GS.vf||0)*.18,h=cb?7.2:6;let da=GS.psi-camAng;da=Math.atan2(Math.sin(da),Math.cos(da));
+{const b0=$('bCam').onclick;$('bCam').onclick=()=>{if(FM.on){FM.fp^=1;toast(FM.fp?'CAB VIEW':'CHASE VIEW')}else b0()};addEventListener('keydown',e=>{if(FM.on&&(e.key==='v'||e.key==='V')){FM.fp^=1;toast(FM.fp?'CAB VIEW':'CHASE VIEW')}})}
+{const u1=updateCam;updateCam=function(dt){u1(dt);if(!FM.on||GS.onFoot||GS.inside||menuOpen)return;const cb=FM.kind==='cb';
+ if(FM.fp){const o=cb?CBG:TRG;o.updateMatrixWorld(true);const ey=cb?new THREE.Vector3(.35,4.05,2.7):new THREE.Vector3(0,2.6,-.5),st=GS.steer||0,e=o.localToWorld(ey.clone()),t=o.localToWorld(new THREE.Vector3(-st*7,ey.y-(cb?.9:.7),ey.z+30));cam.position.copy(e);cam.lookAt(t);if(Math.abs(cam.fov-72)>.1){cam.fov=72;fovNow=72;cam.updateProjectionMatrix()}skyG.position.copy(cam.position);return}
+ d=(cb?16:12.5)+Math.abs(GS.vf||0)*.18,h=cb?7.2:6;let da=GS.psi-camAng;da=Math.atan2(Math.sin(da),Math.cos(da));
  const px=GS.x-Math.sin(camAng)*d,pz=GS.z-Math.cos(camAng)*d;cam.position.set(px,Y+h,pz);cam.lookAt(GS.x+Math.sin(camAng)*(cb?6:4),Y+(cb?2.2:1.2),GS.z+Math.cos(camAng)*(cb?6:4));if(Math.abs(cam.fov-58)>.1){cam.fov=58;fovNow=58;cam.updateProjectionMatrix()}skyG.position.copy(cam.position)}}
 /* ---------- action button ---------- */
 {const c0=ctx;ctx=function(){
