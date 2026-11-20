@@ -3153,9 +3153,10 @@ function fcPark(grp,mb,CX,BW){const L=FCFG,PW2=BW+14,f=cvT(512,512),g=f.cv.getCo
  const cols=[0xc02020,0x2050b0,0xe0e0e0,0x202020,0xd8c020,0x20804a,0x808890,0xe07020,0x6a2a7a],cx0=CX-PW2/2+2;let k=0;
  const car=(x,z,ry,c)=>{const G=new THREE.Group();const b=(xx,yy,zz,w,h,d,hex)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshBasicMaterial({color:hex}));q.position.set(xx,yy+h/2,zz);G.add(q)};b(0,.3,0,1.75,.65,4,c);b(0,.9,-.1,1.55,.55,2.2,0x9ab8cc);b(0,.35,1.98,1.6,.25,.05,0xf0f0d0);for(const sx of[-.9,.9])for(const sz of[-1.3,1.3])b(sx,.05,sz,.2,.55,.55,0x151515);G.position.set(x,.07,z);G.rotation.y=ry;grp.add(G)};
  const rnd2=(()=>{let s=77;return()=>(s=(s*16807)%2147483647)/2147483647})();
- for(let row=0;row<2;row++){const zc=row?10+(L-3)*.62:3+(L-3)*.1;for(let i=0;i<Math.floor((PW2-4)/3);i++){const xx=CX-PW2/2+2.5+i*3,zz=zc+ (row?4:6);if(rnd2()<.62)car(xx,zz,rnd2()<.5?0:Math.PI,cols[Math.floor(rnd2()*cols.length)])}}
- // coach
- mb(CX+PW2/2-3,.4,3+(L-3)*.5,3.2,3.2,12,0xf0f0f0);mb(CX+PW2/2-3,.4+2.0,3+(L-3)*.5,3.25,.9,10,0x30404a);mb(CX+PW2/2-3,1.0,3+(L-3)*.5,3.25,.5,12.05,0xa01418);
+ const GW=(lx,lz)=>{const c=Math.cos(grp.rotation.y),sn=Math.sin(grp.rotation.y);return[grp.position.x+lx*c+lz*sn,grp.position.z-lx*sn+lz*c]};
+ for(const yc of[90,380]){const zz=3+yc/512*(L-3);for(let i=0;i<15;i++){const xx=CX-PW2/2+(16+32*(i+.5))/512*PW2;if(rnd2()<.62){car(xx,zz,rnd2()<.5?0:Math.PI,cols[Math.floor(rnd2()*cols.length)]);for(const dz of[-1.25,1.25]){const w=GW(xx,zz+dz);COL.push([w[0],w[1],1.15])}}}}
+ // coach, parked across the middle aisle
+ {const cxx=CX+PW2/2-10,czz=3+235/512*(L-3);mb(cxx,.4,czz,12,3.2,3.2,0xf0f0f0);mb(cxx,.4+2.0,czz,10,.9,3.25,0x30404a);mb(cxx,1.0,czz,12.05,.5,3.25,0xa01418);for(const dx of[-4.5,-2.25,0,2.25,4.5]){const w=GW(cxx+dx,czz);COL.push([w[0],w[1],1.9])}}
  // lamp posts
  for(const x of[-PW2/2+1,0,PW2/2-1])for(const z of[8,L-6]){mb(CX+x,0,z,.2,6,.2,0x505058);mb(CX+x,6,z,1.4,.25,.5,0xfff0c0)}
  // entrance sign
