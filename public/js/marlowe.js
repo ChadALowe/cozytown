@@ -272,7 +272,7 @@ function mats(){FM=FAC.map((S,k)=>{const d=facTex(k,0),n=facTex(k,1),m=new THREE
 const ROADB=new Builder(2),WATB=new Builder(8),CHUNKS=[];
 function* gen(m,c){mats();yield;
  /* sea (under everything), airport grass, asphalt */
- {const b=WATB;quadXZ(b,W(-1330,-2200),W(1800,-2200),W(1800,2600),W(-1330,2600),[1,1,1],Y-1.4)}
+ {const b=WATB;quadXZ(b,W(-1330,-2200),W(1800,-2200),W(1800,2600),W(-1330,2600),[1,1,1],Y-3.4)}
  {const g=new Builder(6);qz(g,-217,LAND.v0,LAND.u1,LAND.v1,[.34,.5,.26],Y-.06);const gm=new THREE.Group();gm.add(g.mesh(mObj));chunk(m,gm)}
  const AS=[.27,.27,.29];qz(ROADB,-685,-635,-217,1035,AS,Y+.01);qz(ROADB,-1235,-635,-775,1035,AS,Y+.01);for(const j of BRIDGE){const e=EW[j];qz(ROADB,-775,e.v-e.h,-685,e.v+e.h,AS,Y+.01)}
  /* car park south of the terminal */
@@ -285,22 +285,22 @@ function* gen(m,c){mats();yield;
  yield;
  /* embankment + sea walls and stone parapets */
  const wallC=[.6,.58,.54];
- const wallRun=(u0,v0,u1,v1,cu,cv,top)=>{const t=T((u0+u1)/2,(v0+v1)/2);vq(t.o,u0,v0,u1,v1,Y-2.6,top,wallC,cu,cv)};
+ const wallRun=(u0,v0,u1,v1,cu,cv,top)=>{const t=T((u0+u1)/2,(v0+v1)/2);vq(t.o,u0,v0,u1,v1,Y-4.6,top,wallC,cu,cv)};
  for(const[u,su]of[[-692,1],[-768,-1]]){let v=LAND.v0;const segs=[];for(const j of[...BRIDGE].sort((a,b)=>a-b)){const e=EW[j];segs.push([v,e.v-e.h-4]);v=e.v+e.h+4}segs.push([v,LAND.v1]);
   for(const[a,b]of segs){for(let s=a;s<b;s+=40){const e=Math.min(b,s+40);wallRun(u,s,u,e,u+su*5,(s+e)/2,Y+KH);const t=T(u,s);bx(t.o,u+su*.2,Y+KH,(s+e)/2,.4,.95,e-s-.3,[.78,.75,.68]);cBox(u+su*.4-.01,u,s,e)}}}
  /* coast: south, north (city part), west */
  const coast=(u0,v0,u1,v1,nu,nv)=>{const L=Math.hypot(u1-u0,v1-v0),n=Math.ceil(L/40);for(let k=0;k<n;k++){const ua=u0+(u1-u0)*k/n,va=v0+(v1-v0)*k/n,ub=u0+(u1-u0)*(k+1)/n,vb=v0+(v1-v0)*(k+1)/n,t=T(ua,va),air=(ua+ub)/2>-217,top=air?Y:Y+KH;
-  vq(t.o,ua,va,ub,vb,Y-2.6,top,wallC,(ua+ub)/2-nu*5,(va+vb)/2-nv*5);if(air)continue;const mu=(ua+ub)/2-nu*.2,mv=(va+vb)/2-nv*.2,su=Math.abs(nu)>.5?.4:Math.abs(ub-ua)-.2,sv=Math.abs(nv)>.5?.4:Math.abs(vb-va)-.2;bx(t.o,mu,top,mv,su,.95,sv,[.78,.75,.68]);cBox(mu-su/2,mu+su/2,mv-sv/2,mv+sv/2)}};
+  vq(t.o,ua,va,ub,vb,Y-4.6,top,wallC,(ua+ub)/2-nu*5,(va+vb)/2-nv*5);if(air)continue;const mu=(ua+ub)/2-nu*.2,mv=(va+vb)/2-nv*.2,su=Math.abs(nu)>.5?.4:Math.abs(ub-ua)-.2,sv=Math.abs(nv)>.5?.4:Math.abs(vb-va)-.2;bx(t.o,mu,top,mv,su,.95,sv,[.78,.75,.68]);cBox(mu-su/2,mu+su/2,mv-sv/2,mv+sv/2)}};
  coast(-1250,LAND.v0,-768,LAND.v0,0,-1);coast(-692,LAND.v0,LAND.u1,LAND.v0,0,-1);coast(-1250,LAND.v1,-768,LAND.v1,0,1);coast(-692,LAND.v1,LAND.u1,LAND.v1,0,1);coast(-1250,LAND.v0,-1250,LAND.v1,-1,0);coast(LAND.u1,LAND.v0,LAND.u1,LAND.v1,1,0);
  yield;
  /* bridges: deck fascia, parapets, piers, the suspension towers on Airport Way */
- for(const j of BRIDGE){const e=EW[j],v0=e.v-e.h-4,v1=e.v+e.h+4,t=T(-730,e.v);for(const[v,s]of[[v0,-1],[v1,1]]){vq(t.o,-768,v,-692,v,Y-1.2,Y+KH,[.7,.7,.72],-730,e.v);bx(t.o,-730,Y+KH,v-s*.2,76,1.0,.4,[.8,.78,.72]);cBox(-768,-692,Math.min(v,v-s*.4),Math.max(v,v-s*.4))}
-  qz(t.o,-768,v0,-692,v1,[.5,.5,.52],Y-1.2);
-  if(j===4){/* cable-stayed: two twin-leg towers with fans of stays */for(const u of[-704,-756]){for(const sd of[-1,1]){const lv=e.v+sd*(e.h+5.2);bx(t.o,u,Y-2,lv,2.4,52,2.4,[.72,.7,.66]);cBox(u-1.3,u+1.3,lv-1.3,lv+1.3);
+ for(const j of BRIDGE){const e=EW[j],v0=e.v-e.h-4,v1=e.v+e.h+4,t=T(-730,e.v);for(const[v,s]of[[v0,-1],[v1,1]]){vq(t.o,-768,v,-692,v,Y-.6,Y+KH,[.7,.7,.72],-730,e.v);bx(t.o,-730,Y+KH,v-s*.2,76,1.0,.4,[.8,.78,.72]);cBox(-768,-692,Math.min(v,v-s*.4),Math.max(v,v-s*.4))}
+  qz(t.o,-768,v0,-692,v1,[.5,.5,.52],Y-.6);
+  if(j===4){/* cable-stayed: two twin-leg towers with fans of stays */for(const u of[-704,-756]){for(const sd of[-1,1]){const lv=e.v+sd*(e.h+5.2);bx(t.o,u,Y-4,lv,2.4,54,2.4,[.72,.7,.66]);cBox(u-1.3,u+1.3,lv-1.3,lv+1.3);
      for(let k=1;k<=6;k++)for(const dir of[-1,1]){const du=u+dir*k*4.6;if(du<-767||du>-693)continue;beam(t.o,[OX+u,Y+48-k*1.6,OZ+lv],[OX+du,Y+KH+1.1,OZ+e.v+sd*(e.h+4)],.14,[.92,.92,.94])}}
     for(const y of[22,44,50])bx(t.o,u,Y+y,e.v,2,2.2,2*(e.h+6.4),[.66,.64,.6]);const p=W(u,e.v);RLIGHT.push([p[0],Y+52.4,p[1]])}}
-  else{for(const u of[-718,-742])bx(t.o,u,Y-2.6,e.v,4,1.4,v1-v0,[.66,.62,.56]);
-   for(const[a,b2]of[[-768,-742],[-742,-718],[-718,-692]])for(const v of[v0-.05,v1+.05]){let pr=null;for(let k=0;k<=10;k++){const u=a+(b2-a)*k/10,p=[OX+u,Y-2.6+Math.sin(k/10*Math.PI)*1.5,OZ+v];if(pr)beam(t.o,pr,p,.4,[.74,.7,.62]);pr=p}}}}
+  else{for(const u of[-718,-742])bx(t.o,u,Y-4.6,e.v,4,4.0,v1-v0,[.66,.62,.56]);
+   for(const[a,b2]of[[-768,-742],[-742,-718],[-718,-692]])for(const v of[v0-.05,v1+.05]){let pr=null;for(let k=0;k<=10;k++){const u=a+(b2-a)*k/10,p=[OX+u,Y-3.6+Math.sin(k/10*Math.PI)*2.9,OZ+v];if(pr)beam(t.o,pr,p,.4,[.74,.7,.62]);pr=p}}}}
  yield;
  /* road markings, crossings, junction furniture */
  const WH=[.95,.95,.93],YL=[.95,.78,.12],RED=[.4,.15,.14];
