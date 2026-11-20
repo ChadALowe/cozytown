@@ -11,8 +11,8 @@ const MARL=registerMap({id:'marlowe',city:'MARLOWE',airfield:'MARLOWE INTERNATIO
 const ROUTES={home:['marlowe'],marlowe:['home']},FARE=150,CAPN=20;
 /* ---------------------------------------------------------------- shared builders */
 const mk=m=>({m,Br:new Builder(2),L:{},Bo:new Builder(3),W:(u,v)=>[m.ox+u,m.oz+v]});
-const mLay=[];const lyr=(c,y)=>{const k=y<=.035?0:y<=.045?1:y<=.055?2:y<=.065?3:y<=.075?4:5;if(!k)return c.Br;return c.L[k]||(c.L[k]=new Builder(2))};
-function flush(c){const g=new THREE.Group();if(c.Br.p.length)g.add(c.Br.mesh(mRoad));for(const k in c.L){if(!c.L[k].p.length)continue;const mt=mLay[k]||(mLay[k]=wmat(null,{polygonOffset:true,polygonOffsetFactor:-2-k*2,polygonOffsetUnits:-2-k*4},roadTex));g.add(c.L[k].mesh(mt))}c.L={};if(c.Bo.p.length)g.add(c.Bo.mesh(mObj));if(g.children.length)chunk(c.m,g);c.Br=new Builder(2);c.Bo=new Builder(3)}
+const mLay=[];const lm=k=>mLay[k]||(mLay[k]=wmat(null,{polygonOffset:true,polygonOffsetFactor:-2-k*2,polygonOffsetUnits:-2-k*4},roadTex));const lyr=(c,y)=>{const k=y<=.035?0:y<=.045?1:y<=.055?2:y<=.065?3:y<=.075?4:5;if(!k)return c.Br;return c.L[k]||(c.L[k]=new Builder(2))};
+function flush(c){const g=new THREE.Group();if(c.Br.p.length)g.add(c.Br.mesh(mRoad));for(const k in c.L){if(!c.L[k].p.length)continue;const mt=lm(k);g.add(c.L[k].mesh(mt))}c.L={};if(c.Bo.p.length)g.add(c.Bo.mesh(mObj));if(g.children.length)chunk(c.m,g);c.Br=new Builder(2);c.Bo=new Builder(3)}
 const qd=(c,u0,v0,u1,v1,col,y)=>{const W=c.W;quadXZ(lyr(c,y),W(u0,v0),W(u1,v0),W(u1,v1),W(u0,v1),col,Y+y*3.2)};
 const qpoly=(c,pts,w,col,y)=>{const W=c.W;for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l*w/2,nz=(b[0]-a[0])/l*w/2;quadXZ(lyr(c,y),W(a[0]-nx,a[1]-nz),W(a[0]+nx,a[1]+nz),W(b[0]+nx,b[1]+nz),W(b[0]-nx,b[1]-nz),col,Y+y*3.2)}};
 const pb=(c,u,y,v,sx,sy,sz,col,rot)=>{const p=c.W(u,v);pbox(c.Bo,p[0],Y+y,p[1],sx,sy,sz,col,rot||0)};
@@ -175,25 +175,48 @@ function render(){const pn_=OV.pn;pn_.textContent='';const el=(t,css,txt,par)=>{
   const mine=GOODS.filter(g=>g[2]===loc&&(AP.goods[g[0]]|0)>0);if(mine.length)el('div','margin-top:8px;color:#9ab;font-size:11px','YOU ARE STILL CARRYING LOCAL GOODS - TAKE THEM ON A FLIGHT TO SELL.')}}
 function begin(from,to){if(GS.inside)leaveShop(true);A.start(from,to)}
 /* ---------------------------------------------------------------- village airport office */
-const OFFICE={cx:-59,cz:55,rot:-Math.PI/2,w:16,d:11,h:4.9};
+const OFFICE={cx:-160,cz:-178,rot:0,w:38,d:15,h:7};
 const W2=(lx,lz)=>{const c=Math.cos(OFFICE.rot),s=Math.sin(OFFICE.rot);return[OFFICE.cx+lx*c+lz*s,OFFICE.cz-lx*s+lz*c]};
 OFFICE.door=W2(0,OFFICE.d/2+1.4);OFFICE.psi=OFFICE.rot;
 {const Bo=new Builder(3),Br=new Builder(2),p_=(lx,y,lz,sx,sy,sz,col)=>{const p=W2(lx,lz);pbox(Bo,p[0],Y+y,p[1],sx,sy,sz,col,OFFICE.rot)},{w,d,h}=OFFICE,WH=[.94,.95,.97],NV=[.1,.18,.38],GL=[.2,.34,.5];
  p_(0,0,0,w,h,d,WH);p_(0,h,0,w+.8,.5,d+.8,NV);p_(0,h+.5,0,w+.8,.14,d+.8,[.85,.7,.1]);p_(0,0,d/2+.02,w+.2,.5,.3,NV);
- for(let i=0;i<5;i++)p_(-w/2+1.8+i*(w-3.6)/4,.9,d/2+.12,2.6,2.4,.2,GL);
- p_(-3,h+.6,-1,4,1.6,4,NV);
+ for(let i=0;i<9;i++){if(i===4)continue;p_(-w/2+2.2+i*(w-4.4)/8,1.2,d/2+.12,3.0,3.6,.2,GL)}
+ p_(0,0,d/2+.3,5.2,3.8,.5,[.08,.12,.18]);p_(0,3.9,d/2+1.6,9,.4,3.6,NV);for(const sx of[-1,1])pcyl(Bo,W2(sx*4,d/2+3.1)[0],Y,W2(sx*4,d/2+3.1)[1],.3,3.9,8,[.85,.85,.88]);
+ {const p=W2(w/2-5,-1);pcyl(Bo,p[0],Y,p[1],2.2,h+16,14,[.86,.86,.88]);pcyl(Bo,p[0],Y+h+16,p[1],4,2.4,14,[.3,.3,.34]);pbox(Bo,p[0],Y+h+18.4,p[1],7,3,7,[.34,.5,.62],0);pbox(Bo,p[0],Y+h+21.4,p[1],8,.6,8,[.9,.9,.92],0);pcyl(Bo,p[0],Y+h+22,p[1],.2,6,5,[.8,.1,.1]);for(let k=0;k<3;k++)pcyl(Bo,p[0],Y+4+k*5.5,p[1],2.28,.5,14,[.8,.14,.14])}
+ p_(-w/2+8,h+.6,-1,10,1.4,6,NV);
  for(let k=0;k<3;k++){const p=W2(-w/2-1.4,d/2+2+k*2.4);pcyl(Bo,p[0],Y,p[1],.3,2.2,6,[.4,.28,.18]);pcone(Bo,p[0],Y+1.8,p[1],1.5,2.8,7,[.18,.5,.22],0)}
- const q0=W2(0,d/2+4);quadXZ(Br,[q0[0]-9,q0[1]-5],[q0[0]+9,q0[1]-5],[q0[0]+9,q0[1]+5],[q0[0]-9,q0[1]+5],[.3,.3,.32],Y+.055);
+ const q0=W2(0,d/2+5);quadXZ(Br,[q0[0]-w/2-6,q0[1]-5.5],[q0[0]+w/2+6,q0[1]-5.5],[q0[0]+w/2+6,q0[1]+5.5],[q0[0]-w/2-6,q0[1]+5.5],[.42,.42,.44],Y+.055);
+ const ph=Y+.05;
  /* a model jet on a pylon on the roof */
  {const p=W2(3,0),jet=new THREE.Group(),m1=new THREE.MeshBasicMaterial({color:0xf2f4f6}),m2=new THREE.MeshBasicMaterial({color:0x1d56b8}),fu=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,6,10).rotateX(Math.PI/2),m1),wg=new THREE.Mesh(new THREE.BoxGeometry(6.5,.12,1.6),m1),tl=new THREE.Mesh(new THREE.BoxGeometry(.12,1.6,1),m2);wg.position.z=-.2;tl.position.set(0,.8,-2.6);jet.add(fu,wg,tl);jet.position.set(p[0],Y+h+4.2,p[1]);jet.rotation.y=OFFICE.rot+.5;jet.rotation.x=-.18;scene.add(jet);
   const pole=new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,3.4,6),new THREE.MeshBasicMaterial({color:0x8a8e96}));pole.position.set(p[0],Y+h+1.8,p[1]);scene.add(pole)}
  const gr=new THREE.Group();scene.add(gr);gr.add(Br.mesh(mRoad));gr.add(Bo.mesh(mObj));
  const sg=(t,bg,fg,wd,ht,lx,y,lz,pw,ph,sz)=>{const p=W2(lx,lz),m=new THREE.Mesh(new THREE.PlaneGeometry(wd,ht),new THREE.MeshBasicMaterial({map:txtTex(pw,ph,bg,fg,t,sz),side:THREE.DoubleSide}));m.position.set(p[0],Y+y,p[1]);m.rotation.y=OFFICE.rot;gr.add(m)};
- sg('COZY AIRWAYS','#10244a','#ffd24a',w-3,1.5,0,h-.4,d/2+.47,768,84,40);sg('FLIGHTS  ·  CHECK-IN  ·  DUTY FREE','#a8141c','#ffffff',8.6,.7,0,h+1.15,d/2+.5,512,38,22);
+ sg('COZY AIRWAYS  ·  AIRPORT','#10244a','#ffd24a',20,2.1,0,h-1.1,d/2+.47,1024,108,52);sg('FLIGHTS  ·  CHECK-IN  ·  DUTY FREE','#a8141c','#ffffff',11,.9,0,h+1.15,d/2+.5,640,52,26);
  perimCol(OFFICE.cx,OFFICE.cz,OFFICE.rot,w/2,d/2,.5,1.2);OBS.push({x:OFFICE.cx,z:OFFICE.cz,c:1,s:0,hw:w/2,hd:d/2});BLD.push({x:OFFICE.cx,z:OFFICE.cz,rot:OFFICE.rot,w,d,k:'airport',n:1});
  SHOPD.push({x:OFFICE.door[0],z:OFFICE.door[1],psi:OFFICE.rot,t:'COZY AIRWAYS',bg:'#10244a',fg:'#ffd24a',apt:1,rx:12.5,rz:6,sz:3.4});Object.assign(HRS,{'COZY AIRWAYS':[6,22]});
  const cone=new THREE.ConeGeometry(.34,.7,4);cone.rotateX(Math.PI);cone.translate(0,-.35,0);const stem=new THREE.BoxGeometry(.16,.5,.16);stem.translate(0,.25,0);const am=new THREE.MeshBasicMaterial({color:0x6aa8ff,fog:false}),ag=new THREE.Group();ag.add(new THREE.Mesh(cone,am),new THREE.Mesh(stem,am));ag.visible=false;scene.add(ag);
  const u0=updCozy;updCozy=function(dt){u0(dt);const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z,dist=Math.hypot(OFFICE.door[0]-px,OFFICE.door[1]-pz),t=performance.now()/1000;ag.visible=!CIN.on&&!GS.inside&&dist<38&&!menuOpen&&Math.abs(px)<1000;if(ag.visible){ag.position.set(OFFICE.door[0],G0+2.6+Math.sin(t*3.2)*.18,OFFICE.door[1]);ag.rotation.y=t*1.2;ag.scale.setScalar(Math.max(.7,Math.min(1.3,dist/14)))}}}
+/* AIRPORT ROAD: a new road north off the High Street, ending at the terminal forecourt, with a car park and a signpost */
+{const RDW=3.5,AX=OFFICE.cx,Z0=-6,Z1=OFFICE.cz+OFFICE.d/2+5-5.5,L=[new Builder(2),new Builder(2),new Builder(2),new Builder(2)],Bo=new Builder(3),q=(k,x0,z0,x1,z1,col,y)=>quadXZ(L[k],[x0,z0],[x1,z0],[x1,z1],[x0,z1],col,Y+y);
+ ROADS.push({n:'AIRPORT ROAD',p:[[AX,Z0],[AX,Z1]]});{const a=[AX,Z0],b=[AX,Z1],l=Math.abs(Z1-Z0);SEG.push({ri:ROADS.length-1,a,b,l,dx:0,dz:-1})}
+ q(0,AX-RDW-PW,Z1,AX+RDW+PW,Z0,[.52,.52,.5],.09);q(1,AX-RDW,Z1,AX+RDW,Z0,[.17,.17,.19],.13);
+ for(let z=Z0-4;z>Z1+2;z-=9)q(2,AX-.2,z-4.5,AX+.2,z,[.85,.82,.5],.17);
+ for(const sx of[-1,1])q(2,AX+sx*(RDW-.25)-.1,Z1,AX+sx*(RDW-.25)+.1,Z0,[.9,.9,.88],.17);
+ /* lamps down both sides */
+ for(let z=-20;z>Z1;z-=26)for(const sx of[-1,1]){pcyl(Bo,AX+sx*(RDW+PW-.4),Y,z,.11,5.2,5,[.3,.3,.34]);pbox(Bo,AX+sx*(RDW+PW-.4),Y+5.1,z,.9,.2,.4,[1,.95,.7],0)}
+ /* car park on the east side */
+ {const x0=AX+16,x1=AX+66,z0=-168,z1=-120;q(1,x0,z0,x1,z1,[.2,.2,.22],.12);q(1,AX+RDW+PW,z0+14,x0,z0+22,[.2,.2,.22],.12);
+  for(let x=x0+4;x<x1;x+=4.2){q(2,x-.1,z0+3,x+.1,z0+13,[.9,.9,.9],.17);q(2,x-.1,z1-13,x+.1,z1-3,[.9,.9,.9],.17)}
+  const cc=[[.8,.15,.15],[.15,.3,.7],[.9,.9,.9],[.15,.15,.18],[.85,.7,.15],[.2,.5,.3]];let n=0;for(let x=x0+6;x<x1-2;x+=4.2)for(const zz of[z0+8,z1-8]){if(((x*7+zz*3)|0)%5===0)continue;const c=cc[(n++)%6];pbox(Bo,x,Y,zz,1.9,.7,4.2,c,0);pbox(Bo,x,Y+.7,zz-.1,1.7,.6,2.2,[.16,.2,.26],0)}
+  pbox(Bo,x0+10,Y,z0+18,6,2.6,3,[.14,.2,.34],0);pbox(Bo,x0+10,Y+2.6,z0+18,6.6,.3,3.4,[.9,.7,.1],0)}
+ /* the terminal's plane-spotting apron wall and flag poles */
+ for(const sx of[-1,1]){const x=OFFICE.cx+sx*(OFFICE.w/2+4),z=OFFICE.cz+OFFICE.d/2+3;pcyl(Bo,x,Y,z,.14,9,6,[.8,.8,.84]);pbox(Bo,x+1.1,Y+8,z,2.2,1.3,.05,sx>0?[.1,.3,.7]:[.8,.1,.15],0)}
+ const gr=new THREE.Group();scene.add(gr);L.forEach((b,k)=>{if(b.p.length)gr.add(b.mesh(k?lm(k):mRoad))});gr.add(Bo.mesh(mObj));
+ /* signpost at the junction */
+ {const sgn=new THREE.Mesh(new THREE.PlaneGeometry(6,1.9),new THREE.MeshBasicMaterial({map:txtTex(512,160,'#1c4a8a','#ffffff','✈ AIRPORT ↑',64),side:THREE.DoubleSide}));sgn.position.set(AX+RDW+PW+1.4,Y+3.6,-8.5);sgn.rotation.y=Math.PI;const pl=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,3.6,6),new THREE.MeshBasicMaterial({color:0x6a6e76}));pl.position.set(AX+RDW+PW+1.4,Y+1.8,-8.5);gr.add(sgn,pl)}
+ /* show it on the minimap too */
+ try{const x=mb.getContext('2d');x.strokeStyle='#d8d8d0';x.lineCap='round';x.lineWidth=2.6;x.beginPath();x.moveTo(mx(AX),mz(Z0));x.lineTo(mx(AX),mz(Z1));x.stroke();x.fillStyle='#3a8a9a';x.fillRect(mx(OFFICE.cx)-OFFICE.w/2*MMS/SIZE,mz(OFFICE.cz)-OFFICE.d/2*MMS/SIZE,OFFICE.w*MMS/SIZE,OFFICE.d*MMS/SIZE)}catch(e){}}
 {const cone=new THREE.ConeGeometry(.34,.7,4);cone.rotateX(Math.PI);cone.translate(0,-.35,0);const stem=new THREE.BoxGeometry(.16,.5,.16);stem.translate(0,.25,0);const am=new THREE.MeshBasicMaterial({color:0x6aa8ff,fog:false}),ag=new THREE.Group();ag.add(new THREE.Mesh(cone,am),new THREE.Mesh(stem,am));ag.visible=false;scene.add(ag);
  const u0=updCozy;updCozy=function(dt){u0(dt);const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z,dist=Math.hypot(MTERM.x-px,MTERM.z-pz),t=performance.now()/1000;ag.visible=!CIN.on&&!GS.inside&&dist<45&&!menuOpen&&MARL.built&&MARL.active;if(ag.visible){ag.position.set(MTERM.x,gH(MTERM.x,MTERM.z)+2.6+Math.sin(t*3.2)*.18,MTERM.z);ag.rotation.y=t*1.2;ag.scale.setScalar(Math.max(.7,Math.min(1.3,dist/14)))}}}
 SHOPD.push(MTERM);

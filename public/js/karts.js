@@ -3,7 +3,7 @@
    cash, JOB, carry, applyUpg, setLabels, wmat, mRoad, mObj, Builder, pbox, pcyl, quadXZ, txtTex, COL, G0, HW...). */
 (function(){
 const CX=-95,CZ=-58,SX=.94,LAPS=4,HW=5.0,BAR=6.8,FEE=5,PRIZE=[40,20,10,0];
-const KIOSK={x:-113,z:-23.5},PARK={x0:-109,x1:-80,z0:-28.5,z1:-18.5},STRIP={x:-86,z0:-5.3,z1:-18.5,hw:3.8}; // the strip squeezes through the gap between two High Street houses (x -91.2..-80.8)
+const KF=-1,KIOSK={x:-60,z:-24},PARK={x0:-87,x1:-64,z0:-29,z1:-19},STRIP={x:-86,z0:-5.3,z1:-18.5,hw:3.8}; // the strip squeezes through the gap between two High Street houses (x -91.2..-80.8)
 const KT={on:0,state:'idle',cd:0,t:0,tot:0,idx:0,lapsDone:0,lapT:0,laps:[],best:0,bestRace:0,ai:[],back:0,rank:1,hudT:0,saved:null,bigT:0};
 try{const d=JSON.parse(localStorage.getItem('c1kart')||'null');if(d){KT.best=d.lap||0;KT.bestRace=d.race||0}}catch(e){}
 function saveBest(){try{localStorage.setItem('c1kart',JSON.stringify({lap:KT.best,race:KT.bestRace}))}catch(e){}}
@@ -60,11 +60,11 @@ for(let i=0;i<N;i+=2){const s=S[i];for(const sd of[-1,1]){const x=s.x+s.nx*sd*BA
 // kiosk
 {const x=KIOSK.x,z=KIOSK.z;
  pbox(B2,x,Y,z,4.5,2.8,5.6,[.82,.22,.16],0);pbox(B2,x,Y+2.8,z,5.2,.3,6.4,[.2,.2,.24],0);
- pbox(B2,x+2.3,Y+1.0,z,.15,1.0,3.2,[.14,.2,.32],0);pbox(B2,x+2.4,Y+.9,z,.5,.12,3.6,[.45,.3,.15],0);
+ pbox(B2,x+2.3*KF,Y+1.0,z,.15,1.0,3.2,[.14,.2,.32],0);pbox(B2,x+2.4*KF,Y+.9,z,.5,.12,3.6,[.45,.3,.15],0);
  const sg=new THREE.Mesh(new THREE.PlaneGeometry(5,1.2),new THREE.MeshBasicMaterial({map:txtTex(400,96,'#14141a','#ffd23a','COZY KARTS',44),side:THREE.DoubleSide}));
- sg.position.set(x+2.35,Y+3.9,z);sg.rotation.y=Math.PI/2;scene.add(sg);
+ sg.position.set(x+2.35*KF,Y+3.9,z);sg.rotation.y=Math.PI/2*KF;scene.add(sg);
  const po=new THREE.Mesh(new THREE.PlaneGeometry(3.2,.9),new THREE.MeshBasicMaterial({map:txtTex(300,84,'#14141a','#ffffff','£5 · 4 LAPS',32),side:THREE.DoubleSide}));
- po.position.set(x+2.4,Y+2.35,z);po.rotation.y=Math.PI/2;scene.add(po);
+ po.position.set(x+2.4*KF,Y+2.35,z);po.rotation.y=Math.PI/2*KF;scene.add(po);
  // road sign
  const rs=new THREE.Mesh(new THREE.PlaneGeometry(9,1.3),new THREE.MeshBasicMaterial({map:txtTex(512,74,'#2a6a34','#ffffff','COZY KARTS  ▲',40),side:THREE.DoubleSide}));
  rs.position.set(STRIP.x,Y+4.6,-6.2);scene.add(rs)}
@@ -210,7 +210,7 @@ function kartTick(dt){
 {const uc0=updateCar;updateCar=function(){uc0();if(KT.on){kartM.position.copy(car.position);kartM.rotation.copy(car.rotation);for(const w of kartM.userData.fw)w.rotation.y=GS.steer*.5;for(const w of kartM.userData.wh)w.rotation.x=GS_SPIN}}}
 {const ctx0=ctx;ctx=function(){
  if(KT.on)return{label:KT.state==='fin'?'LEAVE TRACK':'QUIT RACE',fn:kartQuit};
- if(!GS.inside){const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z;if(GS.onFoot?Math.hypot(px-(KIOSK.x+3),pz-KIOSK.z)<5:(px>PARK.x0-3&&px<PARK.x1+3&&pz>PARK.z0-3&&pz<PARK.z1+3))return{label:'GO KARTING £'+FEE,fn:kartStart}}
+ if(!GS.inside){const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z;if(GS.onFoot?Math.hypot(px-(KIOSK.x+3*KF),pz-KIOSK.z)<5:(px>PARK.x0-3&&px<PARK.x1+3&&pz>PARK.z0-3&&pz<PARK.z1+3))return{label:'GO KARTING £'+FEE,fn:kartStart}}
  return ctx0()}}
 window.KARTS={KT,S,N,SP,LEN,kartStart,kartQuit,kartEnd,posAt,KIOSK};
 })();
