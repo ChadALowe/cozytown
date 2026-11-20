@@ -240,6 +240,7 @@ special({kind:'shop',units:1,w:20,d:10,eaves:6.2,ridge:3.2,fg:.6,wall:'render',w
 special({kind:'shop',units:1,w:22,d:11,eaves:5.4,ridge:2.6,fg:12,wall:'brick',wc:[.9,.78,.7],roof:'slate',names:[{t:"JOE'S GARAGE",bg:'#c82020',fg:'#ffffff',col:[.6,.1,.1]}]},-100,0,1,0,-1);
 PLACED.push({x:-100,z:-11,rot:0,hw:15,hd:7.5});
 special({kind:'shop',units:1,w:26,d:12,eaves:6.4,ridge:3.4,fg:.6,wall:'render',wc:[.9,.9,1],roof:'tile',names:[{t:'STRIKE BOWL',bg:'#5a1a8a',fg:'#ffe040',col:[.3,.1,.5]}]},78,0,1,0,-1);
+special({kind:'shop',units:1,w:12,d:10,eaves:5.8,ridge:2.8,fg:.6,wall:'render',wc:[1.05,.98,.88],roof:'tile',names:[{t:"LUIGI'S PIZZA",bg:'#c81e1e',fg:'#ffffff',col:[.1,.5,.2]}]},216,0,1,0,1);
 special({kind:'shop',units:1,w:13,d:10,eaves:5.8,ridge:2.8,fg:.6,wall:'brick',wc:[.95,.8,.7],roof:'slate',fash:5,names:[{t:"SINGH'S CORNER SHOP",bg:'#0e5a2e',fg:'#ffffff',col:[.05,.35,.18]}]},212,0,1,0,-1);
 special({kind:'shop',units:1,w:16,d:10,eaves:6,ridge:3,fg:.6,wall:'render',wc:[1.05,.78,.6],roof:'tile',fash:4,names:[{t:"RANI'S SILK HOUSE",bg:'#8a1a4a',fg:'#ffd24a',col:[.54,.1,.29]}]},198,0,1,0,1);
 special({kind:'shop',units:1,w:18,d:10,eaves:6,ridge:3,fg:.6,wall:'brick',wc:[1,.72,.55],roof:'tile',fash:1,names:[{t:"PENNY'S BARGAINS",bg:'#f8d010',fg:'#c01010',col:[.9,.75,.1]}]},-86,0,1,0,1);

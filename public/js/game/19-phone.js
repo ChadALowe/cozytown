@@ -12,7 +12,7 @@ const PHTX=[['MR SINGH','Fresh samosas just out of the fryer. Pop in!'],['FARMER
  const t=PHTX[(DAY*7+3)%PHTX.length];phText(t[0],t[1])}catch(e){}}}
 /* ---- waypoint: a light beam in the world and a pill under the HUD ---- */
 const phBeam=(()=>{const g=new THREE.Group(),m=new THREE.MeshBasicMaterial({color:0x40c8ff,transparent:true,opacity:.45,depthWrite:false,fog:false});const c=new THREE.Mesh(new THREE.CylinderGeometry(.6,.6,60,10,1,true),m);c.position.y=30;g.add(c);const r=new THREE.Mesh(new THREE.RingGeometry(1.4,2.2,24).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x40c8ff,transparent:true,opacity:.8,side:THREE.DoubleSide,fog:false}));r.position.y=.15;g.add(r);g.visible=false;scene.add(g);return g})();
-const phPill=(()=>{const e=document.createElement('div');e.style.cssText='position:fixed;left:50%;top:44px;transform:translateX(-50%);z-index:25;background:rgba(10,40,70,.85);border:2px solid #40c8ff;border-radius:14px;color:#fff;font:bold 12px ui-monospace,monospace;padding:3px 10px;pointer-events:auto;display:none;cursor:pointer';e.title='Tap to clear';e.onclick=()=>{PH.way=null;phWay()};document.body.appendChild(e);return e})();
+const phPill=(()=>{const e=document.createElement('div');e.style.cssText='position:fixed;left:50%;top:44px;transform:translateX(-50%);z-index:25;background:rgba(10,40,70,.85);border:2px solid #40c8ff;border-radius:14px;color:#fff;font:bold 12px ui-monospace,monospace;padding:3px 10px;pointer-events:auto;display:none;cursor:pointer';e.title='Tap to clear';e.onclick=()=>{if(PH.way&&PH.way.keep)return;PH.way=null;phWay()};document.body.appendChild(e);return e})();
 function phWay(){const w=PH.way;phBeam.visible=!!w&&!GS.inside;if(w)phBeam.position.set(w.x,G0,w.z);if(!w)phPill.style.display='none'}
 /* ---- jobs board ---- */
 function phDoor(n){const o=SHOPD.find(s=>s.t===n);return o?{x:o.x,z:o.z}:null}
@@ -29,7 +29,7 @@ function phJobs(){const L=[];const add=(n,pay,info,pos,st)=>{if(pos)L.push({n,pa
  add('FLIGHTS','TRAVEL','Fly to Marlowe City from the airport at the end of Airport Road.',phDoor('COZY AIRWAYS'),'');
  return L}
 /* ---- the phone itself ---- */
-const PHN={ov:null,app:'home',sub:null};
+const PHN={ov:null,app:'home',sub:null};var PHX=[];
 (function(){const st=document.createElement('style');st.textContent=`
 #phB{position:relative}#phBadge{position:absolute;right:-4px;top:-4px;background:#e02030;color:#fff;border-radius:9px;font:bold 10px monospace;min-width:16px;height:16px;line-height:16px;text-align:center;display:none;border:1px solid #fff}
 #phO{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;font:bold 13px ui-monospace,Menlo,monospace;color:#fff;touch-action:manipulation}
@@ -66,9 +66,10 @@ function phRender(){const o=PHN.ov;if(!o)return;o.querySelector('#phT').textCont
  const btn=(par,txt,fn,bg)=>{const b=el('button',null,txt,par);if(bg)b.style.background=bg;b.onclick=fn;return b};
  const a=PHN.app;
  if(a==='home'){const un=PH.msgs.filter(m=>!m.r).length;el('div','phH','COZY PHONE');const g=el('div','phG');
-  for(const[k,ic,n,bg]of[['msg','💬','MESSAGES','#2a9a4a'],['map','🗺','MAP','#2a6ad0'],['bank','💷','BANK','#c89020'],['stk','📈','STOCKS','#1a7a6a'],['cam','📷','CAMERA','#505a70'],['pho','🖼','PHOTOS','#a03a8a'],['job','🧰','JOBS','#c05020']]){const b=el('button','phA',null,g);const i=el('i',null,ic,b);i.style.background=bg;el('span',null,n,b);if(k==='msg'&&un)el('b',null,String(un),b);
+  for(const[k,ic,n,bg]of[['msg','💬','MESSAGES','#2a9a4a'],['map','🗺','MAP','#2a6ad0'],['bank','💷','BANK','#c89020'],['stk','📈','STOCKS','#1a7a6a'],['cam','📷','CAMERA','#505a70'],['pho','🖼','PHOTOS','#a03a8a'],['job','🧰','JOBS','#c05020'],...PHX.map(x=>[x.k,x.ic,x.n,x.bg])]){const b=el('button','phA',null,g);const i=el('i',null,ic,b);i.style.background=bg;el('span',null,n,b);if(k==='msg'&&un)el('b',null,String(un),b);
    b.onclick=()=>{if(k==='map'){phClose();FMAP.open();return}if(k==='cam'){phClose();phPhoto();return}phGo(k)}}
   if(PH.way){const r=el('div','phR');r.style.marginTop='18px';el('div',null,'WAYPOINT: '+PH.way.n,r);const bt=el('div','bt',null,r);btn(bt,'CLEAR',()=>{PH.way=null;phWay();phRender()})}}
+ else if(PHX.some(x=>x.k===a)){PHX.find(x=>x.k===a).render({el,btn,C})}
  else if(a==='msg'){if(PHN.sub!=null){const m=PH.msgs[PHN.sub];if(!m)return phGo('msg');m.r=1;el('div','phH',m.f);const r=el('div','phR');el('div',null,m.t,r);el('small',null,'DAY '+m.d+' · '+m.h,r);return}
   el('div','phH','MESSAGES');if(!PH.msgs.length)el('div','phR','No messages yet.');PH.msgs.forEach((m,i)=>{const r=el('div','phR');r.style.cursor='pointer';if(!m.r)r.style.borderColor='#3aa0ff';const k=el('div','phK',null,r);el('span',null,(m.r?'':'● ')+m.f,k);el('small',null,'DAY '+m.d+' '+m.h,k);el('small',null,m.t.length>46?m.t.slice(0,44)+'…':m.t,r);r.onclick=()=>{PHN.sub=i;phRender()}});
   if(PH.msgs.length){const bt=el('div','bt');btn(bt,'MARK ALL READ',()=>{PH.msgs.forEach(m=>m.r=1);phRender()})}}
@@ -107,6 +108,6 @@ function phPhotoEnd(){if(!PHC.on)return;PHC.on=0;removeEventListener('keydown',P
  try{const n=STOCKS.ST.news[0];if(n&&n!==PH.lastNews){if(PH.lastNews)phText('COZY MARKETS',n,true);PH.lastNews=n}}catch(e){}
  PH.hrT+=dt;if(PH.hrT>150){PH.hrT=0;if(Math.random()<.35){const t=PHTX[Math.floor(Math.random()*PHTX.length)];phText(t[0],t[1])}}
  if(!PH.seen.w){PH.seen.w=1;phText('MUM',"Hope the new place is cosy! I've put your phone on the 📱 button. Press P on a keyboard. Love you x",true)}
- const w=PH.way;phBeam.visible=!!w&&!GS.inside;if(w){const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z,d=Math.hypot(w.x-px,w.z-pz);if(d<7&&!GS.inside){toast('ARRIVED: '+w.n);PH.way=null;phWay()}else{phPill.style.display=GS.inside||menuOpen||PHC.on?'none':'block';phPill.textContent='📍 '+w.n+' · '+Math.round(d)+'m   ✕';phBeam.children[1].rotation.y+=dt}}
+ const w=PH.way;phBeam.visible=!!w&&!GS.inside;if(w){const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z,d=Math.hypot(w.x-px,w.z-pz);if(d<7&&!GS.inside&&!w.keep){toast('ARRIVED: '+w.n);PH.way=null;phWay()}else{phPill.style.display=GS.inside||menuOpen||PHC.on?'none':'block';phPill.textContent='📍 '+w.n+' · '+Math.round(d)+'m'+(w.keep?'':'   ✕');phBeam.children[1].rotation.y+=dt}}
  if(PHN.ov&&(PH._rt=(PH._rt||0)+dt)>1){PH._rt=0;const t=PHN.ov.querySelector('#phT');if(t)t.textContent=phClock()+'  DAY '+DAY;const m=PHN.ov.querySelector('#phM');if(m)m.textContent=phMoney(cash)}}}
 phBadge();
