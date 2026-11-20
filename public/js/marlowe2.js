@@ -145,6 +145,71 @@ function drawCity(T){const reg=M.reg,u=T.x-OX,v=T.z-OZ,cx=(u-reg[0])/MMK,cz=(reg
  mc.fillStyle='rgba(0,0,0,.55)';mc.fillRect(0,MMS-13,MMS,13);mc.fillStyle='#fff';mc.font='bold 9px monospace';mc.textAlign='center';mc.fillText(streetAt(u,v),MMS/2,MMS-3.5)}
 function streetAt(u,v){let best='MARLOWE',bd=9;for(const r of NS){const d=Math.abs(u-r.u)-r.h;if(d<bd&&v>-640&&v<1040){bd=d;best=r.n}}for(const r of EW){const d=Math.abs(v-r.v)-r.h;if(d<bd){bd=d;best=r.n}}if(u>-217)best='MARLOWE AIRPORT';else if(u<-692&&u>-768&&bd>4)best='THE RIVER MARLE';return best}
 {const d0=drawMap;drawMap=function(){const T=GS.onFoot?P:GS;if(M.built&&!GS.inside&&inReg(T.x,T.z)){if(!CMC)cityMap();drawCity(T)}else d0()}}
+
+/* ------------------------------------------------------------------ full-screen Marlowe map (tap the minimap or press M while in the city) */
+const PICON={'MARLOWE CENTRAL STATION':'🚉','MARLOWE SKY TOWER':'🗼',"ST MARLOWE'S CATHEDRAL":'⛪','MARKET SQUARE':'🛒','MARLOWE TOWN HALL':'🏛','MARLOWE ARENA':'🏟','WESTBANK PARK':'🌳','RIVERSIDE GARDENS':'🌷','THE MARLOWE EYE':'🎡','MARLOWE CIRCUS':'📺','MARLOWE AIRPORT':'✈','HIGH STREET':'🛍',"KING'S AVENUE":'🛣','THE DOCKS':'⚓','NORTH QUAY':'⛵'};
+let HMAP=null,FOV=null;
+function cityMapHi(){const reg=M.reg,K=1,w=Math.ceil((reg[1]-reg[0])/K),h=Math.ceil((reg[3]-reg[2])/K),c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');
+ const X=u=>(u-reg[0])/K,Z=v=>(reg[3]-v)/K,rect=(u0,v0,u1,v1,col,st)=>{const x=X(Math.min(u0,u1)),y=Z(Math.max(v0,v1)),ww=Math.abs(u1-u0)/K,hh=Math.abs(v1-v0)/K;g.fillStyle=col;g.fillRect(x,y,ww,hh);if(st){g.strokeStyle=st;g.lineWidth=1;g.strokeRect(x+.5,y+.5,ww-1,hh-1)}};
+ g.fillStyle='#3a6e9e';g.fillRect(0,0,w,h);rect(MW.LAND.u0,MW.LAND.v0,MW.LAND.u1,MW.LAND.v1,'#f0eee8');rect(-217,MW.LAND.v0,MW.LAND.u1,MW.LAND.v1,'#79a862');rect(-30,-575,30,575,'#8a8a8e');rect(-95,-300,-77,430,'#9a9aa0');rect(-217,-420,-150,-296,'#d0d0cc','#999');
+ rect(-768,MW.LAND.v0,-692,MW.LAND.v1,'#3a6e9e');for(const j of MW.BRIDGE){const e=EW[j];rect(-775,e.v-e.h-4,-685,e.v+e.h+4,'#f0eee8');rect(-768,e.v-e.h-4,-692,e.v-e.h,'#c8c6be');rect(-768,e.v+e.h,-692,e.v+e.h+4,'#c8c6be')}
+ for(const o of MW.RAISE){if(o.k==='coast'||o.k==='prom'||o.k==='bridge'){rect(o.u0,o.v0,o.u1,o.v1,'#d4d2ca');continue}if(o.k==='med'){rect(o.u0,o.v0,o.u1,o.v1,'#9cc488');continue}if(o.k==='plaza'){rect(o.u0,o.v0,o.u1,o.v1,'#ddd0b4');continue}
+  const park=o.sp==='parkw'||o.sp==='parke',col=park?'#7cbc62':o.sp==='square'||o.sp==='cathedral'?'#ddd0b4':o.d==='down'?'#a4a8b8':o.d==='old'?'#c9a690':o.d==='west'?'#d2bca8':o.d==='docks'?'#b4a090':'#bcb6aa';
+  rect(o.u0,o.v0,o.u1,o.v1,'#d4d2ca');const pw=r=>r.w>=20?6:4.5;rect(o.u0+pw(o.sw),o.v0+pw(o.ss),o.u1-pw(o.se),o.v1-pw(o.sn),col,park?null:'#0003')}
+ rect(-1112,425,-1078,495,'#3a6e9e');rect(-162,-265,-138,-135,'#e8d26a','#0005');
+ /* lane lines */g.strokeStyle='#fff';g.lineWidth=1;g.setLineDash([4,5]);for(const r of NS){g.beginPath();g.moveTo(X(r.u),Z(-628));g.lineTo(X(r.u),Z(1028));g.stroke()}for(const r of EW){for(const[a,b]of MW.BRIDGE.has(r.j)?[[NS[11].u,NS[0].u]]:[[NS[11].u,NS[6].u],[NS[5].u,NS[0].u]]){g.beginPath();g.moveTo(X(a),Z(r.v));g.lineTo(X(b),Z(r.v));g.stroke()}}g.setLineDash([]);
+ g.fillStyle='#9ad0ff';g.font='bold 22px Georgia,serif';g.textAlign='center';g.save();g.translate(X(-730),Z(560));g.rotate(-Math.PI/2);g.fillText('THE RIVER MARLE',0,8);g.restore();
+ HMAP=c}
+function openCityMap(){if(FOV||busy||menuOpen||(window.AIRPORT&&AIRPORT.CIN&&AIRPORT.CIN.on))return;if(!HMAP)cityMapHi();busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;const reg=M.reg;
+ const ov=document.createElement('div');ov.style.cssText='position:fixed;inset:0;z-index:80;background:#1d3e60;touch-action:none;user-select:none;font:bold 12px ui-monospace,monospace;color:#fff';
+ const cv=document.createElement('canvas');cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;cursor:grab';ov.appendChild(cv);
+ const bar=document.createElement('div');bar.style.cssText='position:absolute;left:0;right:0;top:0;display:flex;align-items:center;gap:8px;padding:8px 10px;background:linear-gradient(#000c,#0000);pointer-events:none';
+ const ttl=document.createElement('div');ttl.textContent='MARLOWE CITY MAP';ttl.style.cssText='font-size:15px;letter-spacing:.12em;color:#ffd24a;flex:1;text-shadow:0 2px 0 #000';bar.appendChild(ttl);
+ const bt=(t,f,w)=>{const b=document.createElement('button');b.textContent=t;b.style.cssText='pointer-events:auto;font:bold 18px ui-monospace,monospace;min-width:'+(w||42)+'px;height:42px;border:3px solid #f5e6a0;border-radius:10px;background:#1b2a3acc;color:#fff;cursor:pointer;padding:0 8px';b.onclick=f;bar.appendChild(b);return b};
+ const info=document.createElement('div');info.style.cssText='position:absolute;right:10px;bottom:10px;background:#0b1420ee;border:3px solid #f5e6a0;border-radius:10px;padding:8px 12px;font-size:13px;display:none;max-width:60vw';
+ const leg=document.createElement('div');leg.style.cssText='position:absolute;left:10px;bottom:10px;background:#0b1420ee;border:3px solid #f5e6a0;border-radius:10px;padding:8px 10px;font-size:11px;line-height:1.7;max-width:min(240px,62vw)';
+ leg.innerHTML='<div style="color:#ffd24a;letter-spacing:.1em">LEGEND</div>'+[['#a4a8b8','DOWNTOWN'],['#bcb6aa','MIDTOWN'],['#b4a090','DOCKS'],['#c9a690','OLD TOWN'],['#d2bca8','WESTBANK'],['#7cbc62','PARKS'],['#3a6e9e','RIVER / SEA']].map(([c,t])=>'<div><span style="display:inline-block;width:18px;height:8px;background:'+c+';margin-right:6px;border-radius:2px"></span>'+t+'</div>').join('')+'<div>Ⓜ METRO · 🚕 TAXI RANK</div><div><span style="color:#ffd24a">●</span> PICK UP · <span style="color:#3ad07a">●</span> DROP OFF</div>';
+ if(innerWidth<700)leg.style.display='none';ov.append(bar,leg,info);
+ const play=()=>GS.onFoot?P:GS,t0=play();
+ const S={s:1,cu:t0.x-OX,cv:t0.z-OZ,ptr:new Map(),drag:0,pd:0,sel:null};
+ const fit=()=>{const r=cv.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);cv.width=r.width*d;cv.height=r.height*d;S.d=d};
+ const clamp=()=>{S.cu=Math.max(reg[0],Math.min(reg[1],S.cu));S.cv=Math.max(reg[2],Math.min(reg[3],S.cv))};
+ const zoom=(f,px,py)=>{const r=cv.getBoundingClientRect(),w2=r.width/2,h2=r.height/2,qx=px==null?w2:px,qy=py==null?h2:py,ns=Math.max(.25,Math.min(8,S.s*f));const u=S.cu+(qx-w2)/S.s,v=S.cv-(qy-h2)/S.s;S.s=ns;S.cu=u-(qx-w2)/S.s;S.cv=v+(qy-h2)/S.s;clamp()};
+ const toS=(u,v)=>{const r=cv.getBoundingClientRect();return[(u-S.cu)*S.s+r.width/2,-(v-S.cv)*S.s+r.height/2]};
+ const pois=()=>{const L=CITY.poi.map(p=>({u:p.u,v:p.v,n:p.metro?'MARLOWE METRO':p.n,ic:p.metro?'Ⓜ':PICON[p.n]||'📍',c:p.metro?'#1d3e8a':p.taxi?'#ffd24a':'#ffffff'}));return L};
+ const close=()=>{cancelAnimationFrame(S.raf);removeEventListener('keydown',S.kd,true);removeEventListener('resize',fit);ov.remove();FOV=null;busy=0};
+ bt('+',()=>zoom(1.5));bt('−',()=>zoom(1/1.5));bt('⌖',()=>{const t=play();S.cu=t.x-OX;S.cv=t.z-OZ;S.s=Math.max(S.s,1.4)});bt('▣',()=>{const r=cv.getBoundingClientRect();S.s=Math.min(r.width/(reg[1]-reg[0]),r.height/(reg[3]-reg[2]))*1.05;S.cu=(reg[0]+reg[1])/2;S.cv=(reg[2]+reg[3])/2});bt('✕',close);
+ cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);S.ptr.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});S.drag=0;if(S.ptr.size===2){const a=[...S.ptr.values()];S.pd=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}cv.style.cursor='grabbing'});
+ cv.addEventListener('pointermove',e=>{const p=S.ptr.get(e.pointerId);if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
+  if(S.ptr.size===1){if(Math.hypot(e.clientX-p.sx,e.clientY-p.sy)>6)S.drag=1;S.cu-=dx/S.s;S.cv+=dy/S.s;clamp()}
+  else if(S.ptr.size===2){S.drag=1;const a=[...S.ptr.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),r=cv.getBoundingClientRect();if(S.pd>0)zoom(d/S.pd,(a[0].x+a[1].x)/2-r.left,(a[0].y+a[1].y)/2-r.top);S.pd=d}});
+ const up=e=>{const p=S.ptr.get(e.pointerId);if(p&&!S.drag&&S.ptr.size===1){const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;let b=null,bd=24;for(const q of pois()){const s=toS(q.u,q.v),d=Math.hypot(s[0]-px,s[1]-py);if(d<bd){bd=d;b=q}}S.sel=b;
+   if(b){const t=play(),dd=Math.round(Math.hypot(OX+b.u-t.x,OZ+b.v-t.z));info.style.display='block';info.innerHTML='';const a=document.createElement('div');a.textContent=b.ic+' '+b.n;const c=document.createElement('div');c.style.cssText='font-size:11px;color:#9ab;margin-top:3px';c.textContent=streetAt(b.u,b.v)+'  ·  '+(dd>1000?(dd/1000).toFixed(1)+' KM':dd+' M')+' AWAY';info.append(a,c)}else info.style.display='none'}
+  S.ptr.delete(e.pointerId);S.pd=0;if(!S.ptr.size)cv.style.cursor='grab'};
+ cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+ cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoom(e.deltaY<0?1.2:1/1.2,e.clientX-r.left,e.clientY-r.top)},{passive:false});
+ S.kd=e=>{if(e.key==='Escape'||e.key==='m'||e.key==='M'){e.preventDefault();e.stopPropagation();close()}else if(e.key==='+'||e.key==='=')zoom(1.3);else if(e.key==='-')zoom(1/1.3)};addEventListener('keydown',S.kd,true);addEventListener('resize',fit);
+ document.body.appendChild(ov);fit();FOV=S;
+ const draw=()=>{S.raf=requestAnimationFrame(draw);const g=cv.getContext('2d'),r=cv.getBoundingClientRect(),Wd=r.width,Ht=r.height,s=S.s;g.setTransform(S.d,0,0,S.d,0,0);g.fillStyle='#3a6e9e';g.fillRect(0,0,Wd,Ht);
+  g.imageSmoothingEnabled=s<2;const o=toS(reg[0],reg[3]);g.drawImage(HMAP,o[0],o[1],HMAP.width*s,HMAP.height*s);
+  /* street names */
+  if(s>.55){g.font='bold '+Math.round(Math.min(14,7+s*2.4))+'px ui-monospace,monospace';g.textAlign='center';g.textBaseline='middle';g.lineWidth=3;g.strokeStyle='#fff';g.fillStyle='#2a3040';
+   const step=Math.max(170,330/s);for(const rd of NS)for(let v=-560;v<1000;v+=step){const q=toS(rd.u,v+(rd.i%2)*60);if(q[0]<-40||q[0]>Wd+40||q[1]<-60||q[1]>Ht+60)continue;g.save();g.translate(q[0],q[1]);g.rotate(-Math.PI/2);g.strokeText(rd.n,0,0);g.fillText(rd.n,0,0);g.restore()}
+   for(const rd of EW)for(let u=-1180;u<-240;u+=step){if(u>-772&&u<-690&&!MW.BRIDGE.has(rd.j))continue;const q=toS(u+(rd.j%2)*55,rd.v);if(q[0]<-60||q[0]>Wd+60||q[1]<-20||q[1]>Ht+20)continue;g.strokeText(rd.n,q[0],q[1]);g.fillText(rd.n,q[0],q[1])}}
+  /* places */
+  const R=Math.max(9,Math.min(16,6+s*4));for(const p of pois()){const q=toS(p.u,p.v);if(q[0]<-30||q[1]<-30||q[0]>Wd+30||q[1]>Ht+30)continue;g.fillStyle=p.c;g.strokeStyle=p===S.sel?'#ff0':'#000c';g.lineWidth=p===S.sel?4:2.5;g.beginPath();g.arc(q[0],q[1],R,0,6.3);g.fill();g.stroke();
+   g.font=Math.round(R*1.05)+'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle=p.ic==='Ⓜ'?'#fff':'#000';g.fillText(p.ic,q[0],q[1]+1);
+   if((s>1.6&&p.ic!=='Ⓜ')||p===S.sel){g.font='bold 11px ui-monospace,monospace';g.fillStyle='#fff';g.strokeStyle='#000';g.lineWidth=3;g.strokeText(p.n,q[0],q[1]+R+9);g.fillText(p.n,q[0],q[1]+R+9)}}
+  /* cab fare */
+  const F=window.MARLOWE3&&MARLOWE3.F;if(F&&SH&&SH.k==='mcab'){const tg=F.st==='ride'?F.b:F.a;if(tg){const q=toS(tg.x-OX,tg.z-OZ);g.fillStyle=F.st==='ride'?'#3ad07a':'#ffd24a';g.strokeStyle='#000';g.lineWidth=3;g.beginPath();g.arc(q[0],q[1],9,0,6.3);g.fill();g.stroke();g.font='bold 11px ui-monospace,monospace';g.fillStyle='#fff';g.strokeText((F.st==='ride'?'DROP: ':'PICK UP: ')+tg.name,q[0],q[1]-16);g.fillText((F.st==='ride'?'DROP: ':'PICK UP: ')+tg.name,q[0],q[1]-16)}}
+  /* you */
+  const t=play();if(GS.onFoot){const q=toS(GS.x-OX,GS.z-OZ);g.fillStyle='#4af';g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.arc(q[0],q[1],6,0,6.3);g.fill();g.stroke()}
+  {const q=toS(t.x-OX,t.z-OZ),ps=GS.onFoot?P.psi:GS.psi;g.save();g.translate(q[0],q[1]);g.rotate(Math.atan2(-Math.cos(ps),Math.sin(ps)));const z=13;g.fillStyle='#fff';g.strokeStyle='#d00';g.lineWidth=2.5;g.beginPath();g.moveTo(z,0);g.lineTo(-z*.7,-z*.6);g.lineTo(-z*.45,0);g.lineTo(-z*.7,z*.6);g.closePath();g.fill();g.stroke();g.restore()}
+  /* scale */const sb=100*s;g.fillStyle='#000a';g.fillRect(Wd-sb-20,Ht-54,sb+8,22);g.fillStyle='#fff';g.fillRect(Wd-sb-16,Ht-38,sb,3);g.font='bold 11px ui-monospace,monospace';g.textAlign='left';g.fillText('100 m',Wd-sb-16,Ht-46);g.fillText('N ↑',Wd-44,70)};
+ draw()}
+/* the minimap tap and the M key open the map of the place you're in */
+addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('#mm')&&here()){e.stopPropagation();e.preventDefault();openCityMap()}},true);
+addEventListener('keydown',e=>{if((e.key==='m'||e.key==='M')&&here()&&!FOV&&!e.repeat&&!e.ctrlKey&&!e.metaKey){const t=e.target;if(t&&/INPUT|TEXTAREA/.test(t.tagName))return;e.stopPropagation();openCityMap()}},true);
 /* ------------------------------------------------------------------ your car: waiting in the airport car park */
 const VAL={has:0,x:0,z:0,psi:0};
 function parkAtAirport(){const p=W(-205,-310.5);GS.x=p[0];GS.z=p[1];GS.psi=-Math.PI/2;GS.vx=GS.vz=0;GS.y=Y+.1;GS.vy=0;GS.prevGY=GS.y;GS.pitch=GS.roll=0}
@@ -166,5 +231,5 @@ let OUTER=null;
  if(CITY.wheel){const w=CITY.wheel;w.g.rotation.x+=dt*.035;for(const p of w.pods)p.rotation.x=-w.g.rotation.x}
  if(CITY.screens&&adT){adClock+=dt;if(adClock>5||!CITY.screens[0].material.map){adClock=0;adI++;CITY.screens.forEach((s,i)=>{s.material.map=adT[(adI+i*2)%adT.length];s.material.needsUpdate=true})}}
  trafficTick(dt);pedTick(dt)}}
-MW.onBuilt=function(){};window.MARLOWE2={onBuilt(){},CARS,PED,sig,VAL,streetAt,parkAtAirport,get IM(){return IM}};
+MW.onBuilt=function(){};window.MARLOWE2={openCityMap,onBuilt(){},CARS,PED,sig,VAL,streetAt,parkAtAirport,get IM(){return IM}};
 })();
