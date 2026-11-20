@@ -14,9 +14,9 @@ CDEF.mafia={n:'THE FAMILY',ic:'🎩',h:[0,24],per:3,unit:'JOBS',ranks:['ERRAND R
 Object.defineProperty(CDEF.mafia,'info',{get(){return MAF.met?'Driving jobs for Don Vittorio: deliveries from the docks and getaways. Lose the police or get busted. Busted '+MAF.busts+' time'+(MAF.busts===1?'':'s')+'.':'Somebody in Marlowe\'s Old Town is looking for a good driver who keeps quiet. Try the trattoria on the High Street.'}});
 CR.xp.mafia=CR.xp.mafia||0;CR.done.mafia=CR.done.mafia||0;
 /* careers glue: who texts you on promotion */
-let PK=null;{const p0=phText;phText=function(from,...a){if(from==='COZY CABS'&&PK)from=PK==='mafia'?'DON VITTORIO':PK==='mcab'?'MARLOWE CABS':from;return p0(from,...a)}}
+let PK=null;{const p0=phText;phText=function(from,...a){if(from==='COZY CABS'&&PK)from=PK==='mafia'?'DON VITTORIO':PK==='mcab'?'MARLOWE CABS':PK==='police'?'MARLOWE POLICE':from;return p0(from,...a)}}
 {const c0=crPay;crPay=function(k,...a){PK=k;setTimeout(()=>{if(PK===k)PK=null},3000);return c0(k,...a)}}
-{const c0=crCan;crCan=function(k){if(k!=='mafia')return c0(k);if(!MAF.met)return 'FIND SOMEONE WHO NEEDS A DRIVER IN MARLOWE\'S OLD TOWN';if(SH)return 'FINISH YOUR '+CDEF[SH.k].n+' SHIFT FIRST';if(!inM())return 'THE FAMILY ONLY WORKS IN MARLOWE';if(GS.inside)return 'GO OUTSIDE FIRST';if(GS.onFoot)return 'GET IN YOUR CAR FIRST';return ''}}
+{const c0=crCan;crCan=function(k){if(k!=='mafia')return c0(k);if(!MAF.met)return 'FIND SOMEONE WHO NEEDS A DRIVER IN MARLOWE\'S OLD TOWN';if(window.REP&&REP.get('family')<15)return 'THE DON WON\'T TAKE YOUR CALLS (FAMILY REPUTATION TOO LOW)';if(SH)return 'FINISH YOUR '+CDEF[SH.k].n+' SHIFT FIRST';if(!inM())return 'THE FAMILY ONLY WORKS IN MARLOWE';if(GS.inside)return 'GO OUTSIDE FIRST';if(GS.onFoot)return 'GET IN YOUR CAR FIRST';return ''}}
 /* ------------------------------------------------------------------ the trattoria */
 const b=MW.BLK.find(x=>x.c===8&&x.r===4),pw=r=>r.w>=20?6:4.5,fu=b.u1-pw(b.se),fv=b.v0+pw(b.ss)+.4*((b.v1-pw(b.sn))-(b.v0+pw(b.ss)));
 const TR={x:OX+fu+1.4,z:OZ+fv,psi:Math.PI/2,t:"VITTORIO'S TRATTORIA",bg:'#1e4a2a',fg:'#f4e8c8',vit:1,rx:6.6,rz:5,sz:4.1};SHOPD.push(TR);HRS[TR.t]=[11,24];
@@ -33,6 +33,9 @@ CUSTOM_SHOP.don=function(msg){$('shT').textContent='🎩 DON VITTORIO';
  const lv=crLvl('mafia');$('shMsg').textContent=msg||('"'+CDEF.mafia.ranks[lv]+', good to see you." · JOBS DONE '+MAF.jobs+' · BUSTED '+MAF.busts);
  if(SH&&SH.k==='mafia')dRow('YOU ARE ON A JOB FOR THE FAMILY',[['GIVE UP',()=>{crEnd(false);renderShop('"Hmm. Disappointing."')}]]);
  else dRow('"ANY WORK FOR ME, DON?"',[['YES',()=>{if(SH){renderShop('FINISH YOUR '+CDEF[SH.k].n+' SHIFT FIRST');return}MAF.pend=1;closeShop();say('DON VITTORIO','"Go to your car. I\'ll text you where to go."',3400)}]]);
+ const ch=MAF.ch|0;if(!SH&&ch<STORY.length)dRow('★ STORY · CHAPTER '+(ch+1)+'/'+STORY.length+': '+STORY[ch][0],[['PLAY',()=>{MAF.next='story';MAF.pend=1;closeShop();say('DON VITTORIO',STORY[ch][1],4200)}]]);
+ if(!SH&&ch>=STORY.length&&!MAF.end){dRow('"VIPER IS GONE. THE CITY IS OURS. I AM OLD… TAKE MY CHAIR."',[['BECOME THE DON',()=>{MAF.end='don';if(window.REP){REP.add('family',40);REP.add('serpents',-50);REP.add('police',-20)}for(let i=0;i<5;i++)setTimeout(()=>beep(392+i*98,.18,'triangle',.06),i*150);renderShop('"Long live the new Don of Marlowe!" (FAMILY JOBS NOW PAY 50% MORE)')}]]);dRow('"OR TAKE THIS AND WALK AWAY, CLEAN."',[['WALK AWAY (£1,000)',()=>{MAF.end='free';cash+=1000;if(window.REP){REP.add('police',30);REP.add('family',-10)}renderShop('"Go, live a quiet life. The door is always open." (+£1,000, POLICE REP UP)')}]])}
+ if(MAF.end)dRow(MAF.end==='don'?'YOU ARE THE DON OF MARLOWE 👑':'YOU WALKED AWAY FROM THE FAMILY. THE DON STILL BUYS YOU LUNCH.',[['🎩',()=>{}]]);
  if(!SH)dRow('"THE SERPENTS ARE TAKING OVER THE DOCKS." (TURF WAR)',[['DEAL WITH THEM',()=>{MAF.next='war';MAF.pend=1;closeShop();say('DON VITTORIO','"Get your car. Show them who runs South Quay."',3400)}]]);
  dRow('CHAT',[['TALK',()=>renderShop(DONL[dl++%DONL.length])]]);dRow('',[['BACK',()=>closeShop()]])};
 {const b0=buildShop;buildShop=function(o){if(!o||!o.vit)return b0(o);while(SG.children.length)SG.remove(SG.children[0]);RX=o.rx;RZ=o.rz;SHK=null;const Hh=IH+.9,B=(x,y,z,w,h,d,hex)=>sbox(x,y,z,w,h,d,fmc(hex));
@@ -87,7 +90,7 @@ function copTick(dt){const p=crPos();trailT+=dt;if(trailT>.25){trailT=0;const l=
  if(near>170||!COPS.length){lostT+=dt;if(lostT>9){toast('😎 YOU LOST THE POLICE!');clearCops();beep(523,.12,'square',.05);setTimeout(()=>beep(784,.16,'square',.05),130)}}else lostT=Math.max(0,lostT-dt*.5);
  const slow=GS.onFoot||Math.abs(GS.speed)<3.5;if(near<5&&slow){bustT+=dt;if(bustT>2.2)busted()}else bustT=Math.max(0,bustT-dt);
  sirenT-=dt;if(sirenT<=0&&near<180){sirenT=.42;beep((t*2|0)%2?720:960,.32,'triangle',.022)}}
-function busted(){const fine=Math.round(80+heat*60+crLvl('mafia')*40);cash=Math.max(0,cash-fine);MAF.busts++;toast('🚔 BUSTED! FINED £'+fine+'. THE CARGO WAS CONFISCATED.');clearCops();beep(150,.6,'sawtooth',.08);
+function busted(){const fine=Math.round(80+heat*60+crLvl('mafia')*40);cash=Math.max(0,cash-fine);MAF.busts++;if(window.REP){REP.add('police',-3);REP.add('family',-3)}toast('🚔 BUSTED! FINED £'+fine+'. THE CARGO WAS CONFISCATED.');clearCops();beep(150,.6,'sawtooth',.08);
  setTimeout(()=>{try{phText('DON VITTORIO','"You got caught? Madonna... We say nothing, you say nothing. Come back when you\'re ready."')}catch(e){}},2500);if(SH&&SH.k==='mafia')crEnd(false)}
 /* ------------------------------------------------------------------ jobs */
 let J=null;const crew=[];
@@ -95,13 +98,14 @@ const snapTo=(u,v,n)=>{const s=window.MARLOWE3&&MARLOWE3.snap(u,v);if(!s)return 
 const DOCKS=[[-560,-560,'THE DOCKS · WAREHOUSE 7'],[-300,-470,'THE DOCKS · LOADING BAY'],[-470,-600,'SOUTH QUAY · CONTAINER YARD']],BANKS=[[-560,300,'MARLOWE BANK · REGENT ROW'],[-320,520,'MARLOWE BANK · CANNON STREET'],[-960,-40,'MARLOWE BANK · HIGH STREET']],SAFE=[[-600,-430,'THE SAFEHOUSE GARAGE'],[-1180,800,'THE SAFEHOUSE GARAGE'],[-330,920,'THE SAFEHOUSE GARAGE']];
 const pick=a=>a[(Math.random()*a.length)|0];
 function newJob(){const lv=crLvl('mafia'),get=lv>=1&&Math.random()<.45;clearCops();TRAIL.length=0;
+ if(MAF.next==='story'){MAF.next=0;storyJob(MAF.ch|0);SH.st='job';return}
  if(MAF.next==='war'||(lv>=1&&Math.random()<.25)){MAF.next=0;warJob();SH.st='job';return}
  if(get){const bk=snapTo(...pick(BANKS));J={k:'get',st:'go',a:bk,t:0};crWay(bk.x,bk.z,'THE CREW: '+bk.name);phText('DON VITTORIO','"My nephews are making a withdrawal at '+bk.name+'. Pick them up out front. Then lose anyone who follows."',true);toast('🎩 GETAWAY JOB: PICK UP THE CREW AT '+bk.name)}
  else{const dk=snapTo(...pick(DOCKS));J={k:'del',st:'go',a:dk,t:0};crWay(dk.x,dk.z,'COLLECT: '+dk.name);phText('DON VITTORIO','"There\'s a crate of olive oil at '+dk.name+'. Very special olive oil. Don\'t open it."',true);toast('🎩 DELIVERY JOB: COLLECT A CRATE AT '+dk.name)}
  SH.st='job'}
 {const s0=crStart;crStart=function(k){if(k!=='mafia')return s0(k);const why=crCan(k);if(why){toast(why);return false}SH={k,n:0,t:0,st:'job',stage:0};toast('🎩 THE FAMILY · '+CDEF.mafia.ranks[crLvl('mafia')]);newJob();return true}}
-{const e0=crEnd;crEnd=function(done){if(SH&&SH.k==='mafia'){clearCops();yardClear();for(const g of crew){scene.remove(g)}crew.length=0;J=null;MAF.pend=0}e0(done)}}
-function jobPay(base,msg){MAF.jobs++;crPay('mafia',base,msg);SH.n++;if(SH.n>=CDEF.mafia.per){crEnd(true);return}setTimeout(()=>{if(SH&&SH.k==='mafia')newJob()},2500);J=null}
+{const e0=crEnd;crEnd=function(done){if(SH&&SH.k==='mafia'){clearCops();yardClear();if(J&&J.r)J.r.remove();for(const g of crew){scene.remove(g)}crew.length=0;J=null;MAF.pend=0}e0(done)}}
+function jobPay(base,msg){if(J&&J.story){MAF.jobs++;crPay('mafia',base*(window.REP?REP.mult('family'):1),msg);J=null;storyDone();return}if(MAF.end==='don')base*=1.5;MAF.jobs++;crPay('mafia',base*(window.REP?REP.mult('family'):1),msg);if(window.REP){REP.add('family',3);REP.add('police',-2)}SH.n++;if(SH.n>=CDEF.mafia.per){crEnd(true);return}setTimeout(()=>{if(SH&&SH.k==='mafia')newJob()},2500);J=null}
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(!dressed&&MW.CITY.built)dress();
  if(MAF.pend&&!SH&&inM()&&!GS.onFoot&&!GS.inside){MAF.pend=0;crStart('mafia')}
  if(!SH||SH.k!=='mafia'){if(COPS.length)clearCops();return}
@@ -109,28 +113,31 @@ function jobPay(base,msg){MAF.jobs++;crPay('mafia',base,msg);SH.n++;if(SH.n>=CDE
  if(!GS.inside)copTick(dt);if(!SH||SH.k!=='mafia')return;const stars='★'.repeat(heat)+'☆'.repeat(3-heat);let line='WAITING FOR THE DON\'S NEXT CALL...';
  if(J){J.t+=dt;
   if(J.k==='war'){const l=warLine(dt);if(!SH)return;if(l)line=l}
+  else if(J.k==='chase'){const l=chaseLine(dt);if(!SH)return;if(l)line=l}
   else if(J.k==='del'){if(J.st==='go'){line='COLLECT THE CRATE · '+J.a.name;if(crStopped(J.a.x,J.a.z,8)){J.st='load';J.w=0}}
-   else if(J.st==='load'){J.w+=dt;line='LOADING THE "OLIVE OIL"… '+Math.max(0,Math.ceil(2.2-J.w));if(!crStopped(J.a.x,J.a.z,9)){J.st='go'}else if(J.w>2.2){const d=MARLOWE3.pickSpot(450,950,{x:J.a.x,z:J.a.z});J.b=d;J.st='drop';J.t=0;J.dist=Math.hypot(d.x-J.a.x,d.z-J.a.z);J.tmax=Math.round(J.dist/8+30);J.spotAt=.3+Math.random()*.35;J.spotted=0;crWay(d.x,d.z,'DROP: '+d.name);toast('CRATE LOADED. TAKE IT TO '+d.name+'. DRIVE CAREFULLY…')}}
-   else if(J.st==='drop'){const left=J.tmax-J.t,dd=Math.hypot(J.b.x-GS.x,J.b.z-GS.z);if(!J.spotted&&dd<J.dist*(1-J.spotAt)&&Math.random()<.6*dt*3){J.spotted=1;if(Math.random()<.65+crLvl('mafia')*.05)setHeat(1,'A PATROL CAR SPOTTED YOU! LOSE THEM BEFORE THE DROP');}
+   else if(J.st==='load'){J.w+=dt;line='LOADING THE "OLIVE OIL"… '+Math.max(0,Math.ceil(2.2-J.w));if(!crStopped(J.a.x,J.a.z,9)){J.st='go'}else if(J.w>2.2){const d=MARLOWE3.pickSpot(450,950,{x:J.a.x,z:J.a.z});J.b=d;J.st='drop';J.t=0;J.dist=Math.hypot(d.x-J.a.x,d.z-J.a.z);J.tmax=Math.round(J.dist/8+30);J.spotAt=.3+Math.random()*.35;J.spotted=0;if(J.forceHeat){J.spotted=1;setTimeout(()=>setHeat(2,'IT\'S A SET-UP! THE POLICE WERE WAITING AT THE DOCKS!'),1500)}crWay(d.x,d.z,'DROP: '+d.name);toast('CRATE LOADED. TAKE IT TO '+d.name+'. DRIVE CAREFULLY…')}}
+   else if(J.st==='drop'){const left=J.tmax-J.t,dd=Math.hypot(J.b.x-GS.x,J.b.z-GS.z);if(!J.spotted&&dd<J.dist*(1-J.spotAt)&&Math.random()<.6*dt*3){J.spotted=1;if(Math.random()<(.65+crLvl('mafia')*.05)*(window.REP?1.3-REP.get('police')/160:1))setHeat(1,'A PATROL CAR SPOTTED YOU! LOSE THEM BEFORE THE DROP');}
     line='DELIVER TO '+J.b.name+' · '+(left>0?fmtT(left):'LATE')+(heat?'\n🚨 LOSE THE POLICE FIRST!':'');
     if(crStopped(J.b.x,J.b.z,8)){if(heat){if(!J.warn||J.t-J.warn>3){J.warn=J.t;toast('NOT WITH THE POLICE ON YOUR TAIL! LOSE THEM FIRST')}}else{const bonus=left>0?Math.round(20+left*.6):0;jobPay(55+J.dist*.06+bonus,bonus?'DELIVERED ON TIME!':'DELIVERED (LATE)')}}}}
   else{if(J.st==='go'){line='PICK UP THE CREW · '+J.a.name;if(!J.crew){J.crew=1;for(let i=0;i<2;i++){const g=mkPerson(pSpec(4600+i,{f:false,hs:8,ts:3,tc:[.06,.06,.08],bc:[.06,.06,.08],gl:true,scarf:null,bp:false,bag:1,old:false}),mObj,scene);const p=W(J.a.pu+(i?.8:-.8),J.a.pv);g.position.set(p[0],Y+KH,p[1]);g.rotation.y=Math.atan2(J.a.cu-J.a.pu,J.a.cv-J.a.pv);crew.push(g)}}
     if(crStopped(J.a.x,J.a.z,8)){for(const g of crew)scene.remove(g);crew.length=0;J.st='alarm';J.w=0;toast('THE CREW JUMP IN: "GO GO GO!"');beep(1200,.12,'square',.05)}}
    else if(J.st==='alarm'){J.w+=dt;line='🔔 THE ALARM IS RINGING… DRIVE!';if(J.w>2.5){setHeat(2,'THE ALARM WENT OFF! TWO POLICE CARS ARE COMING');const s=snapTo(...pick(SAFE.filter(q=>Math.hypot(OX+q[0]-GS.x,OZ+q[1]-GS.z)>350)));J.b=s;J.st='run';crWay(s.x,s.z,s.name)}}
    else if(J.st==='run'){const dd=Math.round(Math.hypot(J.b.x-GS.x,J.b.z-GS.z));line=(heat?'🚨 LOSE THE POLICE, THEN ':'')+'GET TO '+J.b.name+' · '+dd+'M';if(crStopped(J.b.x,J.b.z,9)){if(heat)toast('DON\'T LEAD THEM TO THE SAFEHOUSE! LOSE THEM FIRST');else jobPay(150+J.t*.3,'CLEAN GETAWAY! THE DON IS DELIGHTED')}}}}
+ if(!SH||SH.k!=='mafia')return;
  crHud.style.display=menuOpen||GS.inside?'none':'block';crHud.style.whiteSpace='pre-line';crHud.textContent='🎩 '+CDEF.mafia.ranks[crLvl('mafia')]+' · '+SH.n+'/'+CDEF.mafia.per+' JOBS · HEAT '+stars+(heat&&lostT>0?' · LOSING THEM '+Math.round(lostT/9*100)+'%':'')+'\n'+line}}
 
 /* ------------------------------------------------------------------ TURF WAR: the Serpents want the docks. Pistol on foot, they shoot back.
    Cartoon rules: no blood; people who are hit enough times are knocked out, fall over and are carted off. ===== */
-const YARD={u:-470,v:-643},WB=[];let foes=[],props=null,fireCd=0,gun=null,hp=100,fireBtn=null,hpRegen=0;
+let YARD={u:-470,v:-643,s:1,n:'SOUTH QUAY · CONTAINER YARD'};const YARDS={south:{u:-470,v:-643,s:1,n:'SOUTH QUAY · CONTAINER YARD'},north:{u:-470,v:1042.5,s:-1,n:'NORTH QUAY · VIPER\'S WAREHOUSES'}},WB=[];let foes=[],props=null,fireCd=0,gun=null,hp=100,fireBtn=null,hpRegen=0;
 const box3=(w,h,d,c)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshBasicMaterial({color:c}));
 function yardBuild(){props=new THREE.Group();WB.length=0;const cols=[0xc8102e,0x1d56b8,0x2a8a3a,0xe8a020,0x6a2a8a,0xd8d8d8];
- [[-512,-646.5],[-494,-639],[-476,-646.5],[-458,-639],[-440,-646.5],[-422,-639]].forEach(([u,v],i)=>{const m=box3(6,2.6,2.4,cols[i%6]),p=W(u,v);m.position.set(p[0],Y+KH+1.3,p[1]);props.add(m);for(let k=0;k<5;k++){const r=box3(.08,2.4,2.42,0x000000);r.material.transparent=true;r.material.opacity=.25;r.position.set(p[0]-2.4+k*1.2,Y+KH+1.3,p[1]);props.add(r)}WB.push({x0:p[0]-3,x1:p[0]+3,z0:p[1]-1.2,z1:p[1]+1.2})});
- const sg=new THREE.Mesh(new THREE.PlaneGeometry(5,1),new THREE.MeshBasicMaterial({map:txtTex(512,100,'#1a1a1a','#7aff4a','SERPENTS TURF',50),side:THREE.DoubleSide}));const q=W(YARD.u,-636.2);sg.position.set(q[0],Y+KH+3.3,q[1]);props.add(sg);
+ [[-42,-3.5],[-24,4],[-6,-3.5],[12,4],[30,-3.5],[48,4]].map(([a,c])=>[YARD.u+a,YARD.v+c*YARD.s]).forEach(([u,v],i)=>{const m=box3(6,2.6,2.4,cols[i%6]),p=W(u,v);m.position.set(p[0],Y+KH+1.3,p[1]);props.add(m);for(let k=0;k<5;k++){const r=box3(.08,2.4,2.42,0x000000);r.material.transparent=true;r.material.opacity=.25;r.position.set(p[0]-2.4+k*1.2,Y+KH+1.3,p[1]);props.add(r)}WB.push({x0:p[0]-3,x1:p[0]+3,z0:p[1]-1.2,z1:p[1]+1.2})});
+ const sg=new THREE.Mesh(new THREE.PlaneGeometry(5,1),new THREE.MeshBasicMaterial({map:txtTex(512,100,'#1a1a1a','#7aff4a','SERPENTS TURF',50),side:THREE.DoubleSide}));const q=W(YARD.u,YARD.v+6.8*YARD.s);sg.position.set(q[0],Y+KH+3.3,q[1]);props.add(sg);
  scene.add(props);
- foes=[];const spots=[[-512,-649.2],[-494,-636.4],[-476,-649.2],[-458,-636.4],[-440,-649.2],[-422,-636.4],[-503,-643],[-449,-643]];
+ foes=[];const spots=[[-42,-6.2],[-24,6.6],[-6,-6.2],[12,6.6],[30,-6.2],[48,6.6],[-33,0],[21,0],...(YARD.boss?[[3,-6.4],[39,-6.2]]:[])].map(([a,c])=>[YARD.u+a,YARD.v+c*YARD.s]);
  spots.forEach(([u,v],i)=>{const g=mkPerson(pSpec(4700+i*11,{f:i%3===2,hs:20,hc:[.1,.4,.1],ts:3,tc:[.1,.35,.12],bc:[.08,.08,.1],gl:i%2===0,scarf:null,bp:false,bag:0,old:false}),mObj,scene),p=W(u,v);g.position.set(p[0],Y+KH,p[1]);g.scale.setScalar(.96);
-  const gm=box3(.08,.14,.32,0x111111);gm.position.set(-.22,1.22,.42);g.add(gm);foes.push({g,x:p[0],z:p[1],hp:3,cd:1.5+Math.random()*2,down:0,ph:Math.random()*6,hx:p[0],hz:p[1]})})}
+  const gm=box3(.08,.14,.32,0x111111);gm.position.set(-.22,1.22,.42);g.add(gm);foes.push({g,x:p[0],z:p[1],hp:3,cd:1.5+Math.random()*2,down:0,ph:Math.random()*6,hx:p[0],hz:p[1]})});
+ if(YARD.boss){const vp=W(YARD.u+3,YARD.v-9.5*YARD.s);const g=mkPerson(pSpec(4799,{f:false,hs:19,hc:[.05,.3,.08],ts:3,tc:[.9,.92,.88],bc:[.1,.3,.12],gl:true,scarf:null,bp:false,bag:0,old:false}),mObj,scene);g.position.set(vp[0],Y+KH,vp[1]);const gm=box3(.08,.14,.32,0xd8c070);gm.position.set(-.22,1.22,.42);g.add(gm);foes.push({g,x:vp[0],z:vp[1],hp:7,cd:1,down:0,ph:0,hx:vp[0],hz:vp[1],boss:1});WB.push({x0:vp[0]-4,x1:vp[0]+4,z0:vp[1]+(YARD.s>0?1.3:-1.6),z1:vp[1]+(YARD.s>0?1.6:-1.3)});const cr=box3(8,1.3,.3,0x5a3a20);cr.position.set(vp[0],Y+KH+.65,vp[1]+1.45*YARD.s);props.add(cr)}}
 function yardClear(){if(props){scene.remove(props);props=null}for(const f of foes)scene.remove(f.g);foes=[];WB.length=0;if(gun){scene.remove(gun);gun=null}if(fireBtn)fireBtn.style.display='none'}
 /* containers are solid */
 {const f0=stepFoot;stepFoot=function(dt){f0(dt);for(const b of WB){const cx=Math.max(b.x0,Math.min(P.x,b.x1)),cz=Math.max(b.z0,Math.min(P.z,b.z1)),dx=P.x-cx,dz=P.z-cz,d=Math.hypot(dx,dz);if(d<.4){if(d>1e-4){P.x=cx+dx/d*.4;P.z=cz+dz/d*.4}else{const e=[P.x-b.x0,b.x1-P.x,P.z-b.z0,b.z1-P.z],m=Math.min(...e),k=e.indexOf(m);if(k===0)P.x=b.x0-.4;else if(k===1)P.x=b.x1+.4;else if(k===2)P.z=b.z0-.4;else P.z=b.z1+.4}}}}}
@@ -142,11 +149,11 @@ function shoot(){if(!J||J.k!=='war'||!GS.onFoot||GS.inside||fireCd>0||hp<=0)retu
  let best=null,bs=1e9;for(const f of foes){if(f.down)continue;const dx=f.x-P.x,dz=f.z-P.z,d=Math.hypot(dx,dz);if(d>46)continue;const ang=Math.abs(Math.atan2(Math.sin(Math.atan2(dx,dz)-P.psi),Math.cos(Math.atan2(dx,dz)-P.psi)));if(ang>.75)continue;const sc=d+ang*30+(blocked(gx,gz,f.x,f.z)?60:0);if(sc<bs){bs=sc;best=f}}
  beep(140,.07,'square',.09);setTimeout(()=>beep(90,.05,'sawtooth',.05),30);
  if(best){const cover=blocked(gx,gz,best.x,best.z),d=Math.hypot(best.x-P.x,best.z-P.z),hit=!cover&&Math.random()<.9-d*.011;
-  if(hit){tracer(gx,gy,gz,best.x,Y+KH+1.2,best.z);best.hp--;best.flash=.15;if(best.hp<=0){best.down=1;best.dt=0;toast(pk(['KNOCKED OUT!','ONE SERPENT DOWN!','"OOF!"','DOWN HE GOES!']));const left=foes.filter(f=>!f.down).length;if(!left)warWon()}}
+  if(hit){tracer(gx,gy,gz,best.x,Y+KH+1.2,best.z);best.hp--;best.flash=.15;if(best.hp<=0){best.down=1;best.dt=0;toast(best.boss?'VIPER IS DOWN! THE SERPENTS ARE FINISHED!':pk(['KNOCKED OUT!','ONE SERPENT DOWN!','"OOF!"','DOWN HE GOES!']));const left=foes.filter(f=>!f.down).length;if(!left)warWon()}}
   else{const ox=(Math.random()-.5)*2.5;tracer(gx,gy,gz,best.x+ox,Y+KH+1.2+Math.random(),best.z+ox);if(cover&&Math.random()<.3)toast('THEY\'RE BEHIND COVER! MOVE AROUND')}}
  else tracer(gx,gy,gz,gx+fx*30,gy,gz+fz*30)}
 const pk=a=>a[(Math.random()*a.length)|0];
-function warWon(){J.st='flee';toast('THE DOCKS BELONG TO THE FAMILY AGAIN!');setTimeout(()=>setHeat(2,'SHOTS FIRED AT SOUTH QUAY! THE POLICE ARE COMING. GET AWAY!'),1800);if(fireBtn)fireBtn.style.display='none'}
+function warWon(){J.st='flee';if(window.REP){REP.add('serpents',-15);REP.add('family',5);REP.add('police',-3)}toast('THE DOCKS BELONG TO THE FAMILY AGAIN!');setTimeout(()=>setHeat(2,'SHOTS FIRED AT SOUTH QUAY! THE POLICE ARE COMING. GET AWAY!'),1800);if(fireBtn)fireBtn.style.display='none'}
 function knockedOut(){hp=0;toast('💫 YOU WERE KNOCKED OUT!');fade(()=>{yardClear();P.x=TR.x;P.z=TR.z;P.y=gH(P.x,P.z);P.psi=TR.psi;camAng=P.psi;const fee=120;cash=Math.max(0,cash-fee);hp=100;toast('THE DON\'S DOCTOR PATCHED YOU UP (-£'+fee+')');try{phText('DON VITTORIO','"The Serpents got lucky. Rest, eat something, then we try again."')}catch(e){}if(SH&&SH.k==='mafia')crEnd(false)})}
 addEventListener('keydown',e=>{if((e.key==='f'||e.key==='F')&&J&&J.k==='war'&&!e.repeat){e.preventDefault();shoot()}});
 function warTick(dt){fireCd-=dt;const onSite=Math.hypot(P.x-OX-YARD.u,P.z-OZ-YARD.v)<60&&GS.onFoot&&!GS.inside;
@@ -161,15 +168,39 @@ function warTick(dt){fireCd-=dt;const onSite=Math.hypot(P.x-OX-YARD.u,P.z-OZ-YAR
    beep(170,.06,'square',.05);if(!cover&&Math.random()<.34-mv*.16-d*.004){const dmg=6+(Math.random()*5|0);hp-=dmg;tracer(ax,ay,az,P.x,P.y+1.1,P.z,0xff7040);const fl=document.createElement('div');fl.style.cssText='position:fixed;inset:0;background:rgba(255,0,0,.25);z-index:30;pointer-events:none';document.body.appendChild(fl);setTimeout(()=>fl.remove(),120);if(hp<=0){knockedOut();return}}
    else{const o=(Math.random()-.5)*3;tracer(ax,ay,az,P.x+o,P.y+1+Math.random(),P.z+o,0xff7040)}}}}
 /* the job */
-function warJob(){yardBuild();hp=100;const s=snapTo(YARD.u,YARD.v,'SOUTH QUAY · CONTAINER YARD');J={k:'war',st:'go',a:s,t:0};crWay(s.x,s.z,'TURF WAR: '+s.name);
- phText('DON VITTORIO','"The Serpents have taken the container yard on South Quay. Our yard. Go down there and remind them whose docks these are."',true);toast('🎩 TURF WAR! THE SERPENTS HAVE TAKEN THE SOUTH QUAY CONTAINER YARD')}
+function warJob(where,boss,quiet){YARD=Object.assign({},YARDS[where||'south'],{boss:!!boss});yardBuild();hp=100;const s=snapTo(YARD.u,YARD.v-8*YARD.s,YARD.n);J={k:'war',st:'go',a:s,t:0};crWay(s.x,s.z,'TURF WAR: '+s.name);
+ if(!quiet){phText('DON VITTORIO','"The Serpents have taken the container yard on South Quay. Our yard. Go down there and remind them whose docks these are."',true);toast('🎩 TURF WAR! THE SERPENTS HAVE TAKEN THE SOUTH QUAY CONTAINER YARD')}}
 function warLine(dt){const alive=foes.filter(f=>!f.down).length,dd=Math.hypot(P.x-OX-YARD.u,P.z-OZ-YARD.v),pp=crPos(),dc=Math.hypot(pp.x-OX-YARD.u,pp.z-OZ-YARD.v);warTick(dt);
  if(J.st==='go'){if(dc<70){J.st='fight';toast('GET OUT OF THE CAR AND CLEAR THE YARD! '+(innerWidth<800?'TAP 🔫 FIRE':'PRESS F TO FIRE')+' · USE THE CONTAINERS FOR COVER')}return 'DRIVE TO '+J.a.name+' · '+Math.round(dc)+'M'}
  if(J.st==='fight')return '🔫 TURF WAR · SERPENTS LEFT '+alive+'/'+foes.length+' · ❤ '+Math.max(0,Math.round(hp))+(GS.onFoot?'':'\nGET OUT OF THE CAR!');
- if(J.st==='flee'){if(!heat&&J.fled===undefined&&J.t>0){}if(!heat&&J.shot){yardClear();jobPay(260+crLvl('mafia')*40,'TURF WAR WON! THE DON SENDS HIS THANKS');return ''}if(heat)J.shot=1;return '🚨 GET AWAY FROM THE POLICE! · ❤ '+Math.round(hp)}
+ if(J.st==='flee'){if(!heat&&J.fled===undefined&&J.t>0){}if(!heat&&J.shot){yardClear();jobPay(260+crLvl('mafia')*40+(YARD.boss?200:0),YARD.boss?'VIPER\'S GANG IS FINISHED!':'TURF WAR WON! THE DON SENDS HIS THANKS');return ''}if(heat)J.shot=1;return '🚨 GET AWAY FROM THE POLICE! · ❤ '+Math.round(hp)}
  return ''}
+
+/* ------------------------------------------------------------------ THE STORY: six chapters for Don Vittorio, then a choice */
+const STORY=[['A FAVOUR','"An old friend at THE GRAND MARLOWE is expecting an envelope. Don\'t open it, don\'t be late."'],
+ ['SPOILED OLIVES','"The Serpents hijacked my olive oil van! It\'s driving round the city right now. Stop it and bring it home."'],
+ ['THE YARD','"Now they\'ve taken our container yard on South Quay. This is a message. Send one back."'],
+ ['FEELING THE HEAT','"Someone has tipped off the police about tonight\'s crate. We deliver anyway. Lose them."'],
+ ['THE WITHDRAWAL','"My nephews have business at the bank. Get them out, and get them home."'],
+ ['VIPER\'S NEST','"Viper himself is at the North Quay warehouses with his whole gang. End this, once and for all."']];
+function storyJob(c){const t=STORY[c];phText('DON VITTORIO','CHAPTER '+(c+1)+': '+t[0]+'. '+t[1],true);toast('🎩 CHAPTER '+(c+1)+' · '+t[0]);
+ if(c===1||c===4||c===5)setTimeout(()=>{try{phText('VIPER',pk(['"Marlowe belongs to the Serpents now. Tell the old man."','"Nice car. Shame if something happened to it."','"You\'re working for a dinosaur, kid."']))}catch(e){}},5000);
+ if(c===0){const g=window.MARLOWE4.ALL.find(o=>o.t==='THE GRAND MARLOWE'),s=snapTo(g.door.u,g.door.v,'THE GRAND MARLOWE');J={k:'del',st:'drop',b:s,a:s,t:0,story:1,spotted:1,dist:Math.hypot(s.x-GS.x,s.z-GS.z)};J.tmax=Math.round(J.dist/8+40);crWay(s.x,s.z,'ENVELOPE: THE GRAND MARLOWE')}
+ else if(c===1){const r=new RUNNER({near:crPos(),rmin:130,rmax:230,mesh:MCARMESH([.92,.9,.82],[.1,.4,.12],E=>{E(0,.86,1.6,1.7,.9,1.4,[.92,.9,.82])}),vmax:19,flee:1});J={k:'chase',st:'chase',r,t:0,catchT:0,lostT:0,story:1};toast('FIND THE CREAM VAN WITH THE GREEN STRIPE AND STAY CLOSE TO STOP IT')}
+ else if(c===2){warJob('south',0,1);J.story=1}
+ else if(c===3){const dk=snapTo(...pick(DOCKS));J={k:'del',st:'go',a:dk,t:0,story:1,forceHeat:1};crWay(dk.x,dk.z,'COLLECT: '+dk.name)}
+ else if(c===4){const bk=snapTo(...pick(BANKS));J={k:'get',st:'go',a:bk,t:0,story:1};crWay(bk.x,bk.z,'THE CREW: '+bk.name)}
+ else{warJob('north',1,1);J.story=1}}
+function chaseLine(dt){const r=J.r,p=crPos();if(J.st==='chase'){r.step(dt,p);RUNBUMP(r);const d=Math.hypot(r.x-p.x,r.z-p.z);PH.way={x:r.x,z:r.z,n:'THE STOLEN VAN',keep:1};phWay();
+  if(d<9&&!GS.onFoot&&Math.abs(GS.speed)>2){J.catchT+=dt;if(J.catchT>2.6){r.stopped=1;J.st='grab';J.w=0;toast('THE SERPENTS JUMP OUT AND RUN! THE VAN IS YOURS')}}else J.catchT=Math.max(0,J.catchT-dt*.5);
+  if(d>320){J.lostT+=dt;if(J.lostT>14){r.remove();toast('THE VAN GOT AWAY… THE DON WILL NOT BE PLEASED');crEnd(false);return ''}}else J.lostT=0;
+  return '🚐 STOP THE STOLEN VAN · '+Math.round(d)+'M'+(J.catchT>0?' · STOPPING '+Math.round(J.catchT/2.6*100)+'%':'')}
+ if(J.st==='grab'){r.step(dt,p);J.w+=dt;if(J.w>2){r.remove();J.st='home';const s=snapTo(fu+1.4,fv,"VITTORIO'S TRATTORIA");J.b=s;crWay(s.x,s.z,'DRIVE THE OIL HOME');toast('NOW TAKE THE OLIVE OIL BACK TO THE TRATTORIA')}return 'RECOVERING THE CRATES…'}
+ if(J.st==='home'){if(crStopped(J.b.x,J.b.z,9)){jobPay(120,'THE OLIVE OIL IS HOME');return ''}return 'TAKE THE OIL BACK TO VITTORIO\'S · '+Math.round(Math.hypot(J.b.x-p.x,J.b.z-p.z))+'M'}return ''}
+function storyDone(){MAF.ch=(MAF.ch|0)+1;const c=MAF.ch;cash+=150+c*60;toast('CHAPTER '+c+' COMPLETE! THE DON ADDS £'+(150+c*60));if(window.REP)REP.add('family',4);
+ setTimeout(()=>{try{phText('DON VITTORIO',c>=STORY.length?'"Viper is finished. Come and see me. We need to talk about your future."':'"Bravissimo. When you\'re ready, come and see me for the next job: '+STORY[c][0]+'."')}catch(e){}},2500);crEnd(true)}
 /* minimap: police dots */
 {const w=window.MARLOWE3,m0=w.mm;w.mm=function(mc,T,k){m0(mc,T,k);if(!SH||SH.k!=='mafia')return;const dot=(x,z,c,r)=>{const gx=Math.max(4,Math.min(MMS-4,(x-T.x)*k+MMS/2)),gz=Math.max(4,Math.min(MMS-17,-(z-T.z)*k+MMS/2));mc.fillStyle=c;mc.strokeStyle='#000';mc.lineWidth=1.5;mc.beginPath();mc.arc(gx,gz,r,0,6.3);mc.fill();mc.stroke()};
  const tg=J&&(J.st==='drop'||J.st==='run'?J.b:J.a);if(tg)dot(tg.x,tg.z,'#c040ff',4.5);const t=performance.now()/250|0;for(const c of COPS)dot(c.x,c.z,t%2?'#2a6aff':'#ff2a2a',3.5)}}
-window.MARLOWE6={MAF,COPS,setHeat,clearCops,get J(){return J},TR,get foes(){return foes},shoot,get hp(){return hp},set hp(v){hp=v}};
+window.MARLOWE6={STORY,storyJob,MAF,COPS,setHeat,clearCops,get J(){return J},TR,get foes(){return foes},shoot,get hp(){return hp},set hp(v){hp=v}};
 })();

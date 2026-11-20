@@ -12,7 +12,7 @@ const inCity=()=>M.built&&!GS.inside&&MW.inReg(P.x,P.z);
 /* ------------------------------------------------------------------ passport */
 const PASS={st:{},best:0,paid:0};const STAMPS={eye:'THE MARLOWE EYE',sky:'SKY TOWER SPOT IT!',busk:'BUSKING AT THE CIRCUS',boat:'MARLE SPEEDBOATS',metro:'MARLOWE METRO'};
 {const s0=cozySave,l0=cozyLoad;cozySave=function(){const o=s0();o.m5=PASS;return o};cozyLoad=function(z){l0(z);if(z&&z.m5)Object.assign(PASS,z.m5)}}
-function stamp(k){if(PASS.st[k])return;PASS.st[k]=1;const n=Object.keys(PASS.st).length;setTimeout(()=>{toast('MARLOWE PASSPORT STAMP: '+STAMPS[k]+' ('+n+'/5)');beep(784,.1,'square',.05);setTimeout(()=>beep(1046,.14,'square',.05),110)},1800);
+function stamp(k){if(PASS.st[k])return;PASS.st[k]=1;if(window.REP)REP.add('tourist',6);const n=Object.keys(PASS.st).length;setTimeout(()=>{toast('MARLOWE PASSPORT STAMP: '+STAMPS[k]+' ('+n+'/5)');beep(784,.1,'square',.05);setTimeout(()=>beep(1046,.14,'square',.05),110)},1800);
  if(n>=5&&!PASS.paid){PASS.paid=1;setTimeout(()=>{cash+=300;toast('PASSPORT COMPLETE! THE TOURIST BOARD SENDS YOU £300');try{phText('MARLOWE TOURIST BOARD','Congratulations! You\'ve done everything Marlowe has to offer. Here\'s £300 to spend in the city.')}catch(e){}},4200)}}
 /* ------------------------------------------------------------------ activity framework: freeze the player, take the camera, show a HUD */
 const ACT={on:0};
@@ -110,7 +110,7 @@ function buskGo(){const g=new THREE.Group(),crowd=[];let inst=0,score=0,combo=0,
   for(const n of notes){if(n.hit)continue;if(t>n.t+.17&&!n.miss){n.miss=1;combo=0}if(n.miss)continue;const y=hy-(n.t-t)/FALL*hy;if(y<-30||y>430)continue;cg.fillStyle=['#ff5a6a','#5ac8ff','#7aff7a','#ffd24a'][n.l];cg.beginPath();cg.arc(n.l*lw+lw/2,y,20,0,TAU);cg.fill();cg.strokeStyle='#fff';cg.lineWidth=3;cg.stroke()}
   topTxt(['🎸','🎷','🎻'][inst]+' BUSKING · SCORE '+score+' · COMBO '+combo+'\nCROWD '+crowd.length+' · TIPS £'+tips+' · '+Math.max(0,Math.ceil(LEN+1-ACT.t))+'s');if(t>LEN+.5)actEnd()};
  ACT.cam=()=>{const a=P.psi+Math.sin(ACT.t*.15)*.7,r=7.5;cam.position.set(P.x+Math.sin(a)*r,P.y+3.2,P.z+Math.cos(a)*r);cam.lookAt(P.x,P.y+1.3,P.z)};
- ACT.end=()=>{const bonus=Math.round(score/350)+crowd.length*2;if(started){cash+=bonus;tips+=bonus;toast('SET OVER! SCORE '+score+' · BEST COMBO '+best+' · TOTAL TIPS £'+tips);if(score>=1500)stamp('busk')}cv.remove();scene.remove(prop);if(man.a1){man.a1.rotation.x=0;man.a2.rotation.x=0}setTimeout(()=>{for(const c of crowd){scene.remove(c);c.traverse(o=>{if(o.geometry)o.geometry.dispose()})}},2500)}}
+ ACT.end=()=>{const bonus=Math.round(score/350)+crowd.length*2;if(started){cash+=bonus;tips+=bonus;if(window.REP&&score>=1000)REP.add('tourist',2);toast('SET OVER! SCORE '+score+' · BEST COMBO '+best+' · TOTAL TIPS £'+tips);if(score>=1500)stamp('busk')}cv.remove();scene.remove(prop);if(man.a1){man.a1.rotation.x=0;man.a2.rotation.x=0}setTimeout(()=>{for(const c of crowd){scene.remove(c);c.traverse(o=>{if(o.geometry)o.geometry.dispose()})}},2500)}}
 const pk=a=>a[(Math.random()*a.length)|0];
 /* ------------------------------------------------------------------ 4. MARLE SPEEDBOATS */
 function boatMesh(){const b=new Builder(3);pbox(b,0,0,0,2.2,.7,6,[.95,.95,.97]);pbox(b,0,.05,3.1,1.3,.6,.9,[.95,.95,.97]);pbox(b,0,.68,-.6,2.0,.08,4.2,[.55,.38,.24]);pbox(b,0,.1,0,2.24,.18,6.02,[.08,.3,.6]);pbox(b,0,.75,.9,1.8,.55,.08,[.6,.8,.95]);pbox(b,0,.75,-2.2,1.6,.4,1.0,[.12,.12,.14]);pbox(b,0,.7,-3.0,.5,.6,.5,[.15,.15,.16]);

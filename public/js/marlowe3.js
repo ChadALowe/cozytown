@@ -55,7 +55,7 @@ function startRide(){const a=F.a;const air=Math.random()<.14&&a.name!=='MARLOWE 
 function meter(){return 3.5+F.dist*.012+(F.air?18:0)}
 function finishRide(){const left=F.tmax-F.t;if(left<0)F.stars-=F.rush?2:1;F.stars=Math.max(1,Math.min(5,F.stars));
  const fare=meter(),tip=left>0?Math.round((2+left*.14)*(F.rush?2:1)*F.stars/5):0;const paid=crPay('mcab',fare+tip,(F.rush&&left>0?'RUSH FARE':F.air?'AIRPORT RUN':'FARE')+(tip?' + TIP':''));
- CR.mstar.push(F.stars);if(CR.mstar.length>60)CR.mstar.shift();SH.n++;
+ CR.mstar.push(F.stars);if(window.REP)REP.add('tourist',F.stars>=5?1:F.stars<=2?-1:0);if(CR.mstar.length>60)CR.mstar.shift();SH.n++;
  const say=F.stars>=4?pk(SAY_OK):F.stars>=3?pk(SAY_MEH):pk(SAY_BAD),who=F.who,stars=F.stars;setTimeout(()=>toast(who+' '+'★'.repeat(stars)+'☆'.repeat(5-stars)+' '+say),1600);
  /* the passenger steps out onto the pavement and walks off */
  const b=F.b,fx=Math.sin(GS.psi),fz=Math.cos(GS.psi),g=person(0,0,0);g.position.set(GS.x-fz*1.2,Y,GS.z+fx*1.2);const p=W2(b.pu,b.pv);walkTo(g,p[0],p[1],1.6,()=>{g.position.y=Y+KH;const q=[p[0]+(p[0]-GS.x)*.6,p[1]+(p[1]-GS.z)*.6];walkTo(g,q[0],q[1],2.6,()=>drop(g))});

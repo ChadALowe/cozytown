@@ -196,6 +196,7 @@ function openCityMap(){if(FOV||busy||menuOpen||(window.AIRPORT&&AIRPORT.CIN&&AIR
   if(s>.55){g.font='bold '+Math.round(Math.min(14,7+s*2.4))+'px ui-monospace,monospace';g.textAlign='center';g.textBaseline='middle';g.lineWidth=3;g.strokeStyle='#fff';g.fillStyle='#2a3040';
    const step=Math.max(170,330/s);for(const rd of NS)for(let v=-560;v<1000;v+=step){const q=toS(rd.u,v+(rd.i%2)*60);if(q[0]<-40||q[0]>Wd+40||q[1]<-60||q[1]>Ht+60)continue;g.save();g.translate(q[0],q[1]);g.rotate(-Math.PI/2);g.strokeText(rd.n,0,0);g.fillText(rd.n,0,0);g.restore()}
    for(const rd of EW)for(let u=-1180;u<-240;u+=step){if(u>-772&&u<-690&&!MW.BRIDGE.has(rd.j))continue;const q=toS(u+(rd.j%2)*55,rd.v);if(q[0]<-60||q[0]>Wd+60||q[1]<-20||q[1]>Ht+20)continue;g.strokeText(rd.n,q[0],q[1]);g.fillText(rd.n,q[0],q[1])}}
+  if(window.SATNAV)SATNAV.drawFull(g,(u,v)=>toS(u,v));
   /* places */
   const R=Math.max(9,Math.min(16,6+s*4));for(const p of pois()){const q=toS(p.u,p.v);if(q[0]<-30||q[1]<-30||q[0]>Wd+30||q[1]>Ht+30)continue;g.fillStyle=p.c;g.strokeStyle=p===S.sel?'#ff0':'#000c';g.lineWidth=p===S.sel?4:2.5;g.beginPath();g.arc(q[0],q[1],R,0,6.3);g.fill();g.stroke();
    g.font=Math.round(R*1.05)+'px "Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillStyle=p.ic==='Ⓜ'?'#fff':'#000';g.fillText(p.ic,q[0],q[1]+1);
