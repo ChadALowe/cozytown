@@ -45,8 +45,8 @@ const PHN={ov:null,app:'home',sub:null};var PHX=[];
 .phH{font-size:16px;color:#ffe14a;margin:4px 0 10px;letter-spacing:.05em}
 .phR{background:#161b28;border:1px solid #2a3248;border-radius:12px;padding:9px 10px;margin-bottom:8px}
 .phR small{display:block;color:#8fa0c0;font-size:10px;margin-top:3px}
-.phR .bt{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap}
-.phR .bt button,.phBtn{background:#1c4fa0;color:#fff;border:2px solid #fff;border-radius:8px;font:bold 11px monospace;padding:5px 9px;box-shadow:2px 2px 0 #000}
+.bt{margin:7px 0;display:flex;gap:6px;flex-wrap:wrap}
+.bt button,.phBtn{background:#1c4fa0;color:#fff;border:2px solid #fff;border-radius:8px;font:bold 11px monospace;padding:5px 9px;box-shadow:2px 2px 0 #000}
 .phK{display:flex;justify-content:space-between;align-items:center}
 .phBig{font-size:30px;color:#9fe89f;margin:6px 0 12px}
 .phPh{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}.phPh img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px}
