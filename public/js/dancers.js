@@ -25,7 +25,7 @@ function splitA(g,ax,ys){let pos=g.attributes.position.array,col=g.attributes.co
 
 /* recolour whole triangles by the height of their centre; fn(cy,triIndex,avgBrightness) -> [r,g,b] or null to keep */
 function recol(mesh,fn){const g=mesh.geometry,pos=g.attributes.position,col=g.attributes.color;
- for(let t=0;t<pos.count/3;t++){const i=t*3,cy=(pos.getY(i)+pos.getY(i+1)+pos.getY(i+2))/3,cx=Math.abs(pos.getX(i)+pos.getX(i+1)+pos.getX(i+2))/3,br=(col.getX(i)+col.getY(i)+col.getZ(i)+col.getX(i+1)+col.getY(i+1)+col.getZ(i+1)+col.getX(i+2)+col.getY(i+2)+col.getZ(i+2))/9,c=fn(cy,t,br,cx);
+ for(let t=0;t<pos.count/3;t++){const i=t*3,cy=(pos.getY(i)+pos.getY(i+1)+pos.getY(i+2))/3,cx=Math.abs(pos.getX(i)+pos.getX(i+1)+pos.getX(i+2))/3,br=(col.getX(i)+col.getY(i)+col.getZ(i)+col.getX(i+1)+col.getY(i+1)+col.getZ(i+1)+col.getX(i+2)+col.getY(i+2)+col.getZ(i+2))/9,c=fn(cy,t,br,cx,(col.getX(i)+col.getX(i+1)+col.getX(i+2))/3,(col.getY(i)+col.getY(i+1)+col.getY(i+2))/3,(col.getZ(i)+col.getZ(i+1)+col.getZ(i+2))/3);
   if(c)for(let k=0;k<3;k++)col.setXYZ(i+k,c[0],c[1],c[2])}
  col.needsUpdate=true}
 
@@ -38,11 +38,14 @@ function dress(p,o){const acc=o.acc,bc=o.bc,hx=hex(acc);
  const sk=[ag.color.getX(bi),ag.color.getY(bi),ag.color.getZ(bi)];
  // cropped strap top: sequinned band over the chest, thin shoulder straps, bare shoulders and midriff, crisp edges
  {let g=splitA(p.up.geometry,1,[.98,1.12,1.34,1.46]);g=splitA(g,0,[-.105,-.055,.055,.105]);p.up.geometry=g}
- recol(p.up,(cy,t,br,cx)=>{const k=.82+.3*((t*2654435761>>>0)%7/7);
+ recol(p.up,(cy,t,br,cx,cr,cg,cb)=>{const k=.82+.3*((t*2654435761>>>0)%7/7);
   if(cy>1.12&&cy<=1.34)return[acc[0]*k,acc[1]*k,acc[2]*k];
   if(cy>1.34&&cy<1.46)return(cx>.055&&cx<.105)?[acc[0]*k,acc[1]*k,acc[2]*k]:[sk[0]*.95,sk[1]*.95,sk[2]*.95];
   if(cy>.98&&cy<=1.12)return[sk[0]*.95,sk[1]*.95,sk[2]*.95];
-  if(cy>.8&&cy<=.98)return[bc[0]*.9,bc[1]*.9,bc[2]*.9];return null});
+  if(cy>.8&&cy<=.98)return[bc[0]*.9,bc[1]*.9,bc[2]*.9];
+  // leftover t-shirt neck/collar above the straps: anything not skin-coloured (blends of the top colour) becomes skin
+  if(cy>1.46&&cy<1.64&&(Math.abs(cg/(cr||1)-.8)>.14||Math.abs(cb/(cr||1)-.7)>.14))return[sk[0]*.95,sk[1]*.95,sk[2]*.95];
+  return null});
  // bare arms
  for(const a of[p.a1,p.a2])recol(a,()=>sk);
  // short shorts: cut the legs at the hem, shorts colour above it, skin below
