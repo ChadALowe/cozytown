@@ -16,12 +16,15 @@ const sp=(seed,o)=>pSpec(seed,Object.assign({ts:1,gl:false,scarf:null,bp:false,b
 const bust=(p,tc)=>{const hx=((tc[0]*255|0)<<16)|((tc[1]*255|0)<<8)|(tc[2]*255|0);
  for(const sx of[-1,1]){const g=new THREE.SphereGeometry(.062,10,8),n=g.attributes.position.count;g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3).fill(1),3));
   const m=new THREE.Mesh(g,mat(hx));m.scale.set(1,1.05,.95);m.position.set(sx*.068,1.25,.1);p.up.add(m)}};
-// showgirl costume for the pole dancers: sequinned bodice, gold belt, long opera gloves and a feathered headband
+// showgirl costume for the pole dancers: sequinned cropped vest, long opera gloves and a feathered headband
 const costume=(p,acc,bcol)=>{const sh=((bcol[0]*255|0)<<16)|((bcol[1]*255|0)<<8)|(bcol[2]*255|0);const gold=0xe8bf4a,hx=((acc[0]*255|0)<<16)|((acc[1]*255|0)<<8)|(acc[2]*255|0);
  const g=p.up.geometry,pos=g.attributes.position,col=g.attributes.color;g.computeBoundingBox();const top=g.boundingBox.max.y;
- for(let i=0;i<pos.count;i++){const y=pos.getY(i);if(y>1.06&&y<1.36){const k=.82+.3*(((i*2654435761)>>>0)%7/7);col.setXYZ(i,acc[0]*k,acc[1]*k,acc[2]*k)}}col.needsUpdate=true;
+ // cropped vest: sleeveless, bare midriff and arms (skin tone sampled from the hand), sequinned top band
+ const skinOf=m=>{const q=m.geometry.attributes.position;let bi=0,bd=9;for(let i=0;i<q.count;i++){const d=Math.abs(q.getY(i)+.64);if(d<bd){bd=d;bi=i}}const c=m.geometry.attributes.color;return[c.getX(bi),c.getY(bi),c.getZ(bi)]};
+ const sk=skinOf(p.a1);
+ for(let i=0;i<pos.count;i++){const y=pos.getY(i);if(y>1.1&&y<1.46){const k=.82+.3*(((i*2654435761)>>>0)%7/7);col.setXYZ(i,acc[0]*k,acc[1]*k,acc[2]*k)}else if(y>.8&&y<=1.1)col.setXYZ(i,sk[0],sk[1],sk[2])}col.needsUpdate=true;
+ for(const a of[p.a1,p.a2]){const ac=a.geometry.attributes.color;for(let i=0;i<ac.count;i++)ac.setXYZ(i,sk[0],sk[1],sk[2]);ac.needsUpdate=true}
  const ring=(r,h,y,sz,hex,par,open)=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,12,1,true),mat(hex));const n=m.geometry.attributes.position.count;m.geometry.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3).fill(1),3));m.material.side=THREE.DoubleSide;m.scale.z=sz;m.position.y=y;par.add(m);return m};
- ring(.222,.05,.99,.6,gold,p.up);
  // short shorts: bare the whole leg, then wrap a short band of shorts colour round the top of each thigh
  for(const l of[p.l1,p.l2]){const lg=l.geometry,lp=lg.attributes.position,lc=lg.attributes.color;lg.computeBoundingBox();let bi=0,bd=9;
   for(let i=0;i<lp.count;i++){const d=Math.abs(lp.getY(i)+.5);if(d<bd){bd=d;bi=i}}
