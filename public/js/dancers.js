@@ -62,8 +62,11 @@ function dropBelow(g,y){const pos=g.attributes.position.array,col=g.attributes.c
 /* push the surface of g out with a smooth gaussian bump: fn(x,y,z) -> [dx,dy,dz] */
 function sculpt(g,fn){const q=g.attributes.position;for(let i=0;i<q.count;i++){const d=fn(q.getX(i),q.getY(i),q.getZ(i));if(d){q.setXYZ(i,q.getX(i)+d[0],q.getY(i)+d[1],q.getZ(i)+d[2])}}q.needsUpdate=true}
 /* one cheek shape in the dancer's own space, used for BOTH torso and thighs so the two shells stay flush: returns backward push for a point at (x,y,z) */
-const cheek=(x,y,z)=>{if(z>=0||y<.6||y>1.05)return 0;const fx=Math.exp(-(((Math.abs(x)-.085)/.085)**2)*1.3),fy=Math.exp(-(((y-.84)/.095)**2)*1.3);return .075*fx*fy*Math.min(1,-z/.04)};
-const bump=(x,y,cx,cy,sx,sy)=>Math.exp(-(((x-cx)/sx)**2+((y-cy)/sy)**2)*1.3);
+const cheek=(x,y,z)=>{if(z>=0||y<.5||y>1.06)return 0;const fx=dome((Math.abs(x)-.09)/.105),fy=dome((y-.83)/.15);return .15*fx*fy*Math.min(1,-z/.04)};
+/* hips also widen sideways (same field on torso and thighs) so the figure has an hourglass shape */
+const hipW=(x,y)=>(y<.6||y>1.05)?0:Math.sign(x)*.04*Math.exp(-(((y-.86)/.13)**2)*1.3)*Math.min(1,Math.abs(x)/.08)
+const bump=(x,y,cx,cy,sx,sy)=>Math.exp(-Math.pow(((x-cx)/sx)**2+((y-cy)/sy)**2,1.5)*1.2); // rounded dome (flat-topped), not a pointed gaussian
+const dome=u=>Math.exp(-Math.pow(u*u,1.5)*1.2);
 
 const ring=(r,h,y,sz,hx,par)=>{const g=new THREE.CylinderGeometry(r,r,h,12,1,true);flat(g,g.attributes.position.count);const m=new THREE.Mesh(g,mat(hx));m.material.side=THREE.DoubleSide;m.scale.z=sz;m.position.y=y;par.add(m);return m};
 
@@ -79,12 +82,14 @@ function dress(p,o){const acc=o.acc,bc=acc,hx=hex(acc),F=.92; // one solid colou
   q.needsUpdate=true;c0.needsUpdate=true}
  // sculpt a smooth bust and fuller hips into the torso itself (no stuck-on shapes)
  p.up.geometry=subdiv(p.up.geometry,cy=>cy>.8&&cy<1.45,2);
- sculpt(p.up.geometry,(x,y,z)=>{
-  if(y>1.05&&y<1.42&&z>0){const f=Math.max(bump(x,y,.075,1.235,.062,.07),bump(x,y,-.075,1.235,.062,.07));if(f>.001)return[Math.sign(x)*.012*f,0,.085*f]}
-  if(y>.8&&y<1.05){ // pelvis: slim the hem's depth to the thigh depth (no flat shelf), then add the shared cheek shape
-   const t=Math.max(0,Math.min(1,(.99-y)/.09)),k=.3*t*t*(3-2*t);
-   return[-x*k*.33,0,-z*k*(z<0?1:.6)-cheek(x,y,z)]}
-  return null});
+ sculpt(p.up.geometry,(x,y,z)=>{let dx=0,dz=0,hit=0;
+  // waist: slimmer through the middle
+  {const w=Math.exp(-(((y-1.04)/.075)**2)*1.3);if(w>.01){dx-=x*.14*w;dz-=z*.07*w;hit=1}}
+  // bust: two smooth, large rounded forms on the front of the chest
+  if(y>1.05&&y<1.45&&z>0){const f=Math.max(bump(x,y,.085,1.235,.1,.11),bump(x,y,-.085,1.235,.1,.11));if(f>.001){dz+=.17*f;dx+=Math.sign(x)*.024*f;hit=1}}
+  // pelvis: slim the hem depth down to the thigh depth (no flat shelf), widen the hips, add the shared rear shape
+  if(y>.8&&y<1.05){const t=Math.max(0,Math.min(1,(.99-y)/.09)),k=.3*t*t*(3-2*t);dx+=-x*k*.18+hipW(x,y);dz+=-z*k*(z<0?1:.6)-cheek(x,y,z);hit=1}
+  return hit?[dx,0,dz]:null});
  p.up.geometry=dropBelow(splitA(p.up.geometry,1,[.9]),.9);
  {let g=splitA(p.up.geometry,1,[.98,1.12,1.34,1.46]);g=splitA(g,0,[-.135,-.09,.09,.135]);p.up.geometry=g}
  recol(p.up,(cy,t,br,cx,cr,cg,cb,dy)=>{const k=F;
@@ -102,7 +107,7 @@ function dress(p,o){const acc=o.acc,bc=acc,hx=hex(acc),F=.92; // one solid colou
  // short shorts: cut the legs at the hem, shorts colour above it, skin below
  // short shorts (cut at the hem) + black high heels: recolour the shoe, tip the foot up onto its toes, add a stiletto heel
  const SHOE=[.07,.05,.07];
- for(const l of[p.l1,p.l2]){l.geometry=subdiv(l.geometry,cy=>cy>-.3,2);sculpt(l.geometry,(x,y,z)=>{const c=cheek(x+l.position.x,y+l.position.y,z);return c?[0,0,-c]:null});
+ for(const l of[p.l1,p.l2]){l.geometry=subdiv(l.geometry,cy=>cy>-.3,2);sculpt(l.geometry,(x,y,z)=>{const xw=x+l.position.x,yw=y+l.position.y,c=cheek(xw,yw,z),h=hipW(xw,yw);return(c||h)?[h,0,-c]:null});
   l.geometry=splitA(l.geometry,1,[-.17,-.835]);
   recol(l,cy=>cy>-.17?[acc[0]*F,acc[1]*F,acc[2]*F]:cy>-.835?[sk[0]*.96,sk[1]*.96,sk[2]*.96]:SHOE);
   const lp=l.geometry.attributes.position,PH=-.35;
