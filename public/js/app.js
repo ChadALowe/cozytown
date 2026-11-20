@@ -450,7 +450,8 @@ special({kind:'shop',units:1,w:24,d:11,eaves:6.8,ridge:1.2,fg:5.2,wall:'stone',w
 special({kind:'shop',units:1,w:16,d:10,eaves:5.8,ridge:2.8,fg:.6,wall:'brick',wc:[.85,.7,.66],roof:'slate',names:[{t:'LUCKY BETS',bg:'#b01020',fg:'#ffe040',col:[.65,.1,.14]}]},-72,0,1,0,-1);
 special({kind:'shop',units:1,w:26,d:10,eaves:8.6,ridge:.5,fg:26,wall:'stone',wc:[.82,.82,.88],roof:'slate',names:[{t:'VILLAGE ROVERS FC',bg:'#a01418',fg:'#ffffff',col:[.6,.08,.1]}]},-190,0,1,0,-1);
 special({kind:'shop',units:1,w:18,d:10,eaves:5.8,ridge:2.8,fg:.6,wall:'brick',wc:[.62,.5,.44],roof:'slate',names:[{t:'BULLSEYE RANGE',bg:'#183a22',fg:'#ffe040',col:[.1,.24,.14]}]},-124,0,1,0,-1);
-special({kind:'shop',units:1,w:20,d:10,eaves:6,ridge:3,fg:.6,wall:'render',wc:[.42,.3,.62],roof:'slate',names:[{t:'NEON ARCADE',bg:'#1a0a30',fg:'#ff50e8',col:[.1,.04,.19]}]},-150,0,1,0,-1);
+PLACED.push({x:-160,z:-90,rot:0,hw:5.5,hd:85},{x:-160,z:-166,rot:0,hw:26,hd:21});/* keep Airport Road and the terminal forecourt clear */
+special({kind:'shop',units:1,w:16,d:10,eaves:6,ridge:3,fg:.6,wall:'render',wc:[.42,.3,.62],roof:'slate',names:[{t:'NEON ARCADE',bg:'#1a0a30',fg:'#ff50e8',col:[.1,.04,.19]}]},-146,0,1,0,-1);
 PLACED.push({x:-193,z:-17,rot:0,hw:18,hd:15},{x:-193,z:-60,rot:0,hw:17,hd:16});
 RNDALT=0;
 for(const dp of DEPOTS)console.log('depot',dp.name,dp.x.toFixed(0),dp.z.toFixed(0));
