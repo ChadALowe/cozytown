@@ -69,7 +69,7 @@ function* airfield(m){const c=mk(m),W=c.W;
  for(let k=0;k<10;k++)pc(c,-96+k*3.3,0,-286,.28,.7,6,[.95,.45,.1]);
  {const w=W(40,330),pole=new THREE.Mesh(new THREE.CylinderGeometry(.08,.1,7,6),new THREE.MeshBasicMaterial({color:0xcccccc}));pole.position.set(w[0],Y+3.5,w[1]);const sock=new THREE.Mesh(new THREE.ConeGeometry(.55,3,10,1,true).rotateZ(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xff7a18,side:THREE.DoubleSide}));sock.position.set(w[0]+1.5,Y+7,w[1]);const g=new THREE.Group();g.add(pole,sock);chunk(m,g)}
  flush(c);yield;
- if(m.style==='country')yield*countryside(m,c);else yield*(window.MCITY?window.MCITY(m,c):city(m,c))}
+ if(m.style==='country')yield*countryside(m,c);else if(m.style==='resort')yield*window.RESORTGEN(m,c);else yield*(window.MCITY?window.MCITY(m,c):city(m,c))}
 function* countryside(m,c){const W=c.W;
  /* patchwork fields */
  const fc=[[.38,.55,.22],[.55,.58,.24],[.3,.48,.2],[.62,.55,.28],[.42,.52,.3],[.7,.62,.34]];let k=0;
@@ -140,7 +140,7 @@ function* city(m,c){OFS=[m.ox,m.oz];const W=c.W,mats=[0,1,2,3,4].map(k=>wmt(winT
  for(let k=0;k<40;k++){const a=-1.35+k*.07,r=520+rnd()*140,x=-440+Math.cos(a+Math.PI)*r*.9,z=520+Math.sin(a+Math.PI)*r;if(x>-250)continue;const h=70+rnd()*110,w=26+rnd()*20;boxB(bs,roof,x,z,w,w,h,Y,(rnd()*2)|0,[.9,.9,.95])}
  flushB();yield}
 /* ---------------------------------------------------------------- arrival hooks (where the player is put when a flight ends) */
-HOME.gen=airfield;MARL.gen=airfield;
+HOME.gen=airfield;MARL.gen=airfield;window.AIRFIELDGEN=airfield;
 HOME.arrive=function(){const D=OFFICE.door;GS.inside=0;if(window.inG)inG.visible=false;P.x=D[0];P.z=D[1];P.y=gH(P.x,P.z)+.02;P.psi=OFFICE.psi;P.speed=0;GS.onFoot=1;man.visible=true;camAng=P.psi;AP.at='home'};
 const MTERM={x:MARL.ox-163.8,z:MARL.oz-200,psi:-Math.PI/2,t:'MARLOWE AIRPORT',bg:'#14223a',fg:'#ffd24a',apt:2,rx:12.5,rz:6,sz:3.4};
 MARL.arrive=function(){AP.at='marlowe';GS.inside=0;GS.onFoot=1;man.visible=true;P.x=MTERM.x;P.z=MTERM.z;P.y=G0;P.speed=0;SHOPCUR={o:MTERM,k:[]};enterShop(MTERM,true);toast('WELCOME TO MARLOWE')};
@@ -240,7 +240,7 @@ Object.assign(HRS,{'MARLOWE AIRPORT':[0,24]});
  splane(2*RX,Hh,0,Hh/2,-RZ,0,wm(sWl));splane(2*RX,Hh,0,Hh/2,RZ,Math.PI,wm(sWl));splane(2*RZ,Hh,RX,Hh/2,0,-Math.PI/2,wm(sWl2));splane(2*RZ,Hh,-RX,Hh/2,0,Math.PI/2,wm(sWl2));
  const vd=new THREE.Mesh(new THREE.BoxGeometry(90,70,90),new THREE.MeshBasicMaterial({color:0x0c1420,side:THREE.BackSide,fog:false}));vd.position.y=Hh/2;SG.add(vd);splane(1.1,2.2,0,1.1,RZ-.02,Math.PI,imat(T_FDOOR));
  /* departures / arrivals board + world map */
- const dest=M2?'COZY VILLAGE':'MARLOWE',hd=M2?'ARRIVALS  ·  DEPARTURES':'DEPARTURES';
+ const dest=o.dest||(M2?'COZY VILLAGE':'MARLOWE'),hd=M2?'ARRIVALS  ·  DEPARTURES':'DEPARTURES';
  splane(5.4,1.9,0,2.0,-RZ+.03,0,MB_(cvx(768,270,(g,W,H)=>{g.fillStyle='#050a14';g.fillRect(0,0,W,H);g.strokeStyle='#6aa8ff';g.lineWidth=5;g.strokeRect(4,4,W-8,H-8);g.fillStyle='#ffd24a';g.font='bold 30px monospace';g.fillText(hd,24,48);g.font='bold 24px monospace';g.fillStyle='#fff';g.fillText('CA101   '+dest+'   GATE 1   ON TIME',24,110);g.fillStyle='#9fe';g.fillText('CA102   '+dest+'   GATE 1   BOARDING',24,160);g.fillStyle='#667';g.fillText('CA201   ...      GATE 2   COMING SOON',24,210)})));
  splane(3.2,1.8,-RX+.03,1.9,-1.5,Math.PI/2,MB_(cvx(300,170,(g,W,H)=>{g.fillStyle='#17304e';g.fillRect(0,0,W,H);g.fillStyle='#3e7a4a';for(const[x,y,r]of[[70,60,30],[140,100,24],[210,60,34],[250,120,14]]){g.beginPath();g.arc(x,y,r,0,6.3);g.fill()}g.strokeStyle='#ffd24a';g.setLineDash([6,5]);g.lineWidth=3;g.beginPath();g.moveTo(80,70);g.quadraticCurveTo(150,10,215,62);g.stroke();g.fillStyle='#fff';g.font='bold 14px monospace';g.fillText('COZY AIRWAYS NETWORK',40,155)})));
  /* check-in desk + clerk */
@@ -263,7 +263,7 @@ Object.assign(HRS,{'MARLOWE AIRPORT':[0,24]});
   splane(7,.7,RX-.04,2.9,0,-Math.PI/2,MB_(cvx(768,80,(g,W,H)=>{g.fillStyle='#14223a';g.fillRect(0,0,W,H);g.fillStyle='#ffd24a';g.font='bold 46px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText('DUTY FREE  ·  LOCAL GOODS',W/2,H/2+2)})))}
  IROOM.splice(0,IROOM.length,[-RX-1,RX+1,-RZ-1,-RZ+.9],[-2.8,2.8,-RZ+1.9,-RZ+2.8],[-RX,-RX+1.2,1.2,4],[-RX,-RX+1.2,-5.4,-2.6],[-8,-5,-3.1,-2.1],[-8,-5,2.1,3.1],
   [PX-.2,PX+.2,-RZ-1,-hw],[PX-.2,PX+.2,hw,RZ+1],[RX-4.2,RX-3.0,-4.1,4.1],[RX-4.2,RX-.9,4.1,RZ+1],[RX-4.2,RX-.9,-RZ-1,-4.1],[RX-1.2,RX,-RZ,RZ],[PX+1.2,RX-1.3,-RZ,-RZ+1.6]);
- SHOPCUR={o:o,k:['AGENT',M2?"Welcome to Marlowe. Check in here for the flight home, or browse the shop.":"Welcome to Cozy Airways. Marlowe is only a flight away."]};
+ SHOPCUR={o:o,k:['AGENT',o.greet||(M2?"Welcome to Marlowe. Check in here for the flight home, or browse the shop.":"Welcome to Cozy Airways. Marlowe and Sunhaven Bay are only a flight away.")]};
  IA.splice(0,IA.length,{r:[-2.6,2.6,-RZ+2.8,-RZ+3.8],label:'BOOK A FLIGHT',fn:()=>open(0)},{r:[RX-6.0,RX-4.3,-2.8,2.8],label:'DUTY FREE & TRADE',fn:()=>open(1)},{r:[-1.0,1.0,RZ-.3,RZ],label:'LEAVE',fn:()=>leaveShop()});
  try{addVisitors(o)}catch(e){}}}
 window.AIRFIELDS={HOME,MARL,open,close,begin,OFFICE,GOODS,ROUTES};
