@@ -1,6 +1,6 @@
 /* ===== SELF-CONTAINED CABARET DANCER (pole stages only) =====
    Used only by the Gilded Cage pole stages (casino3.js). Builds an ordinary person with the game's own mkPerson,
-   then dresses THAT ONE INSTANCE: cropped strap top, bare arms, short shorts, a rounded bust. Every mesh it edits is created fresh for the dancer, and nothing in game/*.js or any other
+   then dresses THAT ONE INSTANCE: cropped strap top, bare arms, short shorts, high heels, a rounded bust. Every mesh it edits is created fresh for the dancer, and nothing in game/*.js or any other
    file is modified, so ordinary characters are never affected.
    API: window.mkDancer(seed, parent, x, z, ry, {hs, acc:[r,g,b], bc:[r,g,b], sk}) -> THREE.Group (limbs: up, a1, a2, l1, l2) ===== */
 (function(){
@@ -45,7 +45,15 @@ function dress(p,o){const acc=o.acc,bc=o.bc,hx=hex(acc);
  // bare arms
  for(const a of[p.a1,p.a2])recol(a,()=>sk);
  // short shorts: cut the legs at the hem, shorts colour above it, skin below
- for(const l of[p.l1,p.l2]){l.geometry=splitA(l.geometry,1,[-.17]);recol(l,cy=>cy>-.17?[bc[0]*.9,bc[1]*.9,bc[2]*.9]:cy>-.395?sk:null)}
+ // short shorts (cut at the hem) + black high heels: recolour the shoe, tip the foot up onto its toes, add a stiletto heel
+ const SHOE=[.07,.05,.07];
+ for(const l of[p.l1,p.l2]){l.geometry=splitA(l.geometry,1,[-.17,-.865]);
+  recol(l,cy=>cy>-.17?[bc[0]*.9,bc[1]*.9,bc[2]*.9]:cy>-.395?sk:cy<-.865?SHOE:null);
+  const lp=l.geometry.attributes.position,PH=-.35;
+  for(let i=0;i<lp.count;i++){const y=lp.getY(i),w=Math.max(0,Math.min(1,(-.78-y)/.1));if(!w)continue;const f=PH*w,dz=lp.getZ(i)-.25,dy=y+.92;
+   lp.setY(i,-.92+dz*Math.sin(f)+dy*Math.cos(f));lp.setZ(i,.25+dz*Math.cos(f)-dy*Math.sin(f))}
+  lp.needsUpdate=true;
+  const hg=new THREE.BoxGeometry(.022,.11,.022);flat(hg,hg.attributes.position.count);const h=new THREE.Mesh(hg,mat(0x120c12));h.position.set(0,-.865,-.05);l.add(h)}
  // rounded bust, in the vest colour
  for(const sx of[-1,1])ball(.088,sx*.075,1.23,.105,hx,p.up);}
 
