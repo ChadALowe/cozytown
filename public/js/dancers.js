@@ -2,7 +2,7 @@
    Used only by the Gilded Cage pole stages (casino3.js). Builds an ordinary person with the game's own mkPerson,
    then dresses THAT ONE INSTANCE: cropped strap top, bare arms, short shorts, high heels, a rounded bust. Every mesh it edits is created fresh for the dancer, and nothing in game/*.js or any other
    file is modified, so ordinary characters are never affected.
-   API: window.mkDancer(seed, parent, x, z, ry, {hs, acc:[r,g,b], bc:[r,g,b], sk}) -> THREE.Group (limbs: up, a1, a2, l1, l2) ===== */
+   API: window.mkDancer(seed, parent, x, z, ry, {hs, acc:[r,g,b], bc:[r,g,b], sk, hr:[r,g,b] (optional hair colour)}) -> THREE.Group (limbs: up, a1, a2, l1, l2) ===== */
 (function(){
 const mat=h=>fmc(h);
 const hex=c=>((c[0]*255|0)<<16)|((c[1]*255|0)<<8)|(c[2]*255|0);
@@ -61,9 +61,13 @@ function dress(p,o){const acc=o.acc,bc=o.bc,hx=hex(acc);
  // rounded bust, in the vest colour
  for(const sx of[-1,1])ball(.088,sx*.075,1.23,.105,hx,p.up);
  // fuller hips and rear, in the shorts colour (fixed to the torso)
- for(const sx of[-1,1])ball(.098,sx*.075,.86,-.085,hex(bc),p.up);}
+ for(const sx of[-1,1])ball(.098,sx*.075,.86,-.085,hex(bc),p.up);
+ // red lipstick: find the mouth on this dancer's own face mesh and put a red lip over it
+ {const q=p.up.geometry.attributes.position;let zm=-9;for(let i=0;i<q.count;i++){const x=q.getX(i),y=q.getY(i),z=q.getZ(i);if(Math.abs(x)<.03&&y>1.612&&y<1.64&&z>.06&&z>zm)zm=z}
+  if(zm>-9){const g=new THREE.BoxGeometry(.052,.017,.012);flat(g,g.attributes.position.count);const m=new THREE.Mesh(g,mat(0xc4101e));m.position.set(0,1.625,zm+.001);p.up.add(m)}}}
 
 window.mkDancer=function(seed,parent,x,z,ry,o){
- const spec=pSpec(seed,{f:true,hs:o.hs,ts:2,sh:1,bc:o.bc,tc:o.acc,sk:PSK[o.sk|0],gl:false,scarf:null,bp:false,bag:0,old:false});
+ const so={f:true,hs:o.hs,ts:2,sh:1,bc:o.bc,tc:o.acc,sk:PSK[o.sk|0],gl:false,scarf:null,bp:false,bag:0,old:false};if(o.hr)so.hr=o.hr;
+ const spec=pSpec(seed,so);
  const g=personIn(spec,x,z,ry);SG.remove(g);parent.add(g);dress(g,o);return g};
 })();
