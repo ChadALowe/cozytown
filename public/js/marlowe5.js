@@ -152,5 +152,5 @@ function ride(from,to){cash-=2;if(!train)buildTrain();fade(()=>{train.visible=tr
    if(ACT.t>=T){ACT.tick=null;fade(()=>actEnd())}};
   ACT.cam=()=>{const p=train.position;cam.position.set(p.x+.2,p.y+1.65,p.z-6.5);cam.lookAt(p.x-.1,p.y+1.4,p.z+6)};
   ACT.end=()=>{train.visible=false;man.visible=true;const p=W(to.u+(to.v>0?0:0),to.v);/* step out beside the entrance, on the pavement */let x=p[0],z=p[1];for(const[du,dv]of[[3.4,0],[-3.4,0],[0,3.4],[0,-3.4]]){if(MW.mh(to.u+du,to.v+dv)>Y){x=OX+to.u+du;z=OZ+to.v+dv;break}}P.x=x;P.z=z;P.y=gH(x,z);GT+=.15;toast('WELCOME TO '+to.n);stamp('metro')}})}
-window.MARLOWE5={ACT,PASS,eyeRide,skyGo,buskGo,boatGo,ride,metros,actEnd};
+window.MARLOWE5={actStart,btns,topTxt,boatMesh,stamp,ACT,PASS,eyeRide,skyGo,buskGo,boatGo,ride,metros,actEnd};
 })();

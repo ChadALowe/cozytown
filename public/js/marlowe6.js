@@ -105,7 +105,7 @@ function newJob(){const lv=crLvl('mafia'),get=lv>=1&&Math.random()<.45;clearCops
  SH.st='job'}
 {const s0=crStart;crStart=function(k){if(k!=='mafia')return s0(k);const why=crCan(k);if(why){toast(why);return false}SH={k,n:0,t:0,st:'job',stage:0};toast('🎩 THE FAMILY · '+CDEF.mafia.ranks[crLvl('mafia')]);newJob();return true}}
 {const e0=crEnd;crEnd=function(done){if(SH&&SH.k==='mafia'){clearCops();yardClear();if(J&&J.r)J.r.remove();for(const g of crew){scene.remove(g)}crew.length=0;J=null;MAF.pend=0}e0(done)}}
-function jobPay(base,msg){if(J&&J.story){MAF.jobs++;crPay('mafia',base*(window.REP?REP.mult('family'):1),msg);J=null;storyDone();return}if(MAF.end==='don')base*=1.5;MAF.jobs++;crPay('mafia',base*(window.REP?REP.mult('family'):1),msg);if(window.REP){REP.add('family',3);REP.add('police',-2)}SH.n++;if(SH.n>=CDEF.mafia.per){crEnd(true);return}setTimeout(()=>{if(SH&&SH.k==='mafia')newJob()},2500);J=null}
+function jobPay(base,msg){if(J&&J.heist){const cb=J.heist;MAF.jobs++;crPay('mafia',base*(window.REP?REP.mult('family'):1),msg);J=null;crEnd(true);cb();return}if(J&&J.story){MAF.jobs++;crPay('mafia',base*(window.REP?REP.mult('family'):1),msg);J=null;storyDone();return}if(MAF.end==='don')base*=1.5;MAF.jobs++;crPay('mafia',base*(window.REP?REP.mult('family'):1),msg);if(window.REP){REP.add('family',3);REP.add('police',-2)}SH.n++;if(SH.n>=CDEF.mafia.per){crEnd(true);return}setTimeout(()=>{if(SH&&SH.k==='mafia')newJob()},2500);J=null}
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(!dressed&&MW.CITY.built)dress();
  if(MAF.pend&&!SH&&inM()&&!GS.onFoot&&!GS.inside){MAF.pend=0;crStart('mafia')}
  if(!SH||SH.k!=='mafia'){if(COPS.length)clearCops();return}
@@ -120,8 +120,8 @@ function jobPay(base,msg){if(J&&J.story){MAF.jobs++;crPay('mafia',base*(window.R
     line='DELIVER TO '+J.b.name+' · '+(left>0?fmtT(left):'LATE')+(heat?'\n🚨 LOSE THE POLICE FIRST!':'');
     if(crStopped(J.b.x,J.b.z,8)){if(heat){if(!J.warn||J.t-J.warn>3){J.warn=J.t;toast('NOT WITH THE POLICE ON YOUR TAIL! LOSE THEM FIRST')}}else{const bonus=left>0?Math.round(20+left*.6):0;jobPay(55+J.dist*.06+bonus,bonus?'DELIVERED ON TIME!':'DELIVERED (LATE)')}}}}
   else{if(J.st==='go'){line='PICK UP THE CREW · '+J.a.name;if(!J.crew){J.crew=1;for(let i=0;i<2;i++){const g=mkPerson(pSpec(4600+i,{f:false,hs:8,ts:3,tc:[.06,.06,.08],bc:[.06,.06,.08],gl:true,scarf:null,bp:false,bag:1,old:false}),mObj,scene);const p=W(J.a.pu+(i?.8:-.8),J.a.pv);g.position.set(p[0],Y+KH,p[1]);g.rotation.y=Math.atan2(J.a.cu-J.a.pu,J.a.cv-J.a.pv);crew.push(g)}}
-    if(crStopped(J.a.x,J.a.z,8)){for(const g of crew)scene.remove(g);crew.length=0;J.st='alarm';J.w=0;toast('THE CREW JUMP IN: "GO GO GO!"');beep(1200,.12,'square',.05)}}
-   else if(J.st==='alarm'){J.w+=dt;line='🔔 THE ALARM IS RINGING… DRIVE!';if(J.w>2.5){setHeat(2,'THE ALARM WENT OFF! TWO POLICE CARS ARE COMING');const s=snapTo(...pick(SAFE.filter(q=>Math.hypot(OX+q[0]-GS.x,OZ+q[1]-GS.z)>350)));J.b=s;J.st='run';crWay(s.x,s.z,s.name)}}
+    if(crStopped(J.a.x,J.a.z,8)){for(const g of crew)scene.remove(g);crew.length=0;J.st='alarm';J.w=0;toast(J.big?'THE CREW PILE IN WITH THE BAGS: "DRIVE! DRIVE!"':'THE CREW JUMP IN: "GO GO GO!"');beep(1200,.12,'square',.05)}}
+   else if(J.st==='alarm'){J.w+=dt;line='🔔 THE ALARM IS RINGING… DRIVE!';if(J.w>2.5){if(J.big)setHeat(3,'THE BANK ALARM! EVERY POLICE CAR IN MARLOWE IS COMING');else setHeat(2,'THE ALARM WENT OFF! TWO POLICE CARS ARE COMING');const s=snapTo(...pick(SAFE.filter(q=>Math.hypot(OX+q[0]-GS.x,OZ+q[1]-GS.z)>350)));J.b=s;J.st='run';crWay(s.x,s.z,s.name)}}
    else if(J.st==='run'){const dd=Math.round(Math.hypot(J.b.x-GS.x,J.b.z-GS.z));line=(heat?'🚨 LOSE THE POLICE, THEN ':'')+'GET TO '+J.b.name+' · '+dd+'M';if(crStopped(J.b.x,J.b.z,9)){if(heat)toast('DON\'T LEAD THEM TO THE SAFEHOUSE! LOSE THEM FIRST');else jobPay(150+J.t*.3,'CLEAN GETAWAY! THE DON IS DELIGHTED')}}}}
  if(!SH||SH.k!=='mafia')return;
  crHud.style.display=menuOpen||GS.inside?'none':'block';crHud.style.whiteSpace='pre-line';crHud.textContent='🎩 '+CDEF.mafia.ranks[crLvl('mafia')]+' · '+SH.n+'/'+CDEF.mafia.per+' JOBS · HEAT '+stars+(heat&&lostT>0?' · LOSING THEM '+Math.round(lostT/9*100)+'%':'')+'\n'+line}}
@@ -202,5 +202,6 @@ function storyDone(){MAF.ch=(MAF.ch|0)+1;const c=MAF.ch;cash+=150+c*60;toast('CH
 /* minimap: police dots */
 {const w=window.MARLOWE3,m0=w.mm;w.mm=function(mc,T,k){m0(mc,T,k);if(!SH||SH.k!=='mafia')return;const dot=(x,z,c,r)=>{const gx=Math.max(4,Math.min(MMS-4,(x-T.x)*k+MMS/2)),gz=Math.max(4,Math.min(MMS-17,-(z-T.z)*k+MMS/2));mc.fillStyle=c;mc.strokeStyle='#000';mc.lineWidth=1.5;mc.beginPath();mc.arc(gx,gz,r,0,6.3);mc.fill();mc.stroke()};
  const tg=J&&(J.st==='drop'||J.st==='run'?J.b:J.a);if(tg)dot(tg.x,tg.z,'#c040ff',4.5);const t=performance.now()/250|0;for(const c of COPS)dot(c.x,c.z,t%2?'#2a6aff':'#ff2a2a',3.5)}}
-window.MARLOWE6={STORY,storyJob,MAF,COPS,setHeat,clearCops,get J(){return J},TR,get foes(){return foes},shoot,get hp(){return hp},set hp(v){hp=v}};
+function startHeist(bi,cb){if(SH)return 'FINISH YOUR '+CDEF[SH.k].n+' SHIFT FIRST';if(!inM()||GS.onFoot||GS.inside)return 'GET IN YOUR CAR IN MARLOWE FIRST';SH={k:'mafia',n:0,t:0,st:'job',stage:0};clearCops();TRAIL.length=0;const bk=snapTo(...BANKS[bi]);J={k:'get',st:'go',a:bk,t:0,heist:cb,big:1};crWay(bk.x,bk.z,'THE BIG ONE: '+bk.name);toast('💰 THE BIG ONE: PICK UP THE CREW OUTSIDE '+bk.name);return ''}
+window.MARLOWE6={startHeist,BANKS,snapTo,STORY,storyJob,MAF,COPS,setHeat,clearCops,get J(){return J},TR,get foes(){return foes},shoot,get hp(){return hp},set hp(v){hp=v}};
 })();
