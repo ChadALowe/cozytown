@@ -24,7 +24,10 @@ behave exactly like the single file did.
 | 16-arcade | Neon Arcade and its games |
 | 17-main | civilian traffic, cash shop, audio, UI, main loop |
 | 18-corner-shop | Singh's corner shop: interior, Mr Singh, snacks and drinks menu |
-| 19-phone | the phone: messages, map, bank, stocks, camera + photos, jobs board and waypoints |
+| 19-phone | the phone: messages, map, bank, stocks, camera + photos, jobs board and waypoints (other files add apps via PHX) |
+| 20-careers | taxi, bus, pizza, farm hand and pilot shifts, ranks and pay; Luigi's; bus stops |
+| 21-business | buying and running village businesses (prices, staff, refurbish, daily trading) |
+| 22-home | wardrobe, paint and floors, house extensions with bedroom, games room, cinema & gym, furniture |
 
 ## Rules when editing
 
