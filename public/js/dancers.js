@@ -37,14 +37,16 @@ function dress(p,o){const acc=o.acc,bc=o.bc,hx=hex(acc);
  const ag=p.a1.geometry.attributes,ap=ag.position;let bi=0,bd=9;for(let i=0;i<ap.count;i++){const d=Math.abs(ap.getY(i)+.64);if(d<bd){bd=d;bi=i}}
  const sk=[ag.color.getX(bi),ag.color.getY(bi),ag.color.getZ(bi)];
  // cropped strap top: sequinned band over the chest, thin shoulder straps, bare shoulders and midriff, crisp edges
+ // the tee's collar is a three-ring tube at y 1.42 / 1.52 / 1.60: find exactly those triangles and make them skin (hair and head are left alone)
+ {const g0=p.up.geometry,q=g0.attributes.position,c0=g0.attributes.color,L=[1.42,1.52,1.6],lv=y=>L.findIndex(v=>Math.abs(v-y)<.004);
+  for(let t=0;t<q.count/3;t++){const i=t*3,a=lv(q.getY(i)),b=lv(q.getY(i+1)),c=lv(q.getY(i+2));
+   if(a>=0&&b>=0&&c>=0&&!(a===b&&b===c))for(let k=0;k<3;k++)c0.setXYZ(i+k,sk[0]*.95,sk[1]*.95,sk[2]*.95)}c0.needsUpdate=true}
  {let g=splitA(p.up.geometry,1,[.98,1.12,1.34,1.46]);g=splitA(g,0,[-.105,-.055,.055,.105]);p.up.geometry=g}
  recol(p.up,(cy,t,br,cx,cr,cg,cb)=>{const k=.82+.3*((t*2654435761>>>0)%7/7);
   if(cy>1.12&&cy<=1.34)return[acc[0]*k,acc[1]*k,acc[2]*k];
   if(cy>1.34&&cy<1.46)return(cx>.055&&cx<.105)?[acc[0]*k,acc[1]*k,acc[2]*k]:[sk[0]*.95,sk[1]*.95,sk[2]*.95];
   if(cy>.98&&cy<=1.12)return[sk[0]*.95,sk[1]*.95,sk[2]*.95];
   if(cy>.8&&cy<=.98)return[bc[0]*.9,bc[1]*.9,bc[2]*.9];
-  // leftover t-shirt neck/collar above the straps: anything not skin-coloured (blends of the top colour) becomes skin
-  if(cy>1.46&&cy<1.64&&(Math.abs(cg/(cr||1)-.8)>.14||Math.abs(cb/(cr||1)-.7)>.14))return[sk[0]*.95,sk[1]*.95,sk[2]*.95];
   return null});
  // bare arms
  for(const a of[p.a1,p.a2])recol(a,()=>sk);
