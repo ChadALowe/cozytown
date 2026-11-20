@@ -10,10 +10,11 @@ const HOME=registerMap({id:'home',city:'COZY VILLAGE',airfield:'COZY AIRFIELD',o
 const MARL=registerMap({id:'marlowe',city:'MARLOWE',airfield:'MARLOWE INTERNATIONAL',ox:2400,oz:-1500,reg:[-740,260,-560,1000],style:'city',welcome:'WELCOME TO MARLOWE'});
 const ROUTES={home:['marlowe'],marlowe:['home']},FARE=150,CAPN=20;
 /* ---------------------------------------------------------------- shared builders */
-const mk=m=>({m,Br:new Builder(2),Bo:new Builder(3),W:(u,v)=>[m.ox+u,m.oz+v]});
-function flush(c){const g=new THREE.Group();if(c.Br.p.length)g.add(c.Br.mesh(mRoad));if(c.Bo.p.length)g.add(c.Bo.mesh(mObj));if(g.children.length)chunk(c.m,g);c.Br=new Builder(2);c.Bo=new Builder(3)}
-const qd=(c,u0,v0,u1,v1,col,y)=>{const W=c.W;quadXZ(c.Br,W(u0,v0),W(u1,v0),W(u1,v1),W(u0,v1),col,Y+y*3.2)};
-const qpoly=(c,pts,w,col,y)=>{const W=c.W;for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l*w/2,nz=(b[0]-a[0])/l*w/2;quadXZ(c.Br,W(a[0]-nx,a[1]-nz),W(a[0]+nx,a[1]+nz),W(b[0]+nx,b[1]+nz),W(b[0]-nx,b[1]-nz),col,Y+y*3.2)}};
+const mk=m=>({m,Br:new Builder(2),Br2:new Builder(2),Br3:new Builder(2),Bo:new Builder(3),W:(u,v)=>[m.ox+u,m.oz+v]});
+const mLay=[1,2,3].map(k=>{return wmat(null,{polygonOffset:true,polygonOffsetFactor:-2-k*2,polygonOffsetUnits:-2-k*4},roadTex)});
+function flush(c){const g=new THREE.Group();if(c.Br.p.length)g.add(c.Br.mesh(mRoad));if(c.Br2.p.length)g.add(c.Br2.mesh(mLay[0]));if(c.Br3.p.length)g.add(c.Br3.mesh(mLay[1]));c.Br2=new Builder(2);c.Br3=new Builder(2);if(c.Bo.p.length)g.add(c.Bo.mesh(mObj));if(g.children.length)chunk(c.m,g);c.Br=new Builder(2);c.Bo=new Builder(3)}
+const qd=(c,u0,v0,u1,v1,col,y)=>{const W=c.W;quadXZ(y>.065?c.Br3:y>.045?c.Br2:c.Br,W(u0,v0),W(u1,v0),W(u1,v1),W(u0,v1),col,Y+y*3.2)};
+const qpoly=(c,pts,w,col,y)=>{const W=c.W;for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l*w/2,nz=(b[0]-a[0])/l*w/2;quadXZ(y>.065?c.Br3:y>.045?c.Br2:c.Br,W(a[0]-nx,a[1]-nz),W(a[0]+nx,a[1]+nz),W(b[0]+nx,b[1]+nz),W(b[0]-nx,b[1]-nz),col,Y+y*3.2)}};
 const pb=(c,u,y,v,sx,sy,sz,col,rot)=>{const p=c.W(u,v);pbox(c.Bo,p[0],Y+y,p[1],sx,sy,sz,col,rot||0)};
 const pc=(c,u,y,v,r,h,sg,col)=>{const p=c.W(u,v);pcyl(c.Bo,p[0],Y+y,p[1],r,h,sg,col)};
 const pn=(c,u,y,v,r,h,sg,col)=>{const p=c.W(u,v);pcone(c.Bo,p[0],Y+y,p[1],r,h,sg,col,0)};
