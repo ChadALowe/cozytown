@@ -74,6 +74,7 @@ function dress(p,o){const acc=o.acc,bc=acc,hx=hex(acc),F=.92; // one solid colou
  // skin tone, sampled from the hand of this dancer's own arm mesh
  const ag=p.a1.geometry.attributes,ap=ag.position;let bi=0,bd=9;for(let i=0;i<ap.count;i++){const d=Math.abs(ap.getY(i)+.64);if(d<bd){bd=d;bi=i}}
  const sk=[ag.color.getX(bi),ag.color.getY(bi),ag.color.getZ(bi)];
+ const TC=o.bare?sk:acc; // o.bare = test mode: top and shorts painted skin-coloured to check the body
  // cropped strap top: solid-colour band over the chest, thin shoulder straps, bare shoulders and midriff, crisp edges
  // the tee's collar is a wide three-ring tube (y 1.42 / 1.52 / 1.60): find exactly those triangles, slim them into a neck and make them skin
  {const g0=p.up.geometry,q=g0.attributes.position,c0=g0.attributes.color,L=[1.42,1.52,1.6],lv=y=>L.findIndex(v=>Math.abs(v-y)<.004);
@@ -96,11 +97,10 @@ function dress(p,o){const acc=o.acc,bc=acc,hx=hex(acc),F=.92; // one solid colou
  if(o.bare){const q=p.up.geometry.attributes.position;[1,-1].forEach(sg=>{let bz=-9,bx=0,by=0;for(let i=0;i<q.count;i++){const x=q.getX(i),y=q.getY(i),z=q.getZ(i);if(Math.abs(x-sg*.085)<.035&&Math.abs(y-1.235)<.07&&z>bz){bz=z;bx=x;by=y}}
   const m=new THREE.Mesh(new THREE.SphereGeometry(.018,8,6),new THREE.MeshBasicMaterial({color:0x6b3a1e}));m.position.set(bx,by,bz);p.up.add(m)})}
  recol(p.up,(cy,t,br,cx,cr,cg,cb,dy)=>{const k=F;
-  const TC=o.bare?sk:acc; // o.bare = test mode: top painted skin-coloured to check the body
   if(cy>1.12&&cy<=1.34)return[TC[0]*k,TC[1]*k,TC[2]*k];
   if(cy>1.34&&cy<1.46)return(cx>.09&&cx<.135&&dy>.004)?[TC[0]*k,TC[1]*k,TC[2]*k]:[sk[0]*.95,sk[1]*.95,sk[2]*.95];
   if(cy>.98&&cy<=1.12)return[sk[0]*.95,sk[1]*.95,sk[2]*.95];
-  if(cy>.8&&cy<=.98)return[acc[0]*F,acc[1]*F,acc[2]*F];
+  if(cy>.8&&cy<=.98)return[TC[0]*F,TC[1]*F,TC[2]*F];
   if(cy>1.46&&cy<1.58){const m=Math.hypot(cr,cg,cb)||1,a=Math.hypot(acc[0],acc[1],acc[2])||1;if(Math.hypot(cr/m-acc[0]/a,cg/m-acc[1]/a,cb/m-acc[2]/a)<.4)return[sk[0]*.97,sk[1]*.97,sk[2]*.97]}
   if(cy>1.5&&cy<1.9&&Math.abs(cg/(cr||1)-sk[1]/sk[0])<.06&&Math.abs(cb/(cr||1)-sk[2]/sk[0])<.06)return[Math.min(1,cr*1.3),Math.min(1,cg*1.3),Math.min(1,cb*1.3)];
   return null});
@@ -113,7 +113,7 @@ function dress(p,o){const acc=o.acc,bc=acc,hx=hex(acc),F=.92; // one solid colou
  const SHOE=[.07,.05,.07];
  for(const l of[p.l1,p.l2]){l.geometry=subdiv(l.geometry,cy=>cy>-.3,2);sculpt(l.geometry,(x,y,z)=>{const xw=x+l.position.x,yw=y+l.position.y,c=cheek(xw,yw,z),h=hipW(xw,yw);return(c||h)?[h,0,-c]:null});
   l.geometry=splitA(l.geometry,1,[-.17,-.835]);
-  recol(l,cy=>cy>-.17?[acc[0]*F,acc[1]*F,acc[2]*F]:cy>-.835?[sk[0]*.96,sk[1]*.96,sk[2]*.96]:SHOE);
+  recol(l,cy=>cy>-.17?[TC[0]*F,TC[1]*F,TC[2]*F]:cy>-.835?[sk[0]*.96,sk[1]*.96,sk[2]*.96]:SHOE);
   const lp=l.geometry.attributes.position,PH=-.35;
   for(let i=0;i<lp.count;i++){const y=lp.getY(i),w=Math.max(0,Math.min(1,(-.78-y)/.1));if(!w)continue;const f=PH*w,dz=lp.getZ(i)-.25,dy=y+.92;
    lp.setY(i,-.92+dz*Math.sin(f)+dy*Math.cos(f));lp.setZ(i,.25+dz*Math.cos(f)-dy*Math.sin(f))}
