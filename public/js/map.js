@@ -17,12 +17,12 @@ const CAT={
 const catOf=t=>{t=t.toUpperCase();
  if(/FISH|BAKERY|CAFE|DELI|BUTCHER|CO-OP|ROYAL OAK/.test(t))return'food';
  if(/POST|CHEMIST|HAIR|ESTATE|VET|NEWS/.test(t))return'serv';
- if(/FLORIST|BOOK|PENNY|HARRINGTON|MAISON/.test(t))return'shop';
+ if(/FLORIST|BOOK|PENNY|HARRINGTON|MAISON|RANI/.test(t))return'shop';
  if(/BOWL|BULLSEYE|ARCADE|FC|CASINO/.test(t))return t==='CASINO'?'cash':'fun';
  if(/LUCKY|STOCK/.test(t))return'cash';
  if(/MOTORS|GARAGE|MOTORSPORT/.test(t))return'car';
  if(/AIRWAYS|FERRY|AIRPORT/.test(t))return'trav';return'shop'};
-const ICON={'THE ROYAL OAK':'🍺','POST OFFICE':'📮','CHEMIST':'💊','HAIRDRESSER':'✂','VET':'🐾','BOOKSHOP':'📚','FLORIST':'🌸',"PENNY'S BARGAINS":'🏷','HARRINGTON & CO':'🧥',"MAISON D'OR":'👑','STRIKE BOWL':'🎳','BULLSEYE RANGE':'🎯','NEON ARCADE':'🕹','VILLAGE ROVERS FC':'⚽','CASINO':'🎰','LUCKY BETS':'🎲','COZY STOCK EXCHANGE':'📈','VILLAGE MOTORS':'🚗',"JOE'S GARAGE":'🔧','COZY MOTORSPORT CLUB':'🏁','COZY HARBOUR FERRY':'⛴','COZY AIRWAYS':'✈','BAKERY':'🥖','CAFE':'☕',"FRANKIE'S FISH & CHIPS":'🍟','BUTCHER':'🥩','DELI':'🧀','CO-OP':'🛒','NEWSAGENT':'📰','ESTATE AGENT':'🔑'};
+const ICON={'THE ROYAL OAK':'🍺','POST OFFICE':'📮','CHEMIST':'💊','HAIRDRESSER':'✂','VET':'🐾','BOOKSHOP':'📚','FLORIST':'🌸',"PENNY'S BARGAINS":'🏷','HARRINGTON & CO':'🧥',"MAISON D'OR":'👑',"RANI'S SILK HOUSE":'🥻','STRIKE BOWL':'🎳','BULLSEYE RANGE':'🎯','NEON ARCADE':'🕹','VILLAGE ROVERS FC':'⚽','CASINO':'🎰','LUCKY BETS':'🎲','COZY STOCK EXCHANGE':'📈','VILLAGE MOTORS':'🚗',"JOE'S GARAGE":'🔧','COZY MOTORSPORT CLUB':'🏁','COZY HARBOUR FERRY':'⛴','COZY AIRWAYS':'✈','BAKERY':'🥖','CAFE':'☕',"FRANKIE'S FISH & CHIPS":'🍟','BUTCHER':'🥩','DELI':'🧀','CO-OP':'🛒','NEWSAGENT':'📰','ESTATE AGENT':'🔑'};
 const BC={shop:'#b08a5a',pub:'#9a5a3a',church:'#8a8a94',school:'#c8b060',terr:'#a2705c',semi:'#a2705c',cot:'#b88a6a',det:'#9a6a5a',bung:'#b08a78',casino:'#7a3a9a',club:'#8a4a4a',stocks:'#3a7a5a',ferry:'#3a7a9a',airport:'#3a8a9a'};
 let OVR=null,pts=null;
 function places(){if(pts)return pts;pts=[];const seen={};

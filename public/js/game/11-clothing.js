@@ -3,10 +3,10 @@ var CHR=null,CHM=null,CHS=null;
 function chPalTop(){return[[.09,.63,.42]].concat(PTC)}
 function chPalBot(){return[[.17,.43,.55]].concat(PBC)}
 function chPalHair(){return PHR.concat([[.85,.3,.55],[.25,.45,.85],[.93,.93,.9]])}
-const CH_BD=[.92,1,1.1],CH_HT=[.93,1,1.07],CH_TS=['T-SHIRT','LONG SLEEVE','HOODIE','COAT','DRESS'],CH_HS=['SHORT','LONG','BUN','RECEDING','FLAT CAP','BOBBLE HAT','AFRO','PONYTAIL','BUZZ CUT','BOB','MOHAWK','QUIFF','PIGTAILS','CURLY','SLICKED BACK','SPIKY','MESSY CROP','BERET','FEDORA','TOP HAT','CROWN'],CH_HAIR=[0,8,16,1,9,13,2,12,7,3,6,10,11,14,15,4,5];
-function chDefault(){return{f:false,bd:1,ht:1,sk:PSK[1].slice(),hr:PHR[1].slice(),hs:0,beard:false,gl:false,ts:1,tc:[.09,.63,.42],bc:[.17,.43,.55],sh:false,sc:PSH[2].slice(),scarf:null,bag:0,bp:false,outI:0,ss:0,bs:0,hc:null,nk:false}}
+const CH_BD=[.92,1,1.1],CH_HT=[.93,1,1.07],CH_TS=['T-SHIRT','LONG SLEEVE','HOODIE','COAT','DRESS'],CH_HS=['SHORT','LONG','BUN','RECEDING','FLAT CAP','BOBBLE HAT','AFRO','PONYTAIL','BUZZ CUT','BOB','MOHAWK','QUIFF','PIGTAILS','CURLY','SLICKED BACK','SPIKY','MESSY CROP','BERET','FEDORA','TOP HAT','CROWN','TURBAN'],CH_HAIR=[0,8,16,1,9,13,2,12,7,3,6,10,11,14,15,4,5];
+function chDefault(){return{f:false,bd:1,ht:1,sk:PSK[1].slice(),hr:PHR[1].slice(),hs:0,beard:false,gl:false,ts:1,tc:[.09,.63,.42],bc:[.17,.43,.55],sh:false,sc:PSH[2].slice(),scarf:null,bag:0,bp:false,outI:0,ss:0,bs:0,hc:null,nk:false,bn:false}}
 function chSpec(){return chSpecOf(CHR)}
-function chSpecOf(c){return{f:c.f,w:(c.f?.92:1)*CH_BD[c.bd],h:CH_HT[c.ht],sk:c.sk,hr:c.hr,hs:c.hs,beard:!c.f&&c.beard,ts:c.ts,tc:c.tc,bc:c.bc,sc:c.sc,scarf:c.scarf,gl:c.gl,bag:c.bag,bp:c.bp,st:0,sh:c.sh,old:false,ss:c.ss|0,bs:c.bs|0,hc:c.hc,nk:c.nk}}
+function chSpecOf(c){return{f:c.f,w:(c.f?.92:1)*CH_BD[c.bd],h:CH_HT[c.ht],sk:c.sk,hr:c.hr,hs:c.hs,beard:!c.f&&c.beard,ts:c.ts,tc:c.tc,bc:c.bc,sc:c.sc,scarf:c.scarf,gl:c.gl,bag:c.bag,bp:c.bp,st:0,sh:c.sh,old:false,ss:c.ss|0,bs:c.bs|0,hc:c.hc,nk:c.nk,bn:!!c.bn}}
 function chBuild(){if(!CHR)return;if(CHM){man.remove(CHM);CHM.traverse(o=>{if(o.geometry)o.geometry.dispose()})}CHM=mkPerson(chSpec(),mObj,man)}
 function chSave(){try{localStorage.setItem('c1look',JSON.stringify(CHR))}catch(e){}}
 function chLoad(){CHR=chDefault();try{const d=JSON.parse(localStorage.getItem('c1look')||'null');if(d&&typeof d==='object')for(const k in CHR)if(k in d&&d[k]!==undefined)CHR[k]=d[k]}catch(e){}}
@@ -57,8 +57,9 @@ function chBody(){const S=CHS,c=CHR,el=S.pn.querySelector('#chbody');el.innerHTM
 function chRandom(){const c=CHR,pk=a=>a[Math.floor(Math.random()*a.length)];c.f=Math.random()<.5;c.bd=Math.floor(Math.random()*3);c.ht=Math.floor(Math.random()*3);c.sk=pk(PSK).slice();c.hs=[0,1,2,3,6,7,8,9,10,11,12,13,14,15,16][Math.floor(Math.random()*15)];c.hr=pk(chPalHair()).slice();c.beard=!c.f&&Math.random()<.3;c.gl=Math.random()<.25;chBuild();chBody();beep(880,.08,'square',.05)}
 {const d=document.createElement('div');d.className='mb';d.innerHTML='<button id="chB" class="sec">CHARACTER</button>';const o=document.getElementById('optB');o.parentNode.parentNode.insertBefore(d,o.parentNode);document.getElementById('chB').onclick=chOpen}
 /* ---- THREADS: clothes shop (browse racks, try on, buy) ---- */
-Object.assign(HRS,{"PENNY'S BARGAINS":[8,19],'HARRINGTON & CO':[9.5,18],"MAISON D'OR":[10,17.5]});
-const CFSH={"PENNY'S BARGAINS":'BUDGET','HARRINGTON & CO':'HIGH END',"MAISON D'OR":'ULTRA'};
+Object.assign(HRS,{"RANI'S SILK HOUSE":[9,19],"PENNY'S BARGAINS":[8,19],'HARRINGTON & CO':[9.5,18],"MAISON D'OR":[10,17.5]});
+const CFSH={"PENNY'S BARGAINS":'BUDGET','HARRINGTON & CO':'HIGH END',"MAISON D'OR":'ULTRA',"RANI'S SILK HOUSE":'SILK HOUSE'};
+TH["RANI'S SILK HOUSE"]={wall:0xf6d6a8,fl:'carpet',cnt:0x8a1a4a,top:0xd4af37,sh:0x8a1a4a};
 TH["PENNY'S BARGAINS"]={wall:0xf4e8b0,fl:'tile',cnt:0xc01818,top:0xf8d010,sh:0xc01818};
 TH['HARRINGTON & CO']={wall:0x3a5646,fl:'wood',cnt:0x2a1a10,top:0x4a3020,sh:0x0f3324};
 TH["MAISON D'OR"]={wall:0x1e1c24,fl:'tile2',cnt:0x101014,top:0xd4af37,sh:0x0a0a10};
@@ -104,6 +105,16 @@ function cloItems(){if(CLOIT)return CLOIT;const cn=['RED','BLUE','YELLOW','GREEN
   E(acc,UL,'acc:avi','GOLD AVIATORS',320,c=>{c.gl=3},c=>c.gl===3,c=>{c.gl=false});
   E(acc,UL,'acc:chn','GOLD CHAIN',480,c=>{c.nk=true},c=>!!c.nk,c=>{c.nk=false});
   hat('acc:top','TOP HAT',350,UL,19);hat('acc:crn','GOLD CROWN',2500,UL,20)}
+ /* ---- RANI'S SILK HOUSE: Indian wear ---- */
+ {const SH="SILK HOUSE",E=(arr,id,n,p,ap,has,rm)=>{const o={id,n,p,t:SH,ap,has};if(rm)o.rm=rm;arr.push(o)};
+  for(const[cn_,col,p]of[['WHITE',[.94,.93,.88],45],['SAFFRON',[.95,.55,.12],55],['ROYAL BLUE',[.12,.22,.6],55],['MAROON',[.45,.07,.12],60],['MINT',[.6,.85,.72],50]])E(tops,'top:10:'+cn_,cn_+' KURTA',p,c=>{c.ts=10;c.tc=col.slice()},c=>c.ts===10&&chEq(c.tc,col));
+  for(const[cn_,col,p]of[['IVORY & GOLD',[.92,.86,.7],420],['MAROON',[.45,.06,.12],420],['EMERALD',[.05,.4,.25],460],['NAVY',[.08,.12,.32],440]])E(tops,'top:12:'+cn_,cn_+' SHERWANI',p,c=>{c.ts=12;c.tc=col.slice()},c=>c.ts===12&&chEq(c.tc,col));
+  for(const[cn_,col,p]of[['RED SILK',[.78,.08,.12],180],['PEACOCK BLUE',[.05,.4,.6],180],['MAGENTA',[.8,.1,.5],180],['MARIGOLD',[.98,.62,.1],180],['GOLD BANARASI',[.9,.7,.2],650]])E(tops,'top:11:'+cn_,cn_+' SARI',p,c=>{c.ts=11;c.tc=col.slice()},c=>c.ts===11&&chEq(c.tc,col));
+  for(const[cn_,tc_,bc_,p]of[['RED & GOLD',[.85,.65,.18],[.72,.06,.12],520],['ROSE PINK',[.95,.55,.65],[.85,.25,.5],480],['GREEN & GOLD',[.9,.7,.25],[.1,.45,.25],480],['ROYAL BLUE',[.9,.75,.3],[.12,.2,.6],480]])E(tops,'top:13:'+cn_,cn_+' LEHENGA',p,c=>{c.ts=13;c.tc=tc_.slice();c.bc=bc_.slice();c.sh=false;c.bs=0},c=>c.ts===13&&chEq(c.tc,tc_)&&chEq(c.bc,bc_));
+  for(const[cn_,col,p]of[['WHITE',[.95,.94,.9],30],['CREAM',[.9,.85,.7],30],['BLACK',[.08,.08,.1],30]])E(bots,'bot:chu'+cn_,cn_+' CHURIDAR',p,c=>{c.bc=col.slice();c.sh=false;c.bs=0},c=>!c.sh&&!c.bs&&chEq(c.bc,col));
+  for(const[cn_,col,p]of[['GOLD',[.9,.72,.25],40],['RED',[.7,.1,.12],40],['BLACK',[.1,.08,.08],40],['SILVER',[.82,.82,.86],60]])E(shoes,'sho:5'+cn_,cn_+' JUTTI SLIPPERS',p,c=>{c.sc=col.slice();c.ss=5},c=>c.ss===5&&chEq(c.sc,col));
+  for(const[cn_,col]of[['SAFFRON',[.95,.55,.1]],['NAVY',[.1,.14,.4]],['WHITE',[.95,.95,.93]],['RED',[.75,.1,.12]],['PINK',[.95,.45,.6]],['BLACK',[.08,.08,.1]],['GREEN',[.1,.45,.25]]])E(acc,'acc:tur'+cn_,cn_+' TURBAN',35,c=>{c.hs=21;c.hc=col.slice()},c=>c.hs===21&&chEq(c.hc,col),c=>{c.hs=0;c.hc=null});
+  E(acc,'acc:bng','GOLD BANGLES',90,c=>{c.bn=true},c=>!!c.bn,c=>{c.bn=false})}
  for(const cat of[tops,bots,shoes,acc])for(const it of cat)if(!it.t)it.t='BUDGET';
  return CLOIT=[tops,bots,shoes,acc]}
 function cloOwn(it){return !it.p||!!CLOWN[it.id]}
@@ -113,11 +124,11 @@ function chWard(S,el){const IT=cloItems(),cats=S.tab===2?[0,1,2]:[3];
  for(const ci of cats){const r=document.createElement('div');r.className='r';r.innerHTML='<div class="l">'+CLOCAT[ci]+'</div><div class="c"></div>';el.appendChild(r);const w=r.lastChild;
   if(ci===3){for(const [n,f] of [['NO HAT',c=>{if(c.hs===4||c.hs===5)c.hs=0}],['NO GLASSES',c=>c.gl=false],['NO SCARF',c=>c.scarf=null],['NO BAG',c=>{c.bag=0;c.bp=false}]]){const b=document.createElement('button');b.textContent=n;b.onclick=()=>{f(CHR);chBuild();chBody()};w.appendChild(b)}}
   for(const it of IT[ci]){if(!cloOwn(it))continue;const b=document.createElement('button');b.textContent=it.n;if(it.has(CHR))b.className='on';b.onclick=()=>{if(it.has(CHR)&&it.rm)it.rm(CHR);else it.ap(CHR);chBuild();chBody();beep(600,.05,'square',.04)};w.appendChild(b)}}
- const h=document.createElement('div');h.className='l';h.style.marginTop='6px';h.textContent='MORE CLOTHES: PENNY\'S BARGAINS, HARRINGTON & CO, MAISON D\'OR';el.appendChild(h)}
+ const h=document.createElement('div');h.className='l';h.style.marginTop='6px';h.textContent='MORE CLOTHES: PENNY\'S BARGAINS, HARRINGTON & CO, MAISON D\'OR, RANI\'S SILK HOUSE';el.appendChild(h)}
 /* ---- shop interior ---- */
 const THX=[-5.2,-1.7,1.8,5.3];
 function thPose(){const o=SG;return o}
-function buildThreads(o){const tier=CFSH[o.t]||'BUDGET',TM={BUDGET:{rail:0xb4b4bc,bar:0xc8c8d0,shelf:0xc8a070,sbg:'#c01818',sfg:'#fff2a0',hd:'#f8d010',hf:'#c01010',tag:'BARGAINS  ·  EVERYTHING UNDER £60',cn:0xc01818},'HIGH END':{rail:0xc8a040,bar:0xd8b050,shelf:0x4a3020,sbg:'#0f3324',sfg:'#e8c860',hd:'#0f3324',hf:'#e8c860',tag:'HARRINGTON & CO  ·  TAILORING & FINE KNIT',cn:0x2a1a10},ULTRA:{rail:0xd4af37,bar:0xf0cc50,shelf:0x16161c,sbg:'#0a0a10',sfg:'#f2c84a',hd:'#0a0a10',hf:'#f2c84a',tag:"MAISON D'OR  ·  COUTURE  ·  BY APPOINTMENT",cn:0x101014}}[tier];IA.splice(0,IA.length,LEAVE_IA());IROOM.splice(0,IROOM.length,[-8,8,-4.2,-2.35]);
+function buildThreads(o){const tier=CFSH[o.t]||'BUDGET',TM={BUDGET:{rail:0xb4b4bc,bar:0xc8c8d0,shelf:0xc8a070,sbg:'#c01818',sfg:'#fff2a0',hd:'#f8d010',hf:'#c01010',tag:'BARGAINS  ·  EVERYTHING UNDER £60',cn:0xc01818},'HIGH END':{rail:0xc8a040,bar:0xd8b050,shelf:0x4a3020,sbg:'#0f3324',sfg:'#e8c860',hd:'#0f3324',hf:'#e8c860',tag:'HARRINGTON & CO  ·  TAILORING & FINE KNIT',cn:0x2a1a10},'SILK HOUSE':{rail:0xd4af37,bar:0xe8c050,shelf:0x6a2a14,sbg:'#8a1a4a',sfg:'#ffd24a',hd:'#8a1a4a',hf:'#ffd24a',tag:"RANI'S SILK HOUSE  ·  SARIS · KURTAS · TURBANS",cn:0x8a1a4a},ULTRA:{rail:0xd4af37,bar:0xf0cc50,shelf:0x16161c,sbg:'#0a0a10',sfg:'#f2c84a',hd:'#0a0a10',hf:'#f2c84a',tag:"MAISON D'OR  ·  COUTURE  ·  BY APPOINTMENT",cn:0x101014}}[tier];IA.splice(0,IA.length,LEAVE_IA());IROOM.splice(0,IROOM.length,[-8,8,-4.2,-2.35]);
  const rail=(x)=>{gbox(SG,x-1.28,0,-2.85,.05,1.65,.05,TM.rail);gbox(SG,x+1.28,0,-2.85,.05,1.65,.05,TM.rail);gbox(SG,x-1.28,1.62,-2.85,2.56,.04,.04,TM.bar)};
  sPlane(5.6,.34,0,2.3,-RZ+.03,0,txtTex(512,40,TM.hd,TM.hf,TM.tag,tier==='BUDGET'?22:19));
  THX.forEach((x,si)=>{
@@ -128,14 +139,20 @@ function buildThreads(o){const tier=CFSH[o.t]||'BUDGET',TM={BUDGET:{rail:0xb4b4b
   else{gbox(SG,x,0,-2.75,2.2,.9,.7,TM.cn);gbox(SG,x,.9,-2.75,2.3,.05,.8,tier==='ULTRA'?0xd4af37:0xe0d8e8);for(let j=0;j<4;j++)gbox(SG,x-.8+j*.5,.95,-2.7,.28,.05,.1,0x18181c);rail(x);for(let j=0;j<6;j++){const c=PTC[[0,1,3,5,9,11][j]];gbox(SG,x-1.0+j*.4,1.2,-2.85,.12,.4,.05,fmcRGB(c))}gbox(SG,x-.95,1.0,-2.7,.3,.35,.12,0x8a5a2a);gbox(SG,x+.95,1.0,-2.7,.28,.38,.14,0x3a4a6a)}
   IROOM.push([x-1.4,x+1.4,-4.2,-2.0]);IA.push({r:[x-1.4,x+1.4,-2.0,.7],label:'BROWSE '+CLOCAT[si],fn:()=>thBrowse(si,tier)})});
  gbox(SG,-6.1,0,2.0,.7,.95,2.0,TM.cn);gbox(SG,-6.1,.95,2.0,.8,.05,2.1,tier==='ULTRA'?0xd4af37:0xe0d8e8);gbox(SG,-6.1,1.0,1.6,.3,.25,.25,0x20242c);
- window.SHK=personIn(pSpec(9411,{f:true,gl:true,scarf:null,bp:false,bag:0,old:false,tc:[.55,.25,.5],hs:2}),-6.9,2.0,Math.PI/2);
- IROOM.push([-6.5,-5.7,.95,3.1]);IA.push({r:[-5.7,-4.6,1.2,2.9],label:'TALK TO '+(tier==='BUDGET'?'PENNY':tier==='ULTRA'?'ADRIEN':'KAREN'),fn:()=>say(tier==='BUDGET'?'PENNY':tier==='ULTRA'?'ADRIEN':'KAREN',{BUDGET:'Everything is a bargain! Grab a basket.',"HIGH END":'May I help you find the right fit, sir or madam?',ULTRA:'Welcome to Maison d\'Or. Champagne is on its way.'}[tier],3400)});
- const mq=(x,z,ry,tc,bc)=>{personIn(pSpec(9500+x,{sk:[.8,.78,.74],hr:[.75,.72,.7],hs:0,beard:false,gl:false,scarf:null,bp:false,bag:0,old:false,f:z>1,ts:z>1?4:2,tc,bc,sc:[.5,.5,.52]}),x,z,ry);IROOM.push([x-.3,x+.3,z-.3,z+.3])};mq(4.2,.9,Math.PI,[.2,.5,.55],[.14,.18,.3]);mq(-3.4,1.2,0,[.8,.3,.35],[.5,.43,.3]);
+ const SK=tier==='SILK HOUSE'?'RANI':tier==='BUDGET'?'PENNY':tier==='ULTRA'?'ADRIEN':'KAREN';
+ window.SHK=personIn(pSpec(9411,tier==='SILK HOUSE'?{f:true,gl:false,scarf:null,bp:false,bag:0,old:false,ts:11,sh:false,tc:[.8,.1,.5],hs:2,hr:[.08,.06,.05],sk:[.62,.42,.3],bn:true,ss:5,sc:[.9,.72,.25]}:{f:true,gl:true,scarf:null,bp:false,bag:0,old:false,tc:[.55,.25,.5],hs:2}),-6.9,2.0,Math.PI/2);
+ IROOM.push([-6.5,-5.7,.95,3.1]);IA.push({r:[-5.7,-4.6,1.2,2.9],label:'TALK TO '+SK,fn:()=>say(SK,{'SILK HOUSE':'Namaste! Feel the silk, try anything on, take your time.',BUDGET:'Everything is a bargain! Grab a basket.',"HIGH END":'May I help you find the right fit, sir or madam?',ULTRA:'Welcome to Maison d\'Or. Champagne is on its way.'}[tier],3400)});
+ const mq=(x,z,ry,tc,bc)=>{personIn(pSpec(9500+x,{sk:[.8,.78,.74],hr:[.75,.72,.7],hs:0,beard:false,gl:false,scarf:null,bp:false,bag:0,old:false,sh:false,f:z>1,ts:tier==='SILK HOUSE'?(z>1?11:12):z>1?4:2,tc,bc,sc:[.5,.5,.52]}),x,z,ry);IROOM.push([x-.3,x+.3,z-.3,z+.3])};mq(4.2,.9,Math.PI,[.2,.5,.55],[.14,.18,.3]);mq(-3.4,1.2,0,[.8,.3,.35],[.5,.43,.3]);
  gbox(SG,RX-.12,0,-1.0,.06,2.1,1.3,0xe8e8f0);{const m=new THREE.Mesh(new THREE.PlaneGeometry(1.15,1.95),new THREE.MeshBasicMaterial({color:0xaac8dc}));m.position.set(RX-.16,1.02,-1.0);m.rotation.y=-Math.PI/2;SG.add(m)}
 
  if(tier==='BUDGET'){for(let i=0;i<9;i++)gbox(SG,-6.6+i*1.65,3.15,-RZ+.08,.9,.3,.02,i%2?0xd01818:0xf8e020);
   for(const[bx,bz]of[[-1.4,2.4],[3.5,2.2]]){gbox(SG,bx,0,bz,1.4,.55,.9,0xc8a070);for(let j=0;j<7;j++)gbox(SG,bx-.55+j*.18,.55,bz+(j%2?.1:-.1),.16,.12,.34,fmcRGB(PTC[(j*2+bx*3|0)%12&11]||[.8,.2,.2]));IROOM.push([bx-.75,bx+.75,bz-.5,bz+.5])}
   sPlane(2.2,.6,5.9,3.05,-RZ+.03,0,txtTex(256,72,'#d01010','#ffffff','SALE!  50% OFF',34));sPlane(2.2,.6,-5.9,3.05,-RZ+.03,0,txtTex(256,72,'#f8e020','#101010','BUY 2 GET 1 FREE',24))}
+ else if(tier==='SILK HOUSE'){gbox(SG,0,0,.6,5.4,.02,3.6,0x7a1030);gbox(SG,0,.02,.6,5.0,.01,3.2,0xc8902a);gbox(SG,0,.025,.6,4.4,.01,2.6,0x9a1a3a);
+  for(let i=0;i<22;i++){const x=-7.2+i*.68;gbox(SG,x,3.05-Math.abs(Math.sin(i*.6))*.12,-RZ+.1,.16,.16,.16,i%2?0xff9a10:0xffd020)}
+  for(let i=0;i<6;i++){const sd=i<3?-1:1,z=-1.6+(i%3)*1.5,xw=sd*(RX-.06),cc=[0xc81848,0x1a6a9a,0xf0a010,0x7a1a8a,0x2a8a4a,0xd04a10][i];if(sd>0&&z<-.2)continue;gbox(SG,xw,.9,z,.03,2.2,.6,cc);gbox(SG,xw,.9,z,.05,.08,.6,0xd4af37);gbox(SG,xw,3.05,z,.06,.06,.66,0xd4af37)}
+  for(const[lx,lz]of[[-5,1.6],[5,1.6],[0,3.2]]){gbox(SG,lx,3.3,lz,.02,.5,.02,0x8a6a30);gbox(SG,lx,2.85,lz,.32,.4,.32,0xd4a020);gbox(SG,lx,2.9,lz,.26,.3,.26,0xffd890)}
+  for(const[bx,bz]of[[-1.4,2.6],[3.4,2.4]]){gbox(SG,bx,0,bz,1.3,.6,.8,0x6a2a14);for(let j=0;j<5;j++)gbox(SG,bx-.5+j*.25,.6+(j%2)*.04,bz,.22,.14,.6,[0xc81848,0xf0a010,0x1a6a9a,0x7a1a8a,0x2a8a4a][j]);IROOM.push([bx-.7,bx+.7,bz-.45,bz+.45])}}
  else if(tier==='HIGH END'){gbox(SG,0,0,.6,5.6,.02,3.6,0x1c2c4a);gbox(SG,0,.02,.6,5.2,.01,3.2,0x28406a);
   for(const px of[-7,7]){gbox(SG,px,0,-3.2,.5,.5,.5,0x2a2a30);gbox(SG,px,.5,-3.2,.08,.8,.08,0x5a3a1a);gbox(SG,px,1.0,-3.2,.7,.7,.7,0x1a5a2a)}
   for(let i=0;i<3;i++){gbox(SG,-1+i*1.0,2.3,-RZ+.06,.7,.5,.03,0x6a4a20);gbox(SG,-1+i*1.0,2.34,-RZ+.07,.6,.42,.02,[0x8a6a50,0x405a70,0x706040][i])}}

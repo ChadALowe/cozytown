@@ -127,6 +127,18 @@ function bld(cx,cz,rot,o){
    for(const sg of[-1,1]){const tx=dx+sg*1.5;p(tx,0,zf+.9,.45,.4,.45,[.2,.2,.24]);p(tx,.4,zf+.9,.08,.7,.08,[.35,.22,.1]);p(tx,1.0,zf+.9,.6,.6,.6,[.12,.4,.16]);p(dx+sg*.85,1.7,zf+.25,.14,.3,.14,[1,.88,.5],K.l)}
    p(dx,0,zf+.55,1.5,.08,1.0,[.35,.35,.38]);
    topWin()}
+  else if(t===4){ /* SILK HOUSE: magenta and gold fascia, scalloped arches, marigold garlands, draped silks in the window */
+   const mg=[.54,.1,.29],sf=[.98,.6,.1];door(dx,[.5,.08,.22],1.0);
+   p(ux,2.95,zf+.3,uw-.2,1.2,.5,mg);p(ux,2.9,zf+.57,uw-.2,.07,.06,gold);p(ux,4.12,zf+.57,uw-.2,.07,.06,gold);
+   {const f=W(ux,3.55,zf+.57);signPlane(K,nm.t,'#8a1a4a','#ffd24a',uw-.8,.95,f[0],f[1],f[2],rot,512,56)}
+   for(let i=0;i<12;i++){const aw=(uw-.4)/12,ax=X0+.2+aw*(i+.5);p(ax,2.62,zf+.56,aw*.8,.22,.08,gold);p(ax,2.5,zf+.56,aw*.45,.12,.08,gold)}
+   for(let g2=0;g2<4;g2++){const gx0=X0+.4+g2*(uw-.8)/4,gw=(uw-.8)/4;for(let k=0;k<=8;k++){const t=k/8;p(gx0+gw*t,2.3-Math.sin(t*Math.PI)*.35,zf+.62,.13,.13,.13,k%2?sf:[1,.82,.15])}}
+   const wx0=X0+.5,wx1=dx-1.1,wc=(wx0+wx1)/2,ww=wx1-wx0;winBox(wc,.5,ww,1.68,gold,[.36,.06,.18],[1,.9,.7],[.5,.12,.2]);
+   for(let m=0;m<6;m++){const mx=wx0+.3+m*(ww-.6)/5,cc=[[.8,.1,.15],[.05,.4,.6],[.98,.62,.1],[.8,.1,.5],[.1,.45,.25],[.9,.7,.2]][m];p(mx,.56,zf+.3,.38,1.55,.06,cc);p(mx,.56,zf+.34,.38,.08,.06,gold);p(mx,2.06,zf+.32,.42,.06,.08,gold)}
+   mann(wc,.56,[.8,.1,.5],.85,gold);
+   for(const sg of[-1,1]){p(dx+sg*.75,0,zf+.15,.16,2.5,.16,gold);p(dx+sg*1.3,0,zf+.6,.45,.4,.45,[.62,.28,.14]);p(dx+sg*1.3,.4,zf+.6,.55,.3,.55,[.98,.62,.1]);p(dx+sg*1.0,2.05,zf+.4,.22,.3,.22,[1,.82,.4],K.l)}
+   p(dx,2.45,zf+.12,1.7,.12,.12,gold);for(let k=0;k<7;k++)p(dx-.6+k*.2,2.28-Math.sin(k/6*Math.PI)*.1,zf+.2,.11,.11,.11,k%2?sf:[1,.82,.15]);
+   topWin()}
   else{ /* ULTRA: pale stone, four columns, black and gold fascia, glass front, red carpet */
    p(ux,0,zf+1.7,uw+.4,.14,2.6,[.82,.8,.76]);p(ux,.14,zf+1.5,uw,.14,2.2,[.88,.86,.82]);
    p(ux,.2,zf+.08,uw-.6,3.0,.06,[.95,.82,.55],K.l);
@@ -214,6 +226,7 @@ special({kind:'shop',units:1,w:20,d:10,eaves:6.2,ridge:3.2,fg:.6,wall:'render',w
 special({kind:'shop',units:1,w:22,d:11,eaves:5.4,ridge:2.6,fg:12,wall:'brick',wc:[.9,.78,.7],roof:'slate',names:[{t:"JOE'S GARAGE",bg:'#c82020',fg:'#ffffff',col:[.6,.1,.1]}]},-100,0,1,0,-1);
 PLACED.push({x:-100,z:-11,rot:0,hw:15,hd:7.5});
 special({kind:'shop',units:1,w:26,d:12,eaves:6.4,ridge:3.4,fg:.6,wall:'render',wc:[.9,.9,1],roof:'tile',names:[{t:'STRIKE BOWL',bg:'#5a1a8a',fg:'#ffe040',col:[.3,.1,.5]}]},78,0,1,0,-1);
+special({kind:'shop',units:1,w:16,d:10,eaves:6,ridge:3,fg:.6,wall:'render',wc:[1.05,.78,.6],roof:'tile',fash:4,names:[{t:"RANI'S SILK HOUSE",bg:'#8a1a4a',fg:'#ffd24a',col:[.54,.1,.29]}]},198,0,1,0,1);
 special({kind:'shop',units:1,w:18,d:10,eaves:6,ridge:3,fg:.6,wall:'brick',wc:[1,.72,.55],roof:'tile',fash:1,names:[{t:"PENNY'S BARGAINS",bg:'#f8d010',fg:'#c01010',col:[.9,.75,.1]}]},-86,0,1,0,1);
 special({kind:'shop',units:1,w:20,d:10,eaves:6.2,ridge:3.2,fg:2.2,wall:'brick',wc:[.62,.74,.66],roof:'slate',fash:2,names:[{t:'HARRINGTON & CO',bg:'#0f3324',fg:'#e8c860',col:[.07,.2,.14]}]},-125,0,1,0,1);
 special({kind:'shop',units:1,w:24,d:11,eaves:6.8,ridge:1.2,fg:5.2,wall:'stone',wc:[1.7,1.65,1.52],roof:'slate',fash:3,names:[{t:"MAISON D'OR",bg:'#0a0a10',fg:'#f2c84a',col:[.05,.05,.07]}]},-150,0,1,0,1);
