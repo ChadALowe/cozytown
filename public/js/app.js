@@ -1677,7 +1677,8 @@ function mkPerson(sp,mat,parent){const w=sp.w,S=sp.sk,hr=sp.hr,tc=sp.tc,bc=sp.bc
  // legs
  const short=sp.sh||(ts===4&&0),skirt=ts===4,lg=y=>(short&&y<-.38)||(skirt&&y<-.35)?S:bc;
  const bs=sp.bs|0,ss=sp.ss|0,boot=(ss===1)&&!(short||skirt),scc=sp.sc||[.85,.85,.85];
- const legR=boot?[{y:.02,rx:.1*w,rz:.1,c:bc},{y:-.3,rx:.092*w,rz:.095,c:bc},{y:-.46,rx:.074*w,rz:.08,c:bc},{y:-.6,rx:.07*w,rz:.074,c:bc},{y:-.63,rx:.075*w,rz:.079,c:scc},{y:-.86,rx:.062*w,rz:.066,c:scc},{y:-.9,rx:.064*w,rz:.068,c:scc}]:[{y:.02,rx:.1*w,rz:.1,c:bc},{y:-.3,rx:.092*w,rz:.095,c:lg(-.3)},{y:-.46,rx:.074*w,rz:.08,c:lg(-.46)},{y:-.7,rx:.066*w,rz:.07,c:lg(-.7)},{y:-.86,rx:.054*w,rz:.058,c:lg(-.86)},{y:-.9,rx:.056*w,rz:.06,c:lg(-.9)}];
+ const legR0=boot?[{y:.02,rx:.1*w,rz:.1,c:bc},{y:-.3,rx:.092*w,rz:.095,c:bc},{y:-.46,rx:.074*w,rz:.08,c:bc},{y:-.6,rx:.07*w,rz:.074,c:bc},{y:-.63,rx:.075*w,rz:.079,c:scc},{y:-.86,rx:.062*w,rz:.066,c:scc},{y:-.9,rx:.064*w,rz:.068,c:scc}]:[{y:.02,rx:.1*w,rz:.1,c:bc},{y:-.3,rx:.092*w,rz:.095,c:lg(-.3)},{y:-.46,rx:.074*w,rz:.08,c:lg(-.46)},{y:-.7,rx:.066*w,rz:.07,c:lg(-.7)},{y:-.86,rx:.054*w,rz:.058,c:lg(-.86)},{y:-.9,rx:.056*w,rz:.06,c:lg(-.9)}];
+ const legR=(short||skirt)?(()=>{const hy=short?-.38:-.35,k=(hy+.3)/-.16,a=legR0[1],b=legR0[2],rx=a.rx+(b.rx-a.rx)*k,rz=a.rz+(b.rz-a.rz)*k;return[legR0[0],a,{y:hy,rx,rz,c:bc},{y:hy-.004,rx,rz,c:S},...legR0.slice(2)]})():legR0;
  const shoe=[{z:-.07,rx:.05,ry:.05,cy:.055},{z:.04,rx:.053,ry:.046,cy:.047},{z:.15,rx:.045,ry:.034,cy:.033},{z:.23,rx:.02,ry:.018,cy:.02}];
  const shoeF=[{z:-.07,rx:.044,ry:.04,cy:.05},{z:.05,rx:.046,ry:.036,cy:.042},{z:.17,rx:.04,ry:.028,cy:.03},{z:.27,rx:.016,ry:.016,cy:.02}],shoeC=[{z:-.08,rx:.056,ry:.062,cy:.062},{z:.04,rx:.06,ry:.058,cy:.058},{z:.16,rx:.052,ry:.045,cy:.045},{z:.25,rx:.03,ry:.03,cy:.03}];
  for(const[ix,Lb]of[[0,L1],[1,L2]]){const sd=ix?1:-1;lft(Lb,legR,6,false,true);
@@ -2785,7 +2786,7 @@ function buildThreads(o){const tier=CFSH[o.t]||'BUDGET',TM={BUDGET:{rail:0xb4b4b
  gbox(SG,RX-.12,0,-1.0,.06,2.1,1.3,0xe8e8f0);{const m=new THREE.Mesh(new THREE.PlaneGeometry(1.15,1.95),new THREE.MeshBasicMaterial({color:0xaac8dc}));m.position.set(RX-.16,1.02,-1.0);m.rotation.y=-Math.PI/2;SG.add(m)}
 
  if(tier==='BUDGET'){for(let i=0;i<9;i++)gbox(SG,-6.6+i*1.65,3.15,-RZ+.08,.9,.3,.02,i%2?0xd01818:0xf8e020);
-  for(const[bx,bz]of[[-1.4,3.1],[1.5,3.4]]){gbox(SG,bx,0,bz,1.4,.55,.9,0xc8a070);for(let j=0;j<7;j++)gbox(SG,bx-.55+j*.18,.55,bz+(j%2?.1:-.1),.16,.12,.34,fmcRGB(PTC[(j*2+bx*3|0)%12&11]||[.8,.2,.2]));IROOM.push([bx-.75,bx+.75,bz-.5,bz+.5])}
+  for(const[bx,bz]of[[-1.4,2.4],[3.5,2.2]]){gbox(SG,bx,0,bz,1.4,.55,.9,0xc8a070);for(let j=0;j<7;j++)gbox(SG,bx-.55+j*.18,.55,bz+(j%2?.1:-.1),.16,.12,.34,fmcRGB(PTC[(j*2+bx*3|0)%12&11]||[.8,.2,.2]));IROOM.push([bx-.75,bx+.75,bz-.5,bz+.5])}
   sPlane(2.2,.6,5.9,3.05,-RZ+.03,0,txtTex(256,72,'#d01010','#ffffff','SALE!  50% OFF',34));sPlane(2.2,.6,-5.9,3.05,-RZ+.03,0,txtTex(256,72,'#f8e020','#101010','BUY 2 GET 1 FREE',24))}
  else if(tier==='HIGH END'){gbox(SG,0,0,.6,5.6,.02,3.6,0x1c2c4a);gbox(SG,0,.02,.6,5.2,.01,3.2,0x28406a);
   for(const px of[-7,7]){gbox(SG,px,0,-3.2,.5,.5,.5,0x2a2a30);gbox(SG,px,.5,-3.2,.08,.8,.08,0x5a3a1a);gbox(SG,px,1.0,-3.2,.7,.7,.7,0x1a5a2a)}
@@ -2800,9 +2801,9 @@ for(const n of Object.keys(CFSH))CUSTB[n]={rx:7.4,fn:buildThreads};
 /* ---- browse / try on ---- */
 var BRW=null;
 function thIT(B){const L=cloItems()[B.si];return B.tier?L.filter(it=>it.t===B.tier):L}
-function thBrowse(si,tier){if(BRW||!SHOPCUR)return;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;document.body.classList.add('dz');P.speed=0;
+function thBrowse(si,tier){if(BRW||!SHOPCUR)return;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;document.body.classList.add('dz');P.speed=0;const mv0=man.visible;man.visible=false;
  const IT=cloItems()[si].filter(it=>!tier||it.t===tier);let cur=IT.findIndex(it=>it.has(CHR));if(cur<0)cur=0;
- BRW={si,tier,i:cur,x:THX[si],rot:0,drag:0,t:0,idle:0,dbl:null,last:performance.now(),raf:0};
+ BRW={mv:mv0,si,tier,i:cur,x:THX[si],rot:0,drag:0,t:0,idle:0,dbl:null,last:performance.now(),raf:0};
  const ov=document.createElement('div');ov.id='brov';ov.style.cssText='position:fixed;inset:0;z-index:60;touch-action:none;user-select:none;font:bold 13px ui-monospace,Menlo,monospace;color:#fff';
  ov.innerHTML='<style>#brov button{font:800 14px ui-monospace,monospace;border:3px solid #fff;border-radius:8px;box-shadow:3px 3px 0 #000;color:#fff;background:#1c4fa0;padding:10px 14px}#brov .ar{position:absolute;top:38%;width:54px;height:72px;font-size:26px;padding:0;background:rgba(20,26,60,.8)}#brp{position:absolute;left:0;right:0;bottom:0;background:rgba(10,14,32,.92);border-top:3px solid #fff;padding:8px 10px;text-align:center;padding-bottom:max(8px,env(safe-area-inset-bottom))}#brtr{display:flex;gap:6px;justify-content:center;margin-bottom:6px}#brtr button{padding:5px 9px;font-size:11px;box-shadow:2px 2px 0 #000;background:#223}#brn{font-size:17px;color:#ffe14a;letter-spacing:.06em}#brs{font-size:13px;margin:3px 0 8px;color:#cde}#brr{display:flex;gap:8px;justify-content:center}#brr button{flex:1;max-width:220px}#brt{position:absolute;left:0;right:0;top:10px;text-align:center;font-size:13px;text-shadow:2px 2px 0 #000;pointer-events:none}</style><div id="brt"></div><button class="ar" id="brL" style="left:8px">◀</button><button class="ar" id="brR" style="right:8px">▶</button><div id="brp"><div id="brtr"></div><div id="brn"></div><div id="brs"></div><div id="brr"><button id="brA" style="background:#1f8a3a">BUY</button><button id="brB" style="background:#7a2a2a">BACK</button></div></div>';
  document.body.appendChild(ov);BRW.ov=ov;
@@ -2828,7 +2829,7 @@ function thAct(){const B=BRW;if(!B)return;const it=thIT(B)[B.i];
  if(!cloOwn(it)){if(cash<it.p){toast('NOT ENOUGH CASH');beep(120,.2,'sawtooth',.08);return}cash-=it.p;CLOWN[it.id]=1;cloSave();toast('BOUGHT '+it.n+' -£'+it.p);beep(880,.1,'square',.06);setTimeout(()=>beep(1320,.14,'square',.06),90)}else{beep(700,.06,'square',.05)}
  cloWear(it);thShow()}
 function thLoop(now){const B=BRW;if(!B)return;const dt=Math.min(.05,(now-B.last)/1000);B.last=now;B.t+=dt;if(B.drag)B.idle=0;else{B.idle+=dt;if(B.idle>2)B.rot+=(Math.sin(B.t*.8)*.45-B.rot)*Math.min(1,dt*.8)}if(B.dbl)B.dbl.rotation.y=B.rot;B.raf=requestAnimationFrame(thLoop)}
-function thEnd(){const B=BRW;if(!B)return;cancelAnimationFrame(B.raf);removeEventListener('keydown',B.kd);B.ov.remove();if(B.dbl){SG.remove(B.dbl);B.dbl.traverse(o=>{if(o.geometry)o.geometry.dispose()})}DZ.fn=null;DZ.fov=46;DZ.on=0;DZ.exit=1;document.body.classList.remove('dz');busy=0;BRW=null}
+function thEnd(){const B=BRW;if(!B)return;cancelAnimationFrame(B.raf);removeEventListener('keydown',B.kd);B.ov.remove();if(B.dbl){SG.remove(B.dbl);B.dbl.traverse(o=>{if(o.geometry)o.geometry.dispose()})}DZ.fn=null;DZ.fov=46;DZ.on=0;DZ.exit=1;document.body.classList.remove('dz');man.visible=B.mv!==false;busy=0;BRW=null}
 /* ---- TABLE FOOTBALL in the pub (pub is deepened towards the door to make room) ---- */
 var FBS={w:0,l:0,n:0,g:0},FB=null,FBT=null,FG=null,FBBALL=null,FBSH=null;
 const FTX=-3.0,FTZ=4.4,FTY=.82,FFX=.6,FFZ=.34,FGZ=.11,FBR=.024;
