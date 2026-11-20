@@ -200,7 +200,9 @@ OFFICE.door=W2(0,OFFICE.d/2+1.4);OFFICE.psi=OFFICE.rot;
 /* AIRPORT ROAD: a new road north off the High Street, ending at the terminal forecourt, with a car park and a signpost */
 {const RDW=3.5,AX=OFFICE.cx,Z0=-6,Z1=OFFICE.cz+OFFICE.d/2+5-5.5,L=[new Builder(2),new Builder(2),new Builder(2),new Builder(2)],Bo=new Builder(3),q=(k,x0,z0,x1,z1,col,y)=>quadXZ(L[k],[x0,z0],[x1,z0],[x1,z1],[x0,z1],col,Y+y);
  ROADS.push({n:'AIRPORT ROAD',p:[[AX,Z0],[AX,Z1]]});{const a=[AX,Z0],b=[AX,Z1],l=Math.abs(Z1-Z0);SEG.push({ri:ROADS.length-1,a,b,l,dx:0,dz:-1})}
- q(0,AX-RDW-PW,Z1,AX+RDW+PW,Z0,[.52,.52,.5],.09);q(1,AX-RDW,Z1,AX+RDW,Z0,[.17,.17,.19],.13);
+ q(0,AX-RDW-PW,Z1,AX+RDW+PW,Z0,[.52,.52,.5],.09);q(1,AX-RDW,Z1,AX+RDW,-3.3,[.17,.17,.19],.13);
+ /* flared corners so it reads as a proper junction */
+ {const R=4.5,N=8,col=[.17,.17,.19];for(const sx of[-1,1]){const C=[AX+sx*RDW,-3.3],cx=AX+sx*(RDW+R),cz=-3.3-R;for(let i=0;i<N;i++){const t0=i/N*Math.PI/2,t1=(i+1)/N*Math.PI/2;let A=[cx-sx*R*Math.cos(t0),cz+R*Math.sin(t0)],B2=[cx-sx*R*Math.cos(t1),cz+R*Math.sin(t1)];const cr=(A[0]-C[0])*(B2[1]-A[1])-(A[1]-C[1])*(B2[0]-A[0]);if(cr<0){const t=A;A=B2;B2=t}quadXZ(L[1],C,A,B2,B2,col,Y+.13)}}}
  for(let z=Z0-4;z>Z1+2;z-=9)q(2,AX-.2,z-4.5,AX+.2,z,[.85,.82,.5],.17);
  for(const sx of[-1,1])q(2,AX+sx*(RDW-.25)-.1,Z1,AX+sx*(RDW-.25)+.1,Z0,[.9,.9,.88],.17);
  /* lamps down both sides */
@@ -214,7 +216,16 @@ OFFICE.door=W2(0,OFFICE.d/2+1.4);OFFICE.psi=OFFICE.rot;
  for(const sx of[-1,1]){const x=OFFICE.cx+sx*(OFFICE.w/2+4),z=OFFICE.cz+OFFICE.d/2+3;pcyl(Bo,x,Y,z,.14,9,6,[.8,.8,.84]);pbox(Bo,x+1.1,Y+8,z,2.2,1.3,.05,sx>0?[.1,.3,.7]:[.8,.1,.15],0)}
  const gr=new THREE.Group();scene.add(gr);L.forEach((b,k)=>{if(b.p.length)gr.add(b.mesh(k?lm(k):mRoad))});gr.add(Bo.mesh(mObj));
  /* signpost at the junction */
- {const sgn=new THREE.Mesh(new THREE.PlaneGeometry(6,1.9),new THREE.MeshBasicMaterial({map:txtTex(512,160,'#1c4a8a','#ffffff','✈ AIRPORT ↑',64),side:THREE.DoubleSide}));sgn.position.set(AX+RDW+PW+1.4,Y+3.6,-8.5);sgn.rotation.y=Math.PI;const pl=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,3.6,6),new THREE.MeshBasicMaterial({color:0x6a6e76}));pl.position.set(AX+RDW+PW+1.4,Y+1.8,-8.5);gr.add(sgn,pl)}
+ {const sgn=new THREE.Mesh(new THREE.PlaneGeometry(6,1.9),new THREE.MeshBasicMaterial({map:txtTex(512,160,'#1c4a8a','#ffffff','✈ AIRPORT ↑',64),side:THREE.DoubleSide}));sgn.position.set(AX-RDW-PW-1.8,Y+3.6,-8.5);sgn.rotation.y=0;const pl=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,3.6,6),new THREE.MeshBasicMaterial({color:0x6a6e76}));pl.position.set(AX-RDW-PW-1.8,Y+1.8,-8.5);gr.add(sgn,pl)}
+ /* painted road markings: AIRPORT with a direction arrow */
+ {const mk=(kind)=>{const t=cvx(256,256,(g,W,H)=>{g.clearRect(0,0,W,H);g.fillStyle='rgba(248,248,240,.96)';g.font='bold 56px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText('AIRPORT',W/2,34);
+   g.beginPath();if(kind==='L'){g.moveTo(150,252);g.lineTo(150,150);g.lineTo(84,150);g.lineTo(84,178);g.lineTo(20,136);g.lineTo(84,94);g.lineTo(84,122);g.lineTo(188,122);g.lineTo(188,252)}
+   else if(kind==='R'){g.moveTo(106,252);g.lineTo(106,150);g.lineTo(172,150);g.lineTo(172,178);g.lineTo(236,136);g.lineTo(172,94);g.lineTo(172,122);g.lineTo(68,122);g.lineTo(68,252)}
+   else{g.moveTo(100,252);g.lineTo(100,150);g.lineTo(58,150);g.lineTo(128,78);g.lineTo(198,150);g.lineTo(156,150);g.lineTo(156,252)}
+   g.closePath();g.fill()});return t},
+  put=(tex,x,z,th,w,h)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-8,polygonOffsetUnits:-8}));m.rotation.set(-Math.PI/2,0,th);m.position.set(x,Y+.3,z);m.renderOrder=3;gr.add(m)};
+  put(mk('S'),AX-1.75,-26,0,3,12);put(mk('S'),AX-1.75,-80,0,3,12);
+  put(mk('L'),AX-22,-1.75,-Math.PI/2,3,12);put(mk('R'),AX+22,1.75,Math.PI/2,3,12)}
  /* show it on the minimap too */
  try{const x=mb.getContext('2d');x.strokeStyle='#d8d8d0';x.lineCap='round';x.lineWidth=2.6;x.beginPath();x.moveTo(mx(AX),mz(Z0));x.lineTo(mx(AX),mz(Z1));x.stroke();x.fillStyle='#3a8a9a';x.fillRect(mx(OFFICE.cx)-OFFICE.w/2*MMS/SIZE,mz(OFFICE.cz)-OFFICE.d/2*MMS/SIZE,OFFICE.w*MMS/SIZE,OFFICE.d*MMS/SIZE)}catch(e){}}
 {const cone=new THREE.ConeGeometry(.34,.7,4);cone.rotateX(Math.PI);cone.translate(0,-.35,0);const stem=new THREE.BoxGeometry(.16,.5,.16);stem.translate(0,.25,0);const am=new THREE.MeshBasicMaterial({color:0x6aa8ff,fog:false}),ag=new THREE.Group();ag.add(new THREE.Mesh(cone,am),new THREE.Mesh(stem,am));ag.visible=false;scene.add(ag);

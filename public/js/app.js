@@ -331,16 +331,21 @@ function bld(cx,cz,rot,o){
  };
  /* FASHION SHOPS: 1 budget, 2 high end, 3 ultra luxury */
  const FPAL=[[.8,.2,.2],[.2,.4,.8],[.9,.8,.2],[.2,.6,.3],[.9,.5,.2],[.95,.95,.95],[.6,.3,.7],[.9,.5,.6],[.2,.7,.7],[.5,.5,.5],[.3,.2,.5],[.8,.3,.4]],fashFront=(ux,nm,uw,t)=>{const zf=d/2,dx=ux+uw*.3,p=(x,y,z,sx,sy,sz,c,B)=>pbox(B||K.o,...W(x,y,z),sx,sy,sz,c,rot),gold=[.86,.68,.22],brass=[.78,.6,.2],X0=ux-uw/2;
-  const win=(lx,y,w,h)=>{p(lx,y,zf+.12,w,h,.1,[.62,.82,.9],K.g)};
+  const GLT=()=>{if(window.__FGL)return window.__FGL;const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');g.fillStyle='rgba(170,210,235,.05)';g.fillRect(0,0,128,128);g.fillStyle='rgba(255,255,255,.16)';for(const[x0,wd]of[[10,14],[34,6],[78,22]]){g.beginPath();g.moveTo(x0+30,0);g.lineTo(x0+30+wd,0);g.lineTo(x0+wd,128);g.lineTo(x0,128);g.fill()}const tx=new THREE.CanvasTexture(c);return window.__FGL=tx};
+  /* a proper shop window: lit backdrop, riser, frame, a shallow display box and a pane of glass in front of everything */
+  const winBox=(cx,y,w,h,fc,riser,bg,flr)=>{const zo=zf+.74;p(cx,0,zf+.4,w+.34,y,.8,riser);p(cx,y,zf+.05,w,h,.05,bg,K.l);p(cx,y,zf+.38,w,.05,.66,flr);
+   p(cx,y-.08,zo,w+.34,.14,.22,fc);p(cx,y+h-.04,zo,w+.34,.16,.22,fc);p(cx-w/2-.08,y,zo,.14,h,.22,fc);p(cx+w/2+.08,y,zo,.14,h,.22,fc);
+   const gm=wmat([1,1,1],{vertexColors:false,transparent:true,depthWrite:false},GLT()),pl=new THREE.Mesh(new THREE.PlaneGeometry(w,h),gm),q=W(cx,y+h/2,zf+.72);pl.position.set(q[0],q[1],q[2]);pl.rotation.y=rot;pl.renderOrder=2;K.x.push(pl)};
+  const mann=(mx,y0,cc,sc,pc)=>{const z0=zf+.38;p(mx,y0,z0,.6*sc,.06,.6*sc,[.12,.1,.1]);p(mx,y0+.06,z0,.07,.8*sc,.07,pc||[.7,.55,.2]);p(mx,y0+.4*sc,z0,.34*sc,.7*sc,.2*sc,[.16,.16,.2]);p(mx,y0+.86*sc,z0,.4*sc,.62*sc,.22*sc,cc);p(mx,y0+1.46*sc,z0,.15*sc,.12*sc,.15*sc,[.9,.8,.7]);p(mx,y0+1.58*sc,z0,.2*sc,.24*sc,.2*sc,[.9,.82,.72]);p(mx+.27*sc,y0+.9*sc,z0,.08*sc,.55*sc,.1*sc,cc);p(mx-.27*sc,y0+.9*sc,z0,.08*sc,.55*sc,.1*sc,cc)};
   const topWin=()=>{frame(ux-uw*.14,4.35,d/2,1,1.3,1.2,0);frame(ux+uw*.3,4.35,d/2,1,1.1,1.2,0)};
   if(t===1){ /* BUDGET: bright yellow and red, striped awning, sale posters, rails on the pavement */
    door(dx,[.8,.14,.14],1.0);
    p(ux,3.0,zf+.3,uw-.2,1.15,.5,[.98,.82,.08]);p(ux,2.95,zf+.58,uw-.2,.08,.06,[.8,.1,.1]);p(ux,4.07,zf+.58,uw-.2,.08,.06,[.8,.1,.1]);
    {const f=W(ux,3.58,zf+.58);signPlane(K,nm.t,'#f8d010','#c01010',uw-.7,.95,f[0],f[1],f[2],rot,512,56)}
    for(let i=0;i<14;i++){const aw=(uw-.2)/14;p(X0+.1+aw*(i+.5),2.55,zf+.55,aw,.12,1.1,i%2?[.96,.96,.96]:[.82,.1,.1])}
-   win(ux-uw*.22,.45,uw*.4,1.95);
-   {const f=W(ux-uw*.22,1.4,zf+.2);signPlane(K,'SALE  50% OFF','#d01010','#ffffff',uw*.34,.8,f[0],f[1],f[2],rot,256,64)}
-   {const f=W(ux-uw*.22,.7,zf+.2);signPlane(K,'EVERYTHING MUST GO','#f8e020','#101010',uw*.34,.4,f[0],f[1],f[2],rot,512,48)}
+   {const cx=ux-uw*.22,ww=uw*.4;winBox(cx,.5,ww,1.78,[.8,.1,.1],[.55,.12,.1],[1,.95,.6],[.7,.62,.45]);p(cx,1.6,zf+.35,ww-.3,.04,.04,[.6,.6,.65]);for(let i=0;i<14;i++)p(cx-ww/2+.5+i*(ww-1)/13,1.0,zf+.35,.3,.72,.1,FPAL[(i*5+2)%12]);for(let k=0;k<3;k++)for(let j=0;j<4;j++)p(cx-ww/2+.7+k*.6,.56+j*.12,zf+.4,.5,.1,.4,FPAL[(k*4+j*3)%12]);mann(cx+ww/2-.8,.56,[.95,.8,.1],.75);mann(cx+ww/2-1.9,.56,[.82,.15,.15],.75,[.6,.6,.65])}
+   {const f=W(ux-uw*.22-1.0,2.1,zf+.12);signPlane(K,'SALE  50% OFF','#d01010','#ffffff',uw*.2,.5,f[0],f[1],f[2],rot,256,64)}
+   
    for(let k=0;k<2;k++){const rx=X0+1.2+k*2.2;p(rx-.9,0,zf+1.6,.05,1.5,.05,[.6,.6,.65]);p(rx+.9,0,zf+1.6,.05,1.5,.05,[.6,.6,.65]);p(rx,1.5,zf+1.6,1.85,.04,.04,[.7,.7,.75]);for(let i=0;i<6;i++){const cc=FPAL[(i*3+k*5)%12];p(rx-.7+i*.28,.7,zf+1.6,.2,.8,.08,cc)}}
    p(X0+uw*.45,0,zf+1.7,.9,1.05,.1,[.9,.8,.5]);{const f=W(X0+uw*.45,.62,zf+1.77);signPlane(K,'SALE','#c01010','#fff',.75,.55,f[0],f[1],f[2],rot,128,64)}
    for(let i=0;i<16;i++)p(X0+.4+(uw-.8)*i/15,3.95-Math.abs(Math.sin(i*.4))*.14,zf+1.0,.18,.24,.03,FPAL[(i*5)%12]);
@@ -351,8 +356,7 @@ function bld(cx,cz,rot,o){
    {const f=W(ux,3.55,zf+.55);signPlane(K,nm.t,'#0f3324','#e8c860',uw-.8,.95,f[0],f[1],f[2],rot,512,56)}
    for(let i=0;i<9;i++){const aw=(uw-.4)/9;p(X0+.2+aw*(i+.5),2.45,zf+.6,aw*.92,.1,1.1,i%2?[.1,.3,.2]:[.06,.2,.14]);p(X0+.2+aw*(i+.5),2.38,zf+1.12,aw*.92,.14,.06,brass)}
    const wx0=X0+.5,wx1=dx-1.1,wc=(wx0+wx1)/2,ww=wx1-wx0;
-   p(wc,.4,zf+.06,ww,2.05,.06,[.98,.9,.72],K.l);p(wc,.35,zf+.7,ww+.2,.08,.12,brass);p(wc,2.45,zf+.7,ww+.2,.08,.12,brass);p(wx0-.05,.35,zf+.7,.1,2.2,.12,brass);p(wx1+.05,.35,zf+.7,.1,2.2,.12,brass);p(wc,2.2,zf+.5,ww-.4,.05,.05,brass);
-   for(let m=0;m<3;m++){const mx=wx0+ww*(m+.5)/3,cc=[[.5,.1,.2],[.12,.2,.4],[.85,.8,.7]][m];p(mx,.4,zf+.4,.6,.1,.6,[.12,.1,.1]);p(mx,.5,zf+.4,.24,.8,.16,[.18,.18,.24]);p(mx,1.3,zf+.4,.38,.7,.22,cc);p(mx,2.0,zf+.4,.18,.22,.18,[.9,.82,.72]);p(mx+.25,1.35,zf+.4,.09,.55,.12,cc);p(mx-.25,1.35,zf+.4,.09,.55,.12,cc)}
+   winBox(wc,.5,ww,1.78,brass,[.05,.16,.11],[.98,.9,.72],[.35,.24,.14]);p(wc,2.1,zf+.36,ww-.6,.05,.05,brass);for(let m=0;m<3;m++){const mx=wx0+ww*(m+.5)/3;mann(mx,.56,[[.5,.1,.2],[.12,.2,.4],[.85,.8,.7]][m],.9);p(mx,2.0,zf+.35,.16,.12,.16,[1,.88,.5],K.l)}for(let k=0;k<2;k++)for(let j=0;j<3;j++)p(wx0+.5+k*.55,.56+j*.12,zf+.45,.5,.1,.4,[[.6,.1,.2],[.1,.2,.45],[.85,.8,.7]][(j+k)%3]);
    for(const sg of[-1,1]){const tx=dx+sg*1.5;p(tx,0,zf+.9,.45,.4,.45,[.2,.2,.24]);p(tx,.4,zf+.9,.08,.7,.08,[.35,.22,.1]);p(tx,1.0,zf+.9,.6,.6,.6,[.12,.4,.16]);p(dx+sg*.85,1.7,zf+.25,.14,.3,.14,[1,.88,.5],K.l)}
    p(dx,0,zf+.55,1.5,.08,1.0,[.35,.35,.38]);
    topWin()}
@@ -360,8 +364,7 @@ function bld(cx,cz,rot,o){
    p(ux,0,zf+1.7,uw+.4,.14,2.6,[.82,.8,.76]);p(ux,.14,zf+1.5,uw,.14,2.2,[.88,.86,.82]);
    p(ux,.2,zf+.08,uw-.6,3.0,.06,[.95,.82,.55],K.l);
    for(let i=0;i<7;i++)p(X0+.6+(uw-1.2)*i/6,.2,zf+.28,.1,3.0,.1,gold);
-   for(let m=0;m<6;m++){const mx=X0+2.2+m*((dx-1.6-X0-2.2)/5),dc=[[.85,.68,.2],[.05,.05,.08],[.6,.05,.12],[.9,.88,.84],[.85,.68,.2],[.12,.12,.4]][m];p(mx,.2,zf+.55,.7,.14,.7,[.1,.1,.12]);p(mx,.34,zf+.55,.1,.9,.1,[.7,.55,.2]);p(mx,1.0,zf+.55,.52,.9,.3,dc);p(mx,.55,zf+.55,.78,.55,.5,dc);p(mx,1.95,zf+.55,.2,.26,.2,[.9,.82,.72]);p(mx,2.3,zf+.55,.4,.08,.4,[.85,.68,.2])}
-   p(X0+uw*.3,.25,zf+.62,uw*.6,2.9,.04,[.62,.82,.9],K.g);
+   {const wx0=X0+1.0,wx1=dx-1.6,wc=(wx0+wx1)/2,ww=wx1-wx0;winBox(wc,.4,ww,2.68,gold,[.04,.04,.06],[.92,.78,.5],[.1,.1,.12]);for(let m=0;m<6;m++){const mx=wx0+ww*(m+.5)/6,dc=[[.85,.68,.2],[.05,.05,.08],[.6,.05,.12],[.9,.88,.84],[.85,.68,.2],[.12,.12,.4]][m];mann(mx,.46,dc,1.15);p(mx,2.95,zf+.35,.25,.1,.25,[1,.9,.6],K.l)}for(let i=1;i<6;i++)p(wx0+ww*i/6,.4,zf+.74,.06,2.8,.1,gold)}
    p(ux,3.3,zf+.45,uw,1.1,.9,[.05,.05,.07]);p(ux,3.22,zf+.92,uw,.08,.06,gold);p(ux,4.38,zf+.92,uw,.08,.06,gold);
    {const f=W(ux,3.85,zf+.93);signPlane(K,nm.t,'#0a0a10','#f2c84a',uw-1.8,.9,f[0],f[1],f[2],rot,640,56)}
    p(ux,4.45,zf+.2,uw+.6,.3,1.9,[.92,.9,.84]);p(ux,4.75,zf+.2,uw+.8,.12,2.1,gold);
