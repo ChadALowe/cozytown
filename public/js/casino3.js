@@ -12,6 +12,10 @@ const cy=(r,h,x,y,z,hex,par)=>{const g=new THREE.CylinderGeometry(r,r,h,14),n=g.
 const pl=(w,h,x,y,z,ry,m,par)=>{const o=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);o.position.set(x,y,z);o.rotation.y=ry;(par||G3).add(o);return o};
 const bas=m=>new THREE.MeshBasicMaterial({map:m,fog:false});
 const sp=(seed,o)=>pSpec(seed,Object.assign({ts:1,gl:false,scarf:null,bp:false,bag:0,old:false},o||{}));
+// a rounded, fully clothed bust for the pole dancers: two soft spheres in the dress colour, parented to the torso mesh
+const bust=(p,tc)=>{const hx=((tc[0]*255|0)<<16)|((tc[1]*255|0)<<8)|(tc[2]*255|0);
+ for(const sx of[-1,1]){const g=new THREE.SphereGeometry(.062,10,8),n=g.attributes.position.count;g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*3).fill(1),3));
+  const m=new THREE.Mesh(g,mat(hx));m.scale.set(1,1.05,.95);m.position.set(sx*.068,1.25,.1);p.up.add(m)}};
 const addP=(spec,x,z,ry,par,seated)=>{const p=personIn(spec,x,z,ry,seated);SG.remove(p);(par||G3).add(p);PPL.push(p);return p};
 
 /* ---------- the lounge room (built once) ---------- */
@@ -35,7 +39,7 @@ function buildLounge(){
 // pole stages: a pair of round gold-rimmed platforms flanking the stage, each with a floor-to-ceiling brass pole and a cabaret dancer
  [[-5.6,0],[5.6,1]].forEach(([x,i])=>{const z=-LZ+1.4;
   cy(.9,.3,x,0,z,0x2a1408);cy(.95,.06,x,.3,z,0xe8bf4a);cy(.04,LH-.3,x,.3,z,0xf0d060);cy(.16,.04,x,LH-.34,z,0xc99a2e);
-  const d=addP(sp(8250+i,{f:true,hs:i?13:9,ts:4,tc:i?[.1,.55,.45]:[.8,.15,.35],sk:PSK[i?2:0]}),x+.4,z,Math.PI,G3);d.position.y=.3;POLE.push({p:d,cx:x,cz:z,ph:i*Math.PI})});
+  const d=addP(sp(8250+i,{f:true,hs:i?13:9,ts:4,tc:i?[.1,.55,.45]:[.8,.15,.35],sk:PSK[i?2:0]}),x+.4,z,Math.PI,G3);d.position.y=.3;bust(d,i?[.1,.55,.45]:[.8,.15,.35]);POLE.push({p:d,cx:x,cz:z,ph:i*Math.PI})});
  // tables + candles + patrons
  const tbl=(x,z)=>{cy(.45,.05,x,.75,z,0x3a1a0a);cy(.05,.75,x,0,z,0xc99a2e);cy(.03,.12,x,.8,z,0xffe9a0)};
  [[-5.2,-1.2],[-5.2,1.6],[5.2,-1.2]].forEach(([x,z],i)=>{tbl(x,z);addP(sp(8300+i*3,{f:i===1,hs:i===0?19:i===1?9:18,ts:3,tc:[.1+.2*i,.1,.15],sk:PSK[i%3]}),x+.9,z,-Math.PI/2,G3);addP(sp(8301+i*3,{f:i!==1,hs:i===1?19:11,ts:4,tc:[.5,.1+.1*i,.3],sk:PSK[(i+1)%3]}),x-.9,z,Math.PI/2,G3)});
