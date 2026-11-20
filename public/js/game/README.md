@@ -24,6 +24,7 @@ behave exactly like the single file did.
 | 16-arcade | Neon Arcade and its games |
 | 17-main | civilian traffic, cash shop, audio, UI, main loop |
 | 18-corner-shop | Singh's corner shop: interior, Mr Singh, snacks and drinks menu |
+| 19-phone | the phone: messages, map, bank, stocks, camera + photos, jobs board and waypoints |
 
 ## Rules when editing
 
