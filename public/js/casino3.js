@@ -5,7 +5,7 @@
 const C=window.CG,PASS=100,X0=60,LX=7,LZ=6,LH=3.6;       // lounge half-width, half-depth, height; x offset inside SG
 const CC={pass:0};window.CC3=CC;
 const G3=new THREE.Group();G3.position.x=X0;G3.visible=false;
-const PPL=[],DANCE=[];let built=0,inLng=0,saved=null;
+const PPL=[],DANCE=[],POLE=[];let built=0,inLng=0,saved=null;
 const mat=h=>fmc(h);
 const bx=(x,y,z,w,h,d,hex,par)=>{const g=new THREE.BoxGeometry(w,h,d),col=new Float32Array(g.attributes.position.count*3),F=[.82,.7,1,.45,.9,.74];for(let f=0;f<6;f++)for(let v=0;v<4;v++){const i=(f*4+v)*3;col[i]=col[i+1]=col[i+2]=F[f]}g.setAttribute('color',new THREE.BufferAttribute(col,3));const m=new THREE.Mesh(g,mat(hex));m.position.set(x,y+h/2,z);(par||G3).add(m);return m};
 const cy=(r,h,x,y,z,hex,par)=>{const g=new THREE.CylinderGeometry(r,r,h,14),n=g.attributes.position.count,col=new Float32Array(n*3).fill(1);g.setAttribute('color',new THREE.BufferAttribute(col,3));const m=new THREE.Mesh(g,mat(hex));m.position.set(x,y+h/2,z);(par||G3).add(m);return m};
@@ -44,6 +44,10 @@ function buildLounge(){
  for(const p of PPL)p.position.y+=.35;
  // dance floor lights + Charleston troupe
  [[-1.6,-.4],[0,.2],[1.6,-.4]].forEach(([x,z],i)=>{const d=addP(sp(8200+i,{f:true,hs:i===1?13:9,ts:4,tc:[[.9,.75,.2],[.15,.15,.2],[.85,.2,.4]][i],sk:PSK[i]}),x,z,Math.PI,G3);DANCE.push({p:d,ph:i*1.1,x,z})});
+ // pole stages: a pair of round gold-rimmed platforms flanking the stage, each with a floor-to-ceiling brass pole and a cabaret dancer
+ [[-5.6,0],[5.6,1]].forEach(([x,i])=>{const z=-LZ+1.4;
+  cy(.9,.3,x,0,z,0x2a1408);cy(.95,.06,x,.3,z,0xe8bf4a);cy(.04,LH-.3,x,.3,z,0xf0d060);cy(.16,.04,x,LH-.34,z,0xc99a2e);
+  const d=addP(sp(8250+i,{f:true,hs:i?13:9,ts:4,tc:i?[.1,.55,.45]:[.8,.15,.35],sk:PSK[i?2:0]}),x+.4,z,Math.PI,G3);d.position.y=.3;POLE.push({p:d,cx:x,cz:z,ph:i*Math.PI})});
  // tables + candles + patrons
  const tbl=(x,z)=>{cy(.45,.05,x,.75,z,0x3a1a0a);cy(.05,.75,x,0,z,0xc99a2e);cy(.03,.12,x,.8,z,0xffe9a0)};
  [[-5.2,-1.2],[-5.2,1.6],[5.2,-1.2]].forEach(([x,z],i)=>{tbl(x,z);addP(sp(8300+i*3,{f:i===1,hs:i===0?19:i===1?9:18,ts:3,tc:[.1+.2*i,.1,.15],sk:PSK[i%3]}),x+.9,z,-Math.PI/2,G3);addP(sp(8301+i*3,{f:i!==1,hs:i===1?19:11,ts:4,tc:[.5,.1+.1*i,.3],sk:PSK[(i+1)%3]}),x-.9,z,Math.PI/2,G3)});
@@ -66,11 +70,12 @@ function inLounge(){return inLng}
 
 /* ---------- entering and leaving ---------- */
 function goLounge(){fade(()=>{saved={R:IROOM.slice(),A:IA.slice(),rx:RX,rz:RZ};if(!built)buildLounge();G3.visible=true;inLng=1;IX=3200+X0;RX=LX;RZ=LZ;
- IROOM.splice(0,IROOM.length,[-4.9,-1.8,-LZ,-LZ+2.4],[-1.5,1.5,-LZ,-LZ+2.5],[1.8,4.5,-LZ,-LZ+2.5],[-6.2,-4.2,-2.2,-.2],[-6.2,-4.2,.6,2.6],[4.2,6.2,-2.2,-.2],[LX-1.5,LX,1.5,5.1],[-LX,-LX+1.1,2.2,4.6],[-LX+1.0,-LX+3.2,2.5,4.3]);
+ IROOM.splice(0,IROOM.length,[-6.5,-4.7,-LZ+.5,-LZ+2.3],[4.7,6.5,-LZ+.5,-LZ+2.3],[-4.9,-1.8,-LZ,-LZ+2.4],[-1.5,1.5,-LZ,-LZ+2.5],[1.8,4.5,-LZ,-LZ+2.5],[-6.2,-4.2,-2.2,-.2],[-6.2,-4.2,.6,2.6],[4.2,6.2,-2.2,-.2],[LX-1.5,LX,1.5,5.1],[-LX,-LX+1.1,2.2,4.6],[-LX+1.0,-LX+3.2,2.5,4.3]);
  IA.splice(0,IA.length,{r:[-1.2,1.2,LZ-.5,LZ],label:'LEAVE THE LOUNGE',fn:leaveLounge},
   {r:[LX-3.2,LX-1.5,1.6,5.0],label:'ORDER A COCKTAIL (£10)',fn:()=>{if(cash>=10){cash-=10;cashUI();fed(14,24,'SIDECAR! FOOD +14 ENERGY +24 (£10)')}else toast('NOT ENOUGH CASH')}},
   {r:[-LX+.6,-LX+3.7,1.2,2.5],label:'HIGH STAKES TABLE',fn:()=>C.bjOpen(true)},
-  {r:[-2.6,2.6,-2.5,-1.2],label:'WATCH THE SHOW',fn:()=>toast(['THE CHARLESTON GIRLS KICK UP THEIR HEELS','THE BAND SWINGS INTO "THE GILDED CAGE BLUES"','BRAVO! THE SINGER BOWS'][Math.floor(Math.random()*3)])},
+  ...[[-5.6],[5.6]].map(([x])=>({r:[x-1.3,x+1.3,-LZ+2.3,-LZ+3.6],label:'TIP THE DANCER (£5)',fn:()=>{if(cash>=5){cash-=5;cashUI();beep(660,.08,'square',.05);toast(['THE DANCER SPINS AND WINKS','A GRACEFUL TWIRL ROUND THE POLE. BRAVO!','SHE TIPS HER FEATHERED HEADBAND TO YOU'][Math.floor(Math.random()*3)])}else toast('NOT ENOUGH CASH')}})),
+  {r:[-2.6,2.6,-2.5,-1.2],label:'WATCH THE SHOW',fn:()=>toast(['THE CHARLESTON GIRLS KICK UP THEIR HEELS','THE POLE DANCERS SPIN GRACEFULLY ON THEIR GOLD PLATFORMS','THE BAND SWINGS INTO "THE GILDED CAGE BLUES"','BRAVO! THE SINGER BOWS'][Math.floor(Math.random()*4)])},
   ...[[-5.2,-1.2],[-5.2,1.6],[5.2,-1.2]].map(([x,z])=>({r:[x-1.6,x+1.6,z-1.1,z+1.1],label:'TAKE A SEAT',fn:()=>{fed(0,6,'YOU RELAX WITH THE MUSIC. ENERGY +6')}})));
  P.x=IX;P.z=IZ+LZ-1.6;P.y=IY+.02;P.psi=Math.PI;P.speed=0;camAng=P.psi;toast('THE GILDED CAGE · MEMBERS ONLY');setLabels()})}
 function leaveLounge(){fade(()=>{inLng=0;G3.visible=false;IX=3200;if(saved){RX=saved.rx;RZ=saved.rz;IROOM.splice(0,IROOM.length,...saved.R);IA.splice(0,IA.length,...saved.A)}
@@ -108,6 +113,9 @@ function dressHall(){
 /* ---------- animation ---------- */
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(!inLng||!built)return;const t=performance.now()/1000;
  for(const d of DANCE){const p=d.p,s=Math.sin(t*5+d.ph);p.position.y=Math.abs(Math.sin(t*5+d.ph))*.06;p.rotation.y=Math.PI+Math.sin(t*2.5+d.ph)*.35;p.l1.rotation.x=s*.7;p.l2.rotation.x=-s*.7;p.a1.rotation.x=-1.4+s*.5;p.a2.rotation.x=-1.4-s*.5;p.position.x=d.x+Math.sin(t*1.2+d.ph)*.25}
+ for(const d of POLE){const p=d.p,a=t*1.3+d.ph,s=Math.sin(t*3+d.ph),hop=Math.max(0,Math.sin(t*.9+d.ph))**3;
+  p.position.x=d.cx+Math.cos(a)*.4;p.position.z=d.cz+Math.sin(a)*.4;p.position.y=.3+hop*.35;p.rotation.y=Math.PI-a+Math.PI/2;
+  p.a1.rotation.x=-2.9;p.a2.rotation.x=-1.6+s*.4;p.l1.rotation.x=s*.6-hop*.5;p.l2.rotation.x=-s*.6+hop*.4}
  if(PPL.sing){PPL.sing.a1.rotation.x=-1.2+Math.sin(t*3)*.15;PPL.sing.rotation.y=Math.PI+Math.sin(t*1.3)*.12}
  if(PPL.trum){PPL.trum.a1.rotation.x=-1.5+Math.sin(t*6)*.08;PPL.trum.a2.rotation.x=-1.5;PPL.trum.position.y=.35+Math.abs(Math.sin(t*3))*.02}
  if(PPL.bass){PPL.bass.a1.rotation.x=-.9+Math.sin(t*4)*.2;PPL.bass.a2.rotation.x=-.9+Math.cos(t*4)*.2}
