@@ -54,8 +54,15 @@ function subdiv(g,pred,lv){let pos=g.attributes.position.array,col=g.attributes.
   pos=new Float32Array(P);col=new Float32Array(C);uv=new Float32Array(U)}
  const ng=new THREE.BufferGeometry();ng.setAttribute('position',new THREE.BufferAttribute(pos,3));ng.setAttribute('color',new THREE.BufferAttribute(col,3));ng.setAttribute('uv',new THREE.BufferAttribute(uv,2));return ng}
 
+/* remove every triangle whose centre is below y (used to delete the hidden hem flare so torso and thighs are one clean surface) */
+function dropBelow(g,y){const pos=g.attributes.position.array,col=g.attributes.color.array,uv=g.attributes.uv.array,P=[],C=[],U=[];
+ for(let t=0;t<pos.length/9;t++){const cy=(pos[t*9+1]+pos[t*9+4]+pos[t*9+7])/3;if(cy<y)continue;for(let k=0;k<9;k++){P.push(pos[t*9+k]);C.push(col[t*9+k])}for(let k=0;k<6;k++)U.push(uv[t*6+k])}
+ const ng=new THREE.BufferGeometry();ng.setAttribute('position',new THREE.BufferAttribute(new Float32Array(P),3));ng.setAttribute('color',new THREE.BufferAttribute(new Float32Array(C),3));ng.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(U),2));return ng}
+
 /* push the surface of g out with a smooth gaussian bump: fn(x,y,z) -> [dx,dy,dz] */
 function sculpt(g,fn){const q=g.attributes.position;for(let i=0;i<q.count;i++){const d=fn(q.getX(i),q.getY(i),q.getZ(i));if(d){q.setXYZ(i,q.getX(i)+d[0],q.getY(i)+d[1],q.getZ(i)+d[2])}}q.needsUpdate=true}
+/* one cheek shape in the dancer's own space, used for BOTH torso and thighs so the two shells stay flush: returns backward push for a point at (x,y,z) */
+const cheek=(x,y,z)=>{if(z>=0||y<.6||y>1.05)return 0;const fx=Math.exp(-(((Math.abs(x)-.085)/.085)**2)*1.3),fy=Math.exp(-(((y-.84)/.095)**2)*1.3);return .075*fx*fy*Math.min(1,-z/.04)};
 const bump=(x,y,cx,cy,sx,sy)=>Math.exp(-(((x-cx)/sx)**2+((y-cy)/sy)**2)*1.3);
 
 const ring=(r,h,y,sz,hx,par)=>{const g=new THREE.CylinderGeometry(r,r,h,12,1,true);flat(g,g.attributes.position.count);const m=new THREE.Mesh(g,mat(hx));m.material.side=THREE.DoubleSide;m.scale.z=sz;m.position.y=y;par.add(m);return m};
@@ -74,8 +81,11 @@ function dress(p,o){const acc=o.acc,bc=acc,hx=hex(acc),F=.92; // one solid colou
  p.up.geometry=subdiv(p.up.geometry,cy=>cy>.8&&cy<1.45,2);
  sculpt(p.up.geometry,(x,y,z)=>{
   if(y>1.05&&y<1.42&&z>0){const f=Math.max(bump(x,y,.075,1.235,.062,.07),bump(x,y,-.075,1.235,.062,.07));if(f>.001)return[Math.sign(x)*.012*f,0,.085*f]}
-  if(y>.8&&y<1.08&&z<0){const f=Math.max(bump(x,y,.085,.91,.085,.1),bump(x,y,-.085,.91,.085,.1));if(f>.001)return[Math.sign(x)*.02*f,0,-.075*f]}
+  if(y>.8&&y<1.05){ // pelvis: slim the hem's depth to the thigh depth (no flat shelf), then add the shared cheek shape
+   const t=Math.max(0,Math.min(1,(.99-y)/.09)),k=.3*t*t*(3-2*t);
+   return[-x*k*.33,0,-z*k*(z<0?1:.6)-cheek(x,y,z)]}
   return null});
+ p.up.geometry=dropBelow(splitA(p.up.geometry,1,[.9]),.9);
  {let g=splitA(p.up.geometry,1,[.98,1.12,1.34,1.46]);g=splitA(g,0,[-.135,-.09,.09,.135]);p.up.geometry=g}
  recol(p.up,(cy,t,br,cx,cr,cg,cb,dy)=>{const k=F;
   if(cy>1.12&&cy<=1.34)return[acc[0]*k,acc[1]*k,acc[2]*k];
@@ -92,7 +102,7 @@ function dress(p,o){const acc=o.acc,bc=acc,hx=hex(acc),F=.92; // one solid colou
  // short shorts: cut the legs at the hem, shorts colour above it, skin below
  // short shorts (cut at the hem) + black high heels: recolour the shoe, tip the foot up onto its toes, add a stiletto heel
  const SHOE=[.07,.05,.07];
- for(const l of[p.l1,p.l2]){l.geometry=subdiv(l.geometry,cy=>cy>-.3,2);sculpt(l.geometry,(x,y,z)=>{if(y>-.3&&y<.05&&z<0){const f=bump(0,y,0,-.07,1,.1)*Math.min(1,-z/.05);return[0,0,-.055*f]}return null});
+ for(const l of[p.l1,p.l2]){l.geometry=subdiv(l.geometry,cy=>cy>-.3,2);sculpt(l.geometry,(x,y,z)=>{const c=cheek(x+l.position.x,y+l.position.y,z);return c?[0,0,-c]:null});
   l.geometry=splitA(l.geometry,1,[-.17,-.835]);
   recol(l,cy=>cy>-.17?[acc[0]*F,acc[1]*F,acc[2]*F]:cy>-.835?[sk[0]*.96,sk[1]*.96,sk[2]*.96]:SHOE);
   const lp=l.geometry.attributes.position,PH=-.35;
