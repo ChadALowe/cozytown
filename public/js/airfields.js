@@ -10,11 +10,11 @@ const HOME=registerMap({id:'home',city:'COZY VILLAGE',airfield:'COZY AIRFIELD',o
 const MARL=registerMap({id:'marlowe',city:'MARLOWE',airfield:'MARLOWE INTERNATIONAL',ox:2400,oz:-1500,reg:[-740,260,-560,1000],style:'city',welcome:'WELCOME TO MARLOWE'});
 const ROUTES={home:['marlowe'],marlowe:['home']},FARE=150,CAPN=20;
 /* ---------------------------------------------------------------- shared builders */
-const mk=m=>({m,Br:new Builder(2),Br2:new Builder(2),Br3:new Builder(2),Bo:new Builder(3),W:(u,v)=>[m.ox+u,m.oz+v]});
-const mLay=[1,2,3].map(k=>{return wmat(null,{polygonOffset:true,polygonOffsetFactor:-2-k*2,polygonOffsetUnits:-2-k*4},roadTex)});
-function flush(c){const g=new THREE.Group();if(c.Br.p.length)g.add(c.Br.mesh(mRoad));if(c.Br2.p.length)g.add(c.Br2.mesh(mLay[0]));if(c.Br3.p.length)g.add(c.Br3.mesh(mLay[1]));c.Br2=new Builder(2);c.Br3=new Builder(2);if(c.Bo.p.length)g.add(c.Bo.mesh(mObj));if(g.children.length)chunk(c.m,g);c.Br=new Builder(2);c.Bo=new Builder(3)}
-const qd=(c,u0,v0,u1,v1,col,y)=>{const W=c.W;quadXZ(y>.065?c.Br3:y>.045?c.Br2:c.Br,W(u0,v0),W(u1,v0),W(u1,v1),W(u0,v1),col,Y+y*3.2)};
-const qpoly=(c,pts,w,col,y)=>{const W=c.W;for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l*w/2,nz=(b[0]-a[0])/l*w/2;quadXZ(y>.065?c.Br3:y>.045?c.Br2:c.Br,W(a[0]-nx,a[1]-nz),W(a[0]+nx,a[1]+nz),W(b[0]+nx,b[1]+nz),W(b[0]-nx,b[1]-nz),col,Y+y*3.2)}};
+const mk=m=>({m,Br:new Builder(2),L:{},Bo:new Builder(3),W:(u,v)=>[m.ox+u,m.oz+v]});
+const mLay=[];const lyr=(c,y)=>{const k=y<=.035?0:y<=.045?1:y<=.055?2:y<=.065?3:y<=.075?4:5;if(!k)return c.Br;return c.L[k]||(c.L[k]=new Builder(2))};
+function flush(c){const g=new THREE.Group();if(c.Br.p.length)g.add(c.Br.mesh(mRoad));for(const k in c.L){if(!c.L[k].p.length)continue;const mt=mLay[k]||(mLay[k]=wmat(null,{polygonOffset:true,polygonOffsetFactor:-2-k*2,polygonOffsetUnits:-2-k*4},roadTex));g.add(c.L[k].mesh(mt))}c.L={};if(c.Bo.p.length)g.add(c.Bo.mesh(mObj));if(g.children.length)chunk(c.m,g);c.Br=new Builder(2);c.Bo=new Builder(3)}
+const qd=(c,u0,v0,u1,v1,col,y)=>{const W=c.W;quadXZ(lyr(c,y),W(u0,v0),W(u1,v0),W(u1,v1),W(u0,v1),col,Y+y*3.2)};
+const qpoly=(c,pts,w,col,y)=>{const W=c.W;for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l*w/2,nz=(b[0]-a[0])/l*w/2;quadXZ(lyr(c,y),W(a[0]-nx,a[1]-nz),W(a[0]+nx,a[1]+nz),W(b[0]+nx,b[1]+nz),W(b[0]-nx,b[1]-nz),col,Y+y*3.2)}};
 const pb=(c,u,y,v,sx,sy,sz,col,rot)=>{const p=c.W(u,v);pbox(c.Bo,p[0],Y+y,p[1],sx,sy,sz,col,rot||0)};
 const pc=(c,u,y,v,r,h,sg,col)=>{const p=c.W(u,v);pcyl(c.Bo,p[0],Y+y,p[1],r,h,sg,col)};
 const pn=(c,u,y,v,r,h,sg,col)=>{const p=c.W(u,v);pcone(c.Bo,p[0],Y+y,p[1],r,h,sg,col,0)};
@@ -103,13 +103,15 @@ function* city(m,c){OFS=[m.ox,m.oz];const W=c.W,mats=[0,1,2,3,4].map(k=>wmt(winT
  /* plaza in front of the terminal + kiosk + fountain */
  qd(c,-215,-282,-164,-120,[.66,.64,.6],.06);qd(c,-212,-278,-168,-124,[.72,.7,.65],.07);
  pc(c,-190,0,-200,6,.7,24,[.58,.58,.6]);pc(c,-190,.7,-200,5.3,.15,24,[.2,.5,.7]);pc(c,-190,.7,-200,.7,3.4,10,[.75,.75,.78]);pc(c,-190,3.5,-200,1.6,.5,12,[.5,.74,.9]);
- pb(c,-182,0,-236,6,3.2,3.2,[.14,.2,.34]);pb(c,-182,3.2,-236,6.6,.35,3.6,[.9,.7,.1]);pb(c,-182,0,-165,6,3.2,3.2,[.7,.2,.18]);pb(c,-182,3.2,-165,6.6,.35,3.6,[.95,.95,.92]);
- for(let k=0;k<6;k++){pc(c,-170,0,-272+k*30,.12,5.6,6,[.3,.3,.34]);pb(c,-170,5.5,-272+k*30,.5,.3,.5,[1,.95,.7])}
+  for(let k=0;k<6;k++){pc(c,-170,0,-272+k*30,.12,5.6,6,[.3,.3,.34]);pb(c,-170,5.5,-272+k*30,.5,.3,.5,[1,.95,.7])}
  for(let k=0;k<8;k++){const z=-270+k*20;pc(c,-208,0,z,.3,2.6,6,[.4,.28,.18]);pn(c,-208,2.2,z,1.8,2.8,7,[.18,.5,.22])}
- col_(m,-182,-236,6,3.2);col_(m,-182,-165,6,3.2);col_(m,-190,-200,12,12);
+ col_(m,-190,-200,12,12);
  flush(c);
- const k1=sign(m,'MARLOWE MARKET','#7a1a22','#ffe9a8',-182,4.7,-165+1.9,6,1,0,512,86,40);const k2=sign(m,'AIRPORT CHECK-IN','#14223a','#ffd24a',-182,4.7,-236+1.9,6,1,0,512,86,36);const kg=new THREE.Group();kg.add(k1,k2);
- const sk=sign(m,'WELCOME TO MARLOWE','#101a2a','#e8d890',-190,6.5,-120,16,2,0,1024,128,56);kg.add(sk);chunk(m,kg);yield;
+ pb(c,-162.3,0,-200,.5,3.6,5.2,[.08,.12,.18]);pb(c,-162.2,0,-202.9,.6,3.8,.5,[.85,.7,.2]);pb(c,-162.2,0,-197.1,.6,3.8,.5,[.85,.7,.2]);pb(c,-162.2,3.6,-200,.6,.5,6.4,[.85,.7,.2]);pb(c,-166.4,4.1,-200,9,.4,12,[.2,.3,.5]);for(const sv of[-1,1])pc(c,-170.6,0,-200+sv*5.4,.25,4.1,8,[.85,.85,.88]);
+ pb(c,-163.2,0,-200,2.8,.06,5.6,[.5,.18,.2]);
+ const kg=new THREE.Group();kg.add(sign(m,'ARRIVALS  ·  CHECK-IN  ·  SHOPS','#14223a','#ffd24a',-171.05,4.3,-200,8,.8,-Math.PI/2,768,76,34));
+ 
+ const sk=sign(m,'WELCOME TO MARLOWE','#101a2a','#e8d890',-190,6.5,-120,16,2,0,1024,128,56);kg.add(sk);chunk(m,kg);flush(c);yield;
  /* the skyline and blocks */
  const cxn=-440,czn=560;let nb=0,bs=[0,1,2,3,4].map(MB),roof=MB(),colTally=0;
  const flushB=()=>{const g=new THREE.Group();bs.forEach((b,k)=>{if(b.n)g.add(bmesh(b,mats[k]))});if(roof.n)g.add(bmesh(roof,roofM));if(g.children.length)chunk(m,g);bs=[0,1,2,3,4].map(MB);roof=MB()};
@@ -140,7 +142,8 @@ function* city(m,c){OFS=[m.ox,m.oz];const W=c.W,mats=[0,1,2,3,4].map(k=>wmt(winT
 /* ---------------------------------------------------------------- arrival hooks (where the player is put when a flight ends) */
 HOME.gen=airfield;MARL.gen=airfield;
 HOME.arrive=function(){const D=OFFICE.door;GS.inside=0;if(window.inG)inG.visible=false;P.x=D[0];P.z=D[1];P.y=gH(P.x,P.z)+.02;P.psi=OFFICE.psi;P.speed=0;GS.onFoot=1;man.visible=true;camAng=P.psi;AP.at='home'};
-MARL.arrive=function(){const a=Wc(MARL,-186,-200);GS.inside=0;P.x=a[0];P.z=a[1]+.0;P.y=gH(P.x,P.z)+.02;P.psi=-Math.PI/2;P.speed=0;GS.onFoot=1;man.visible=true;camAng=P.psi;AP.at='marlowe'};
+const MTERM={x:MARL.ox-163.8,z:MARL.oz-200,psi:-Math.PI/2,t:'MARLOWE AIRPORT',bg:'#14223a',fg:'#ffd24a',apt:2,rx:12.5,rz:6,sz:3.4};
+MARL.arrive=function(){AP.at='marlowe';GS.inside=0;GS.onFoot=1;man.visible=true;P.x=MTERM.x;P.z=MTERM.z;P.y=G0;P.speed=0;SHOPCUR={o:MTERM,k:[]};enterShop(MTERM,true);toast('WELCOME TO MARLOWE')};
 /* region activation follows the player (also covers loading a save made abroad) */
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(CIN.on)return;const p=GS.onFoot?P:GS,m=mapAt(p.x,p.z);for(const k in MAPS){const q=MAPS[k];if(m===q&&!q.built){pump(q,6)}if(q.built&&q.active!==(m===q?1:0))setActive(q,m===q?1:0)}A.warmTick()}}
 /* ---------------------------------------------------------------- goods trade */
@@ -188,28 +191,46 @@ OFFICE.door=W2(0,OFFICE.d/2+1.4);OFFICE.psi=OFFICE.rot;
  const sg=(t,bg,fg,wd,ht,lx,y,lz,pw,ph,sz)=>{const p=W2(lx,lz),m=new THREE.Mesh(new THREE.PlaneGeometry(wd,ht),new THREE.MeshBasicMaterial({map:txtTex(pw,ph,bg,fg,t,sz),side:THREE.DoubleSide}));m.position.set(p[0],Y+y,p[1]);m.rotation.y=OFFICE.rot;gr.add(m)};
  sg('COZY AIRWAYS','#10244a','#ffd24a',w-3,1.5,0,h-.4,d/2+.47,768,84,40);sg('FLIGHTS  ·  CHECK-IN  ·  DUTY FREE','#a8141c','#ffffff',8.6,.7,0,h+1.15,d/2+.5,512,38,22);
  perimCol(OFFICE.cx,OFFICE.cz,OFFICE.rot,w/2,d/2,.5,1.2);OBS.push({x:OFFICE.cx,z:OFFICE.cz,c:1,s:0,hw:w/2,hd:d/2});BLD.push({x:OFFICE.cx,z:OFFICE.cz,rot:OFFICE.rot,w,d,k:'airport',n:1});
- SHOPD.push({x:OFFICE.door[0],z:OFFICE.door[1],psi:OFFICE.rot,t:'COZY AIRWAYS',bg:'#10244a',fg:'#ffd24a',apt:1,rx:6.8,rz:5.2,sz:3.0});Object.assign(HRS,{'COZY AIRWAYS':[6,22]});
- const sl0=shopLabel;shopLabel=function(o){return o&&o.apt?(shopOpen(o).open?'ENTER AIRPORT OFFICE':sl0(o)):sl0(o)};
+ SHOPD.push({x:OFFICE.door[0],z:OFFICE.door[1],psi:OFFICE.rot,t:'COZY AIRWAYS',bg:'#10244a',fg:'#ffd24a',apt:1,rx:12.5,rz:6,sz:3.4});Object.assign(HRS,{'COZY AIRWAYS':[6,22]});
  const cone=new THREE.ConeGeometry(.34,.7,4);cone.rotateX(Math.PI);cone.translate(0,-.35,0);const stem=new THREE.BoxGeometry(.16,.5,.16);stem.translate(0,.25,0);const am=new THREE.MeshBasicMaterial({color:0x6aa8ff,fog:false}),ag=new THREE.Group();ag.add(new THREE.Mesh(cone,am),new THREE.Mesh(stem,am));ag.visible=false;scene.add(ag);
  const u0=updCozy;updCozy=function(dt){u0(dt);const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z,dist=Math.hypot(OFFICE.door[0]-px,OFFICE.door[1]-pz),t=performance.now()/1000;ag.visible=!CIN.on&&!GS.inside&&dist<38&&!menuOpen&&Math.abs(px)<1000;if(ag.visible){ag.position.set(OFFICE.door[0],G0+2.6+Math.sin(t*3.2)*.18,OFFICE.door[1]);ag.rotation.y=t*1.2;ag.scale.setScalar(Math.max(.7,Math.min(1.3,dist/14)))}}}
+{const cone=new THREE.ConeGeometry(.34,.7,4);cone.rotateX(Math.PI);cone.translate(0,-.35,0);const stem=new THREE.BoxGeometry(.16,.5,.16);stem.translate(0,.25,0);const am=new THREE.MeshBasicMaterial({color:0x6aa8ff,fog:false}),ag=new THREE.Group();ag.add(new THREE.Mesh(cone,am),new THREE.Mesh(stem,am));ag.visible=false;scene.add(ag);
+ const u0=updCozy;updCozy=function(dt){u0(dt);const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z,dist=Math.hypot(MTERM.x-px,MTERM.z-pz),t=performance.now()/1000;ag.visible=!CIN.on&&!GS.inside&&dist<45&&!menuOpen&&MARL.built&&MARL.active;if(ag.visible){ag.position.set(MTERM.x,gH(MTERM.x,MTERM.z)+2.6+Math.sin(t*3.2)*.18,MTERM.z);ag.rotation.y=t*1.2;ag.scale.setScalar(Math.max(.7,Math.min(1.3,dist/14)))}}}
+SHOPD.push(MTERM);
+const sl0=shopLabel;shopLabel=function(o){return o&&o.apt?(shopOpen(o).open?(o.apt===2?'ENTER AIRPORT TERMINAL':'ENTER AIRPORT OFFICE'):sl0(o)):sl0(o)};
+Object.assign(HRS,{'MARLOWE AIRPORT':[0,24]});
 {const b0=buildShop;buildShop=function(o){if(!o||!o.apt)return b0(o);
- while(SG.children.length)SG.remove(SG.children[0]);RX=o.rx;RZ=o.rz;SHK=null;const B=(x,y,z,w2,h2,d2,hex)=>sbox(x,y,z,w2,h2,d2,fmc(hex)),Hh=IH+.9;
+ while(SG.children.length)SG.remove(SG.children[0]);RX=o.rx;RZ=o.rz;SHK=null;const M2=o.apt===2,PX=2.8,B=(x,y,z,w2,h2,d2,hex)=>sbox(x,y,z,w2,h2,d2,fmc(hex)),Hh=IH+.9,MB_=c=>new THREE.MeshBasicMaterial({map:c,side:THREE.DoubleSide});
  SG.add(new THREE.Mesh(new THREE.PlaneGeometry(2*RX,2*RZ).rotateX(-Math.PI/2),imat(FLR.tile())));
- const wm=tx=>{const m=imat(tx);m.color.setHex(0x2a4466);return m};
+ const wc=M2?0x1f4a52:0x2a4466,wm=tx=>{const m=imat(tx);m.color.setHex(wc);return m};
  splane(2*RX,Hh,0,Hh/2,-RZ,0,wm(sWl));splane(2*RX,Hh,0,Hh/2,RZ,Math.PI,wm(sWl));splane(2*RZ,Hh,RX,Hh/2,0,-Math.PI/2,wm(sWl2));splane(2*RZ,Hh,-RX,Hh/2,0,Math.PI/2,wm(sWl2));
  const vd=new THREE.Mesh(new THREE.BoxGeometry(90,70,90),new THREE.MeshBasicMaterial({color:0x0c1420,side:THREE.BackSide,fog:false}));vd.position.y=Hh/2;SG.add(vd);splane(1.1,2.2,0,1.1,RZ-.02,Math.PI,imat(T_FDOOR));
- /* departures board + world map */
- splane(5.4,1.9,0,2.0,-RZ+.03,0,new THREE.MeshBasicMaterial({map:cvx(768,270,(g,W,H)=>{g.fillStyle='#050a14';g.fillRect(0,0,W,H);g.strokeStyle='#6aa8ff';g.lineWidth=5;g.strokeRect(4,4,W-8,H-8);g.fillStyle='#ffd24a';g.font='bold 30px monospace';g.fillText('DEPARTURES',24,48);g.font='bold 24px monospace';g.fillStyle='#fff';g.fillText('CA101   MARLOWE   GATE 1   ON TIME',24,110);g.fillStyle='#9fe';g.fillText('CA102   MARLOWE   GATE 1   BOARDING',24,160);g.fillStyle='#667';g.fillText('CA201   ...      GATE 2   COMING SOON',24,210)}),side:THREE.DoubleSide}));
- splane(3.2,1.8,-RX+.03,1.9,-1.5,Math.PI/2,new THREE.MeshBasicMaterial({map:cvx(300,170,(g,W,H)=>{g.fillStyle='#17304e';g.fillRect(0,0,W,H);g.fillStyle='#3e7a4a';for(const[x,y,r]of[[70,60,30],[140,100,24],[210,60,34],[250,120,14]]){g.beginPath();g.arc(x,y,r,0,6.3);g.fill()}g.strokeStyle='#ffd24a';g.setLineDash([6,5]);g.lineWidth=3;g.beginPath();g.moveTo(80,70);g.quadraticCurveTo(150,10,215,62);g.stroke();g.fillStyle='#fff';g.font='bold 14px monospace';g.fillText('COZY AIRWAYS NETWORK',40,155)}),side:THREE.DoubleSide}));
+ /* departures / arrivals board + world map */
+ const dest=M2?'COZY VILLAGE':'MARLOWE',hd=M2?'ARRIVALS  ·  DEPARTURES':'DEPARTURES';
+ splane(5.4,1.9,0,2.0,-RZ+.03,0,MB_(cvx(768,270,(g,W,H)=>{g.fillStyle='#050a14';g.fillRect(0,0,W,H);g.strokeStyle='#6aa8ff';g.lineWidth=5;g.strokeRect(4,4,W-8,H-8);g.fillStyle='#ffd24a';g.font='bold 30px monospace';g.fillText(hd,24,48);g.font='bold 24px monospace';g.fillStyle='#fff';g.fillText('CA101   '+dest+'   GATE 1   ON TIME',24,110);g.fillStyle='#9fe';g.fillText('CA102   '+dest+'   GATE 1   BOARDING',24,160);g.fillStyle='#667';g.fillText('CA201   ...      GATE 2   COMING SOON',24,210)})));
+ splane(3.2,1.8,-RX+.03,1.9,-1.5,Math.PI/2,MB_(cvx(300,170,(g,W,H)=>{g.fillStyle='#17304e';g.fillRect(0,0,W,H);g.fillStyle='#3e7a4a';for(const[x,y,r]of[[70,60,30],[140,100,24],[210,60,34],[250,120,14]]){g.beginPath();g.arc(x,y,r,0,6.3);g.fill()}g.strokeStyle='#ffd24a';g.setLineDash([6,5]);g.lineWidth=3;g.beginPath();g.moveTo(80,70);g.quadraticCurveTo(150,10,215,62);g.stroke();g.fillStyle='#fff';g.font='bold 14px monospace';g.fillText('COZY AIRWAYS NETWORK',40,155)})));
+ /* check-in desk + clerk */
  B(0,0,-RZ+2.4,5.2,1.0,.8,0x10244a);B(0,1.0,-RZ+2.4,5.3,.07,.9,0xd8c890);B(-1.3,1.07,-RZ+2.4,.6,.4,.05,0x202228);B(1.3,1.07,-RZ+2.4,.6,.4,.05,0x202228);
  const cl=personIn(pSpec(9217,{f:true,hs:2,ts:1,gl:false,scarf:[.1,.2,.5],bp:false,bag:0,old:false,tc:[.1,.2,.45],sk:PSK[1]}),0,-RZ+1.6,0);SG.add(cl);
- B(-RX+1.0,0,2.6,1.0,.45,2.6,0x1c3a6a);B(-RX+.55,.45,2.6,.3,.5,2.6,0x1c3a6a);B(RX-1.0,0,2.6,1.0,.45,2.6,0x1c3a6a);B(RX-.55,.45,2.6,.3,.5,2.6,0x1c3a6a);
- B(RX-.9,0,-1.6,1.2,.9,2.6,0x7a1a22);B(RX-.9,.9,-1.6,1.3,.07,2.7,0xd8c890);
- IROOM.splice(0,IROOM.length,[-RX-1,RX+1,-RZ-1,-RZ+.9],[-2.8,2.8,-RZ+1.9,-RZ+2.8],[-RX,-RX+1.2,1.2,4],[RX-1.2,RX,1.2,4],[RX-1.4,RX,-3,-.2]);
- SHOPCUR={o:o,k:['AGENT',"Welcome to Cozy Airways. Marlowe is only a flight away."]};
- IA.splice(0,IA.length,{r:[-2.6,2.6,-RZ+2.8,-RZ+3.8],label:'BOOK A FLIGHT',fn:()=>open(0)},{r:[RX-2.8,RX-.9,-1.4,1.2],label:'DUTY FREE & TRADE',fn:()=>open(1)},{r:[-1.0,1.0,RZ-.3,RZ],label:'LEAVE',fn:()=>leaveShop()});
+ /* waiting benches */
+ for(const[bx,bz]of[[-RX+1.0,2.6],[-RX+1.0,-4.0],[-6.5,-2.6],[-6.5,2.6]]){const L=bx<-RX+2;B(bx,0,bz,L?1.0:3.0,.45,L?2.6:.9,0x1c3a6a);if(L)B(bx-.45,.45,bz,.3,.5,2.6,0x1c3a6a);else B(bx,.45,bz+(bz>0?.4:-.4),3.0,.5,.2,0x1c3a6a)}
+ /* the doorway into the shop (no door) */
+ const hw=1.6,sh=Hh-2.4;B(PX,0,-(RZ+hw)/2,.3,Hh,RZ-hw,0x2f5a8a);B(PX,0,(RZ+hw)/2,.3,Hh,RZ-hw,0x2f5a8a);B(PX,2.4,0,.3,sh,2*hw,0x2f5a8a);
+ for(const sd of[-1,1])B(PX,0,sd*hw,.4,2.4,.14,0xd8b040);B(PX,2.36,0,.4,.1,2*hw+.14,0xd8b040);
+ splane(3.6,.56,PX-.18,Hh-.3,0,-Math.PI/2,MB_(cvx(512,80,(g,W,H)=>{g.fillStyle='#7a1a22';g.fillRect(0,0,W,H);g.strokeStyle='#ffd24a';g.lineWidth=5;g.strokeRect(5,5,W-10,H-10);g.fillStyle='#ffe9a8';g.font='bold 44px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText('DUTY FREE SHOP',W/2,H/2+2)})));
+ splane(3.6,.56,PX+.18,Hh-.3,0,Math.PI/2,MB_(cvx(512,80,(g,W,H)=>{g.fillStyle='#1c3a6a';g.fillRect(0,0,W,H);g.fillStyle='#fff';g.font='bold 40px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText('← TERMINAL',W/2,H/2+2)})));
+ /* the little shop */
+ {const cp=new THREE.Mesh(new THREE.PlaneGeometry(RX-PX-.2,2*RZ-.1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x6b2f38}));cp.position.set((PX+RX)/2+.1,.012,0);SG.add(cp);
+  const gc={cheese:0xe8c050,ale:0x6a3a1a,honey:0xe09a20,coffee:0x2a1a12,choc:0x5a3220,watch:0xbfc4cc},gk=Object.keys(gc);let q=0;
+  const shelf=(x,z,alongZ)=>{const w2=alongZ?.7:1.9,d2=alongZ?1.9:.7;B(x,0,z,w2,2.0,d2,0x5a3a24);for(let lv=0;lv<3;lv++)for(let k=0;k<3;k++){const c=gc[gk[q++%6]],gx=alongZ?x-.42:x-.6+k*.6,gz=alongZ?z-.6+k*.6:z+.42;B(gx,.22+lv*.6,gz,.3,.34,.3,c)}};
+  for(const z of[-4.6,-2.4,2.4,4.6])shelf(RX-.5,z,1);for(const x of[PX+2.4,PX+4.6,PX+6.8])shelf(x,-RZ+.5,0);
+  B(RX-3.6,0,0,1.0,1.0,8,0x7a1a22);B(RX-3.6,1.0,0,1.15,.07,8.15,0xd8c890);B(RX-3.7,1.07,1.2,.5,.4,.05,0x202228);
+  const kp=personIn(pSpec(9305,{f:false,hs:1,ts:2,gl:false,scarf:[.7,.2,.2],bp:false,bag:0,old:false,tc:[.55,.12,.16],sk:PSK[0]}),RX-2.2,0,-Math.PI/2);SG.add(kp);
+  splane(7,.7,RX-.04,2.9,0,-Math.PI/2,MB_(cvx(768,80,(g,W,H)=>{g.fillStyle='#14223a';g.fillRect(0,0,W,H);g.fillStyle='#ffd24a';g.font='bold 46px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText('DUTY FREE  ·  LOCAL GOODS',W/2,H/2+2)})))}
+ IROOM.splice(0,IROOM.length,[-RX-1,RX+1,-RZ-1,-RZ+.9],[-2.8,2.8,-RZ+1.9,-RZ+2.8],[-RX,-RX+1.2,1.2,4],[-RX,-RX+1.2,-5.4,-2.6],[-8,-5,-3.1,-2.1],[-8,-5,2.1,3.1],
+  [PX-.2,PX+.2,-RZ-1,-hw],[PX-.2,PX+.2,hw,RZ+1],[RX-4.2,RX-3.0,-4.1,4.1],[RX-4.2,RX-.9,4.1,RZ+1],[RX-4.2,RX-.9,-RZ-1,-4.1],[RX-1.2,RX,-RZ,RZ],[PX+1.2,RX-1.3,-RZ,-RZ+1.6]);
+ SHOPCUR={o:o,k:['AGENT',M2?"Welcome to Marlowe. Check in here for the flight home, or browse the shop.":"Welcome to Cozy Airways. Marlowe is only a flight away."]};
+ IA.splice(0,IA.length,{r:[-2.6,2.6,-RZ+2.8,-RZ+3.8],label:'BOOK A FLIGHT',fn:()=>open(0)},{r:[RX-6.0,RX-4.3,-2.8,2.8],label:'DUTY FREE & TRADE',fn:()=>open(1)},{r:[-1.0,1.0,RZ-.3,RZ],label:'LEAVE',fn:()=>leaveShop()});
  try{addVisitors(o)}catch(e){}}}
-/* the plaza kiosks in Marlowe */
-{const c0=ctx;ctx=function(){if(!CIN.on&&GS.onFoot&&!GS.inside&&MARL.built){const a=Wc(MARL,-182,-236),b=Wc(MARL,-182,-165);if(Math.hypot(P.x-a[0],P.z-a[1]-2.4)<4.5)return{label:'AIRPORT CHECK-IN',fn:()=>open(0)};if(Math.hypot(P.x-b[0],P.z-b[1]-2.4)<4.5)return{label:'MARLOWE MARKET',fn:()=>open(1)}}return c0()}}
 window.AIRFIELDS={HOME,MARL,open,close,begin,OFFICE,GOODS,ROUTES};
 })();
