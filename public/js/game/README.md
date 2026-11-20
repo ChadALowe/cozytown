@@ -16,13 +16,14 @@ behave exactly like the single file did.
 | 08-farm-pub | farm, food and energy, darts, zoom, bottle caps, herding, milking |
 | 09-pub-games | fruit machine, scratch cards, pool |
 | 10-garage-bowling | showroom, Joe's garage, spray booth, bowling |
-| 11-clothing | character customiser, clothing shops, try-on |
+| 11-clothing | character customiser, clothing shops (incl. Rani's Silk House), try-on |
 | 12-table-football | pub table football |
 | 13-bets-fc | Lucky Bets, Village Rovers FC ground and matchday |
 | 14-services-range | hairdresser, estate agent, florist, shooting range |
 | 15-football-engine | match engine v2 |
 | 16-arcade | Neon Arcade and its games |
 | 17-main | civilian traffic, cash shop, audio, UI, main loop |
+| 18-corner-shop | Singh's corner shop: interior, Mr Singh, snacks and drinks menu |
 
 ## Rules when editing
 

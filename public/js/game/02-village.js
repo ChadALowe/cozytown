@@ -139,6 +139,20 @@ function bld(cx,cz,rot,o){
    for(const sg of[-1,1]){p(dx+sg*.75,0,zf+.15,.16,2.5,.16,gold);p(dx+sg*1.3,0,zf+.6,.45,.4,.45,[.62,.28,.14]);p(dx+sg*1.3,.4,zf+.6,.55,.3,.55,[.98,.62,.1]);p(dx+sg*1.0,2.05,zf+.4,.22,.3,.22,[1,.82,.4],K.l)}
    p(dx,2.45,zf+.12,1.7,.12,.12,gold);for(let k=0;k<7;k++)p(dx-.6+k*.2,2.28-Math.sin(k/6*Math.PI)*.1,zf+.2,.11,.11,.11,k%2?sf:[1,.82,.15]);
    topWin()}
+  else if(t===5){ /* CORNER SHOP: green fascia and awning, packed windows, fruit and veg on the pavement, newspaper board, OPEN sign */
+   const gr=[.05,.35,.18],wh=[.96,.96,.94];door(dx,[.08,.3,.16],1.0);
+   p(ux,2.95,zf+.28,uw-.2,1.15,.5,gr);p(ux,2.9,zf+.55,uw-.2,.06,.06,wh);p(ux,4.06,zf+.55,uw-.2,.06,.06,wh);
+   {const f=W(ux,3.6,zf+.56);signPlane(K,"SINGH'S",'#0e5a2e','#ffffff',uw*.55,.62,f[0],f[1],f[2],rot,256,56)}
+   {const f=W(ux,3.12,zf+.56);signPlane(K,'GROCERIES · NEWS · OFF LICENCE · OPEN 7 TILL LATE','#0e5a2e','#ffe680',uw-.6,.3,f[0],f[1],f[2],rot,768,40)}
+   for(let i=0;i<10;i++){const aw=(uw-.2)/10;p(X0+.1+aw*(i+.5),2.52,zf+.55,aw,.1,1.0,i%2?wh:gr)}
+   const wx0=X0+.5,wx1=dx-1.0,wc=(wx0+wx1)/2,ww=wx1-wx0;winBox(wc,.55,ww,1.65,[.9,.9,.88],[.4,.12,.1],[.98,.96,.88],[.6,.5,.35]);
+   for(let r=0;r<3;r++){p(wc,.7+r*.52,zf+.42,ww-.2,.04,.28,[.75,.72,.68]);for(let k=0;k<Math.floor((ww-.4)/.24);k++)p(wc-ww/2+.3+k*.24,.74+r*.52,zf+.45,.18,.24+((k+r)%3)*.04,.12,FPAL[(k*5+r*3)%12])}
+   {const f=W(wc-ww/2+.55,1.95,zf+.71);signPlane(K,'OPEN','#101010','#ff3040',.7,.28,f[0],f[1],f[2],rot,128,48)}
+   {const f=W(wc+ww/2-.6,1.95,zf+.71);signPlane(K,'LOTTO','#d02020','#ffe040',.75,.28,f[0],f[1],f[2],rot,128,48)}
+   for(let k=0;k<3;k++){const cx=X0+.9+k*1.05,fc=[[.9,.2,.1],[.95,.75,.1],[.3,.65,.2]][k];p(cx,0,zf+1.25,.9,.55,.55,[.55,.4,.25]);p(cx,.55,zf+1.25,.92,.06,.6,[.3,.55,.25]);for(let j=0;j<6;j++)p(cx-.3+(j%3)*.3,.6,zf+1.12+((j/3)|0)*.26,.2,.14,.2,fc)}
+   p(dx+1.25,0,zf+1.3,.7,1.0,.06,[.12,.12,.14]);{const f=W(dx+1.25,.6,zf+1.34);signPlane(K,'NEWS','#ffffff','#c01010',.6,.45,f[0],f[1],f[2],rot,128,96)}
+   p(X0+uw-.35,1.2,zf+.6,.06,1.2,.06,[.6,.6,.62]);p(X0+uw-.35,2.1,zf+.85,.04,.5,.5,[.95,.9,.3]);
+   topWin()}
   else{ /* ULTRA: pale stone, four columns, black and gold fascia, glass front, red carpet */
    p(ux,0,zf+1.7,uw+.4,.14,2.6,[.82,.8,.76]);p(ux,.14,zf+1.5,uw,.14,2.2,[.88,.86,.82]);
    p(ux,.2,zf+.08,uw-.6,3.0,.06,[.95,.82,.55],K.l);
@@ -226,6 +240,7 @@ special({kind:'shop',units:1,w:20,d:10,eaves:6.2,ridge:3.2,fg:.6,wall:'render',w
 special({kind:'shop',units:1,w:22,d:11,eaves:5.4,ridge:2.6,fg:12,wall:'brick',wc:[.9,.78,.7],roof:'slate',names:[{t:"JOE'S GARAGE",bg:'#c82020',fg:'#ffffff',col:[.6,.1,.1]}]},-100,0,1,0,-1);
 PLACED.push({x:-100,z:-11,rot:0,hw:15,hd:7.5});
 special({kind:'shop',units:1,w:26,d:12,eaves:6.4,ridge:3.4,fg:.6,wall:'render',wc:[.9,.9,1],roof:'tile',names:[{t:'STRIKE BOWL',bg:'#5a1a8a',fg:'#ffe040',col:[.3,.1,.5]}]},78,0,1,0,-1);
+special({kind:'shop',units:1,w:13,d:10,eaves:5.8,ridge:2.8,fg:.6,wall:'brick',wc:[.95,.8,.7],roof:'slate',fash:5,names:[{t:"SINGH'S CORNER SHOP",bg:'#0e5a2e',fg:'#ffffff',col:[.05,.35,.18]}]},212,0,1,0,-1);
 special({kind:'shop',units:1,w:16,d:10,eaves:6,ridge:3,fg:.6,wall:'render',wc:[1.05,.78,.6],roof:'tile',fash:4,names:[{t:"RANI'S SILK HOUSE",bg:'#8a1a4a',fg:'#ffd24a',col:[.54,.1,.29]}]},198,0,1,0,1);
 special({kind:'shop',units:1,w:18,d:10,eaves:6,ridge:3,fg:.6,wall:'brick',wc:[1,.72,.55],roof:'tile',fash:1,names:[{t:"PENNY'S BARGAINS",bg:'#f8d010',fg:'#c01010',col:[.9,.75,.1]}]},-86,0,1,0,1);
 special({kind:'shop',units:1,w:20,d:10,eaves:6.2,ridge:3.2,fg:2.2,wall:'brick',wc:[.62,.74,.66],roof:'slate',fash:2,names:[{t:'HARRINGTON & CO',bg:'#0f3324',fg:'#e8c860',col:[.07,.2,.14]}]},-125,0,1,0,1);
