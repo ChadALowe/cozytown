@@ -37,11 +37,12 @@ function dress(p,o){const acc=o.acc,bc=o.bc,hx=hex(acc);
  const ag=p.a1.geometry.attributes,ap=ag.position;let bi=0,bd=9;for(let i=0;i<ap.count;i++){const d=Math.abs(ap.getY(i)+.64);if(d<bd){bd=d;bi=i}}
  const sk=[ag.color.getX(bi),ag.color.getY(bi),ag.color.getZ(bi)];
  // cropped strap top: sequinned band over the chest, thin shoulder straps, bare shoulders and midriff, crisp edges
- {let g=splitA(p.up.geometry,1,[1.12,1.34,1.46]);g=splitA(g,0,[-.105,-.055,.055,.105]);p.up.geometry=g}
+ {let g=splitA(p.up.geometry,1,[.98,1.12,1.34,1.46]);g=splitA(g,0,[-.105,-.055,.055,.105]);p.up.geometry=g}
  recol(p.up,(cy,t,br,cx)=>{const k=.82+.3*((t*2654435761>>>0)%7/7);
   if(cy>1.12&&cy<=1.34)return[acc[0]*k,acc[1]*k,acc[2]*k];
   if(cy>1.34&&cy<1.46)return(cx>.055&&cx<.105)?[acc[0]*k,acc[1]*k,acc[2]*k]:[sk[0]*.95,sk[1]*.95,sk[2]*.95];
-  if(cy>.8&&cy<=1.12)return[sk[0]*.95,sk[1]*.95,sk[2]*.95];return null});
+  if(cy>.98&&cy<=1.12)return[sk[0]*.95,sk[1]*.95,sk[2]*.95];
+  if(cy>.8&&cy<=.98)return[bc[0]*.9,bc[1]*.9,bc[2]*.9];return null});
  // bare arms
  for(const a of[p.a1,p.a2])recol(a,()=>sk);
  // short shorts: cut the legs at the hem, shorts colour above it, skin below
