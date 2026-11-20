@@ -69,7 +69,7 @@ function* airfield(m){const c=mk(m),W=c.W;
  for(let k=0;k<10;k++)pc(c,-96+k*3.3,0,-286,.28,.7,6,[.95,.45,.1]);
  {const w=W(40,330),pole=new THREE.Mesh(new THREE.CylinderGeometry(.08,.1,7,6),new THREE.MeshBasicMaterial({color:0xcccccc}));pole.position.set(w[0],Y+3.5,w[1]);const sock=new THREE.Mesh(new THREE.ConeGeometry(.55,3,10,1,true).rotateZ(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xff7a18,side:THREE.DoubleSide}));sock.position.set(w[0]+1.5,Y+7,w[1]);const g=new THREE.Group();g.add(pole,sock);chunk(m,g)}
  flush(c);yield;
- if(m.style==='country')yield*countryside(m,c);else yield*city(m,c)}
+ if(m.style==='country')yield*countryside(m,c);else yield*(window.MCITY?window.MCITY(m,c):city(m,c))}
 function* countryside(m,c){const W=c.W;
  /* patchwork fields */
  const fc=[[.38,.55,.22],[.55,.58,.24],[.3,.48,.2],[.62,.55,.28],[.42,.52,.3],[.7,.62,.34]];let k=0;
