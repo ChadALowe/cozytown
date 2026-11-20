@@ -87,7 +87,7 @@ function dress(p,o){const acc=o.acc,bc=acc,hx=hex(acc),F=.92; // one solid colou
   // waist: slimmer through the middle
   {const w=Math.exp(-(((y-1.04)/.075)**2)*1.3);if(w>.01){dx-=x*.14*w;dz-=z*.07*w;hit=1}}
   // bust: two smooth, large rounded forms on the front of the chest
-  if(y>1.05&&y<1.45&&z>0){const f=Math.max(bump(x,y,.085,1.235,.1,.11),bump(x,y,-.085,1.235,.1,.11));if(f>.001){dz+=.17*f;dx+=Math.sign(x)*.024*f;hit=1}}
+  if(y>1.05&&y<1.45&&z>0){const f=Math.max(bump(x,y,.1,1.235,.14,.11),bump(x,y,-.1,1.235,.14,.11));if(f>.001){dz+=.17*f;dx+=Math.sign(x)*.024*f;hit=1}}
   // pelvis: slim the hem depth down to the thigh depth (no flat shelf), widen the hips, add the shared rear shape
   if(y>.8&&y<1.05){const t=Math.max(0,Math.min(1,(.99-y)/.09)),k=.3*t*t*(3-2*t);dx+=-x*k*.18+hipW(x,y);dz+=-z*k*(z<0?1:.6)-cheek(x,y,z);hit=1}
   return hit?[dx,0,dz]:null});
