@@ -68,3 +68,38 @@ details.hw[open] summary{background:#1b2140}
 @media (max-height:460px){.card{padding:1.6vmin 3vmin}.mb{margin:.8vmin 0}.card h1{font-size:max(26px,9vmin)}}
 
 #go:disabled{background:#555;opacity:.75}
+
+/* ---- title screen + loader ---- */
+#menu.boot,#menu.ready{background:#1c2160}
+#art{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;opacity:1;transition:opacity .9s ease}
+#menu.paused{background:rgba(5,8,20,.62)}
+#menu.paused #art,#menu.paused #sky,#menu.paused #road{display:none}
+body:not(.mo) #art,body:not(.mo) #sky,body:not(.mo) #road{display:none}
+#sky,#road{position:absolute;inset:0;pointer-events:none;overflow:hidden;transition:opacity .9s ease}
+.cl{position:absolute;height:4.2vmin;border-radius:4vmin;background:rgba(255,236,220,.55);box-shadow:3vmin -1.6vmin 0 -.4vmin rgba(255,236,220,.55),-3vmin -1vmin 0 -.8vmin rgba(255,236,220,.5);will-change:transform;animation:cdrift linear infinite}
+.c1{width:14vmin;top:16%;left:-20vmin;animation-duration:70s}.c2{width:10vmin;top:28%;left:-20vmin;animation-duration:96s;animation-delay:-40s;opacity:.8}.c3{width:12vmin;top:9%;left:-20vmin;animation-duration:120s;animation-delay:-80s;opacity:.6}
+@keyframes cdrift{to{transform:translateX(160vw)}}
+#plane{position:absolute;top:21%;left:-12vmin;width:7vmin;height:1.8vmin;background:#f4f6f8;border-radius:1.8vmin 1vmin 1vmin 1.8vmin;will-change:transform;animation:fly 38s linear infinite;animation-delay:-6s}
+#plane:before{content:"";position:absolute;left:30%;top:-1.5vmin;width:2.6vmin;height:3.6vmin;background:#dde2e8;transform:skewX(30deg)}
+#plane u{position:absolute;right:100%;top:.7vmin;width:30vmin;height:.5vmin;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55))}
+@keyframes fly{to{transform:translate(130vw,-6vmin)}}
+#road #bcar{position:absolute;bottom:calc(4vmin);left:-12vmin;width:11vmin;height:4.4vmin;image-rendering:pixelated;will-change:transform;animation:drive 16s linear infinite}
+@keyframes drive{to{transform:translateX(125vw)}}
+#menu .card{position:relative;z-index:2;background:rgba(12,14,38,.78);border:3px solid #ffe14a;max-width:min(92vw,460px);padding:3vmin 5vmin 3.4vmin;backdrop-filter:none}
+#logo h1{font-size:max(40px,12vmin);line-height:.92;letter-spacing:.05em;margin:0 0 1.2vmin;color:#ffe14a;text-shadow:0 .7vmin 0 #c8102e,.5vmin 1.2vmin 0 #000}
+#logo h2{font-size:max(11px,2.4vmin);letter-spacing:.16em;color:#9fd4ff;margin:0 0 1.6vmin}
+#chips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:2.4vmin}
+#chips span{font:800 max(10px,2vmin) ui-monospace,monospace;letter-spacing:.12em;padding:.6vmin 1.4vmin;border-radius:20px;background:#1b2250;color:#ffe9a0;border:2px solid #3a4590}
+#loader{margin:1vmin auto 0;width:min(78vw,360px)}
+#lbar{position:relative;height:max(14px,2.8vmin);border:3px solid #fff;border-radius:99px;background:#0a0d22;overflow:hidden}
+#lfill{position:absolute;left:0;top:0;bottom:0;width:2%;background:linear-gradient(90deg,#ffb020,#ffe14a);border-radius:99px;transition:width .5s ease}
+#lbar u{position:absolute;top:0;bottom:0;left:0;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);will-change:transform;animation:shim 1.2s linear infinite}
+@keyframes shim{from{transform:translateX(-100%)}to{transform:translateX(340%)}}
+#lstat{margin-top:1.2vmin;font:800 max(12px,2.6vmin) ui-monospace,monospace;letter-spacing:.12em;color:#ffe9a0}
+#ltip{margin-top:1vmin;font:max(11px,2.1vmin) ui-monospace,monospace;color:#8a93b8;min-height:2.6em}
+#mbtns .mb{margin:1.1vmin 0}
+#mbtns button{width:min(78vw,340px);border-radius:12px;font:800 max(16px,3.6vmin) ui-monospace,monospace;letter-spacing:.1em;cursor:pointer}
+#mbtns #go{background:linear-gradient(180deg,#ffe14a,#ffb81c);color:#1a1230;border:3px solid #fff;box-shadow:0 .8vmin 0 #a86a00,0 1.4vmin 0 #000;padding:1.6vmin 3vmin}
+#mbtns .sec{background:#1b2250;color:#fff;border:3px solid #4a5590;box-shadow:0 .6vmin 0 #0a0d22;padding:1.2vmin 3vmin;font-size:max(14px,3vmin)}
+#mbtns .sec.warn{background:#a8141c;border-color:#fff}
+#saveInfo{font:800 max(11px,2.1vmin) ui-monospace,monospace;color:#9fd4ff;letter-spacing:.1em;margin:-.2vmin 0 1.4vmin;min-height:1.2em}

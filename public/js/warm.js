@@ -18,6 +18,7 @@ function warm(){
   rt.dispose();
   console.log('warm-up ms',Math.round(performance.now()-t0));
  }catch(e){console.warn('warm-up skipped',e)}
+ window.WARMED=true;
 }
 let tries=0;(function wait(){if(window.READY===true){setTimeout(warm,300);return}if(++tries<600)setTimeout(wait,100)})();
 // the extra cars' textures arrive asynchronously: draw them once more when they have landed

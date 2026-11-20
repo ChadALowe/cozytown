@@ -541,6 +541,6 @@ window.openTune=openTune;window.closeTune=closeTune;window.TNon=()=>on;
 // Joe's garage + the old spray booth now open the tuning screen
 {const o0=openShop;openShop=function(m){if(m==='garage2'){toast('DRIVE YOUR CAR INTO A BAY AT JOES GARAGE');return}o0.apply(this,arguments)}}
 garagePaint=function(){toast('DRIVE YOUR CAR INTO A BAY AT JOES GARAGE')};
+{const lg=loadGame;loadGame=function(){const r=lg.apply(this,arguments);if(r&&TN.pnt){paintC=canon(TN.pnt);try{applyPaint()}catch(e){}}neonNow();return r}}
 })();
 
-{const lg=loadGame;loadGame=function(){const r=lg.apply(this,arguments);if(r&&TN.pnt){paintC=canon(TN.pnt);try{applyPaint()}catch(e){}}neonNow();return r}}
