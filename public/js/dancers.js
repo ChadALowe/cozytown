@@ -55,7 +55,9 @@ function dress(p,o){const acc=o.acc,bc=o.bc,hx=hex(acc);
   lp.needsUpdate=true;
   const hg=new THREE.BoxGeometry(.022,.11,.022);flat(hg,hg.attributes.position.count);const h=new THREE.Mesh(hg,mat(0x120c12));h.position.set(0,-.865,-.05);l.add(h)}
  // rounded bust, in the vest colour
- for(const sx of[-1,1])ball(.088,sx*.075,1.23,.105,hx,p.up);}
+ for(const sx of[-1,1])ball(.088,sx*.075,1.23,.105,hx,p.up);
+ // fuller hips and rear, in the shorts colour (fixed to the torso)
+ for(const sx of[-1,1])ball(.098,sx*.075,.86,-.085,hex(bc),p.up);}
 
 window.mkDancer=function(seed,parent,x,z,ry,o){
  const spec=pSpec(seed,{f:true,hs:o.hs,ts:2,sh:1,bc:o.bc,tc:o.acc,sk:PSK[o.sk|0],gl:false,scarf:null,bp:false,bag:0,old:false});
