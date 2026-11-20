@@ -1,7 +1,7 @@
 /* ===== FARM SIMULATOR: Holt's farmland on its own map. Plough, sow and harvest four real fields with a tractor and a combine,
    unload at the silo, sell grain at the daily price, buy diesel. Crops grow overnight. ===== */
 (function(){
-const A=window.AIRPORT,cvx=A.cvx,wmt=A.wmt,Y=G0,FX0=-1500,FZ0=0,CELL=3,NX=32,NZ=20,NC=NX*NZ;
+const A=window.AIRPORT,CIN=A.CIN,cvx=A.cvx,wmt=A.wmt,Y=G0,FX0=-1500,FZ0=0,CELL=3,NX=32,NZ=20,NC=NX*NZ;
 const Wd=(u,v)=>[FX0+u,FZ0+v];
 const inFM=(x,z)=>Math.abs(x-FX0)<430&&Math.abs(z-FZ0)<430;
 {const h0=hAt;hAt=function(x,z){return inFM(x,z)?G0:h0(x,z)}}
@@ -81,7 +81,7 @@ function buildMap(){if(FM.built)return;FM.built=1;
  const geo=new THREE.BoxGeometry(CELL,1,CELL);geo.translate(0,.5,0);
  for(const f of FL){const m=wmt(stripeTex,{},[1,1,1]);f.im=new THREE.InstancedMesh(geo,m,NC);f.im.frustumCulled=false;scene.add(f.im);refresh(f);if(f.locked){const p=Wd(f.u0+48,f.v0+30),sm=new THREE.Mesh(new THREE.PlaneGeometry(14,3.4),new THREE.MeshBasicMaterial({map:txtTex(512,128,'#8a1c1c','#ffffff','FOR SALE  £'+LAND[f.i-4],54),side:THREE.DoubleSide}));sm.position.set(p[0],Y+4,p[1]);scene.add(sm);f.sign=sm}}
  for(const c of FC)COL.push(c);
- buildVehicles();
+ buildVehicles();{const b=board(),h=hopper(),gt=gate();mkArrow(b[0],b[1],Y+4.2,60);mkArrow(h[0],h[1]-4,Y+3.6,60);mkArrow(gt[0],gt[1],Y+7.4,70)}
  /* beacon + hud */
  FM.bc=new THREE.Mesh(new THREE.CylinderGeometry(3,3,90,12,1,true),new THREE.MeshBasicMaterial({color:0xffe14a,transparent:true,opacity:.22,depthWrite:false,fog:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending}));FM.bc.visible=false;scene.add(FM.bc)}
 /* ---------- vehicles ---------- */
@@ -189,13 +189,18 @@ function drawMap(){const c=mm.getContext('2d');c.fillStyle='#3a5a2a';c.fillRect(
   return{label:(FM.low?'RAISE ':'LOWER ')+JB[FM.job].n,fn:()=>{if(FM.unl)return;FM.low=FM.low?0:1;beep(FM.low?260:380,.08,'square',.05)}}}
  return c0()}}
 /* ---------- on-foot spots: village signpost, farm office, silo, gate ---------- */
-const VG=[-92,160.5];
-{const pole=new THREE.Mesh(new THREE.BoxGeometry(.2,2.6,.2),new THREE.MeshBasicMaterial({color:0x6a4a28}));pole.position.set(VG[0],G0+1.3,VG[1]);scene.add(pole);
- const bd=new THREE.Mesh(new THREE.PlaneGeometry(2.6,.8),new THREE.MeshBasicMaterial({map:txtTex(512,160,'#4a2e16','#ffe6a8','HOLT FARMLAND ➜',58),side:THREE.DoubleSide}));bd.position.set(VG[0],G0+2.3,VG[1]);bd.rotation.y=-Math.PI/2;scene.add(bd)}
+const VG=[-102,141.5];
+{const pm=new THREE.MeshBasicMaterial({color:0x6a4a28});for(const dx of[-2.3,2.3]){const p=new THREE.Mesh(new THREE.BoxGeometry(.26,3.4,.26),pm);p.position.set(VG[0]+dx,G0+1.7,VG[1]);scene.add(p)}
+ const bd=new THREE.Mesh(new THREE.PlaneGeometry(5.4,1.5),new THREE.MeshBasicMaterial({map:txtTex(1024,284,'#4a2e16','#ffe6a8','HOLT FARMLAND ➜',78),side:THREE.DoubleSide}));bd.position.set(VG[0],G0+2.7,VG[1]);bd.rotation.y=Math.PI;scene.add(bd);
+ const bd2=bd.clone();bd2.position.z+=.02;bd2.rotation.y=0;scene.add(bd2);const sb=new THREE.Mesh(new THREE.PlaneGeometry(5.4,.5),new THREE.MeshBasicMaterial({map:txtTex(1024,96,'#1a3c78','#ffffff','DRIVE A TRACTOR · HARVEST WITH A COMBINE',34),side:THREE.DoubleSide}));sb.position.set(VG[0],G0+1.55,VG[1]-.02);sb.rotation.y=Math.PI;scene.add(sb)}
+/* bobbing arrows (same style as the airport office) mark every place that takes you somewhere */
+const ARR=[];function mkArrow(x,z,y,r){const cone=new THREE.ConeGeometry(.34,.7,4);cone.rotateX(Math.PI);cone.translate(0,-.35,0);const stem=new THREE.BoxGeometry(.16,.5,.16);stem.translate(0,.25,0);const am=new THREE.MeshBasicMaterial({color:0x6aa8ff,fog:false}),g=new THREE.Group();g.add(new THREE.Mesh(cone,am),new THREE.Mesh(stem,am));g.visible=false;scene.add(g);ARR.push({g,x,z,y,r,far:0})}
+mkArrow(VG[0],VG[1],G0+5.0,60);
+{const u0=updCozy;updCozy=function(dt){u0(dt);const t=performance.now()/1000,px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z;for(const a of ARR){const d=Math.hypot(a.x-px,a.z-pz);a.g.visible=!FM.on&&!CIN.on&&GS.onFoot&&!GS.inside&&!menuOpen&&d<a.r;if(a.g.visible){a.g.position.set(a.x,a.y+Math.sin(t*3.2)*.2,a.z);a.g.rotation.y=t*1.2;a.g.scale.setScalar(Math.max(.9,Math.min(2.6,d/9)))}}}}
 function toFarm(){if(busy)return;fade(()=>{buildMap();const p=Wd(0,-238);P.x=p[0];P.z=p[1];P.y=Y+.02;P.psi=0;P.speed=0;camAng=0;GS.onFoot=GS.onFoot;toast(FD.first?'BACK AT THE FARMLAND':'HOLT FARMLAND: FIND THE FARM BOARD TO PICK A JOB');FD.first=1})}
-function toVillage(){if(busy)return;fade(()=>{P.x=VG[0]+1.5;P.z=VG[1]+1.5;P.y=G0+.02;P.psi=Math.PI/2;P.speed=0;camAng=P.psi})}
+function toVillage(){if(busy)return;fade(()=>{P.x=VG[0];P.z=VG[1]-4;P.y=G0+.02;P.psi=Math.PI;P.speed=0;camAng=P.psi})}
 {const g0=gardenNear;gardenNear=function(){const g=g0();if(!GS.onFoot||GS.inside||FM.on)return g;
- const spots=[[VG[0],VG[1],3.4,'DRIVE TO THE FARMLAND',toFarm]];if(inFM(P.x,P.z)){const b=board(),h=hopper(),gt=gate();spots.push([b[0],b[1],4,'FARM BOARD',()=>open(0)],[h[0],h[1]-4,6,'SELL GRAIN',()=>open(2)],[gt[0],gt[1],5,'RETURN TO THE VILLAGE',toVillage])}
+ const spots=[[VG[0],VG[1],5.5,'DRIVE TO THE FARMLAND',toFarm]];if(inFM(P.x,P.z)){const b=board(),h=hopper(),gt=gate();spots.push([b[0],b[1],4,'FARM BOARD',()=>open(0)],[h[0],h[1]-4,6,'SELL GRAIN',()=>open(2)],[gt[0],gt[1],5,'RETURN TO THE VILLAGE',toVillage])}
  let best=g;for(const s of spots){const d=Math.hypot(P.x-s[0],P.z-s[1]);if(d<s[2]&&(!best||d*.5<best.d))best={d:d*.5,btn:{label:s[3],fn:s[4]}}}return best}}
 /* ---------- the farm board overlay ---------- */
 let OV=null;
