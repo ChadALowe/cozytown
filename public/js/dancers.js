@@ -1,6 +1,6 @@
 /* ===== SELF-CONTAINED CABARET DANCER (pole stages only) =====
    Used only by the Gilded Cage pole stages (casino3.js). Builds an ordinary person with the game's own mkPerson,
-   then dresses THAT ONE INSTANCE: cropped sequin vest, bare arms with opera gloves, short shorts, a rounded bust and
+   then dresses THAT ONE INSTANCE: cropped sequin vest, bare arms, short shorts, a rounded bust and
    a feathered headband. Every mesh it edits is created fresh for the dancer, and nothing in game/*.js or any other
    file is modified, so ordinary characters are never affected.
    API: window.mkDancer(seed, parent, x, z, ry, {hs, acc:[r,g,b], bc:[r,g,b], sk}) -> THREE.Group (limbs: up, a1, a2, l1, l2) ===== */
@@ -40,8 +40,8 @@ function dress(p,o){const acc=o.acc,bc=o.bc,hx=hex(acc);
  // cropped vest: sequinned band, bare midriff, with crisp edges
  p.up.geometry=splitY(p.up.geometry,[1.12,1.46]);
  recol(p.up,(cy,t)=>cy>1.12&&cy<1.46?(k=>[acc[0]*k,acc[1]*k,acc[2]*k])(.82+.3*((t*2654435761>>>0)%7/7)):cy>.8&&cy<=1.12?[sk[0]*.95,sk[1]*.95,sk[2]*.95]:null);
- // bare arms + opera gloves
- for(const a of[p.a1,p.a2]){recol(a,()=>sk);ring(.054,.34,-.38,1,hx,a)}
+ // bare arms
+ for(const a of[p.a1,p.a2])recol(a,()=>sk);
  // short shorts: cut the legs at the hem, shorts colour above it, skin below
  for(const l of[p.l1,p.l2]){l.geometry=splitY(l.geometry,[-.17]);recol(l,cy=>cy>-.17?[bc[0]*.9,bc[1]*.9,bc[2]*.9]:cy>-.395?sk:null)}
  // rounded bust, in the vest colour
