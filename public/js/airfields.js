@@ -35,7 +35,7 @@ function* airfield(m){const c=mk(m),W=c.W;
  qpoly(c,PATH.p,20,RW,.05);qd(c,-95,-300,-77,430,RW,.05);
  qpoly(c,spline([[-86,330],[-84,372],[-62,404],[-28,418],[0,412]],8),20,RW,.05);
  qpoly(c,PATH.p,.5,YL,.07);qd(c,-86.2,-300,-85.8,425,YL,.07);qpoly(c,spline([[-86,330],[-84,372],[-62,404],[-28,418],[0,412]],8),.5,YL,.07);
- qd(c,-136,-302,-45,-96,CON,.05);for(let z=-290;z<=-110;z+=18)qd(c,-135,z-.1,-46,z+.1,[.5,.5,.51],.07);qd(c,-86.3,-250,-85.7,-110,YL,.08);qd(c,-96,-203,-76,-197,YL,.08);qd(c,-94,-212,-78,-211.7,YL,.08);
+ qd(c,-136,-302,-45,-96,CON,.044);for(let z=-290;z<=-110;z+=18)qd(c,-135,z-.1,-46,z+.1,[.5,.5,.51],.06);qd(c,-86.3,-250,-85.7,-110,YL,.08);qd(c,-96,-203,-76,-197,YL,.08);qd(c,-94,-212,-78,-211.7,YL,.08);
  {const num=cvx(256,256,(g,w,h)=>{g.fillStyle='#f4f4ee';g.font='bold 170px Arial';g.textAlign='center';g.textBaseline='middle';g.fillText('36',w/2,h/2)});const nm=new THREE.Mesh(new THREE.PlaneGeometry(14,14).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:num,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));const p=W(0,500);nm.position.set(p[0],Y+.09,p[1]);const g=new THREE.Group();g.add(nm);chunk(m,g);
   const n2=nm.clone();n2.material=nm.material.clone();n2.material.map=cvx(256,256,(g2,w,h)=>{g2.fillStyle='#f4f4ee';g2.font='bold 170px Arial';g2.textAlign='center';g2.textBaseline='middle';g2.save();g2.translate(w/2,h/2);g2.rotate(Math.PI);g2.fillText('18',0,0);g2.restore()});const p2=W(0,-500);n2.position.set(p2[0],Y+.09,p2[1]);const g2=new THREE.Group();g2.add(n2);chunk(m,g2)}
  flush(c);yield;
