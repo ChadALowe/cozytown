@@ -96,8 +96,9 @@ function dress(p,o){const acc=o.acc,bc=acc,hx=hex(acc),F=.92; // one solid colou
  if(o.bare){const q=p.up.geometry.attributes.position;[1,-1].forEach(sg=>{let bz=-9,bx=0,by=0;for(let i=0;i<q.count;i++){const x=q.getX(i),y=q.getY(i),z=q.getZ(i);if(Math.abs(x-sg*.085)<.035&&Math.abs(y-1.235)<.07&&z>bz){bz=z;bx=x;by=y}}
   const m=new THREE.Mesh(new THREE.SphereGeometry(.018,8,6),new THREE.MeshBasicMaterial({color:0xff0000}));m.position.set(bx,by,bz);p.up.add(m)})}
  recol(p.up,(cy,t,br,cx,cr,cg,cb,dy)=>{const k=F;
-  if(cy>1.12&&cy<=1.34)return[acc[0]*k,acc[1]*k,acc[2]*k];
-  if(cy>1.34&&cy<1.46)return(cx>.09&&cx<.135&&dy>.004)?[acc[0]*k,acc[1]*k,acc[2]*k]:[sk[0]*.95,sk[1]*.95,sk[2]*.95];
+  const TC=o.bare?sk:acc; // o.bare = test mode: top painted skin-coloured to check the body
+  if(cy>1.12&&cy<=1.34)return[TC[0]*k,TC[1]*k,TC[2]*k];
+  if(cy>1.34&&cy<1.46)return(cx>.09&&cx<.135&&dy>.004)?[TC[0]*k,TC[1]*k,TC[2]*k]:[sk[0]*.95,sk[1]*.95,sk[2]*.95];
   if(cy>.98&&cy<=1.12)return[sk[0]*.95,sk[1]*.95,sk[2]*.95];
   if(cy>.8&&cy<=.98)return[acc[0]*F,acc[1]*F,acc[2]*F];
   if(cy>1.46&&cy<1.58){const m=Math.hypot(cr,cg,cb)||1,a=Math.hypot(acc[0],acc[1],acc[2])||1;if(Math.hypot(cr/m-acc[0]/a,cg/m-acc[1]/a,cb/m-acc[2]/a)<.4)return[sk[0]*.97,sk[1]*.97,sk[2]*.97]}
