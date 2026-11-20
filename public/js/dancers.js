@@ -45,7 +45,7 @@ function dress(p,o){const acc=o.acc,bc=o.bc,hx=hex(acc);
  // short shorts: cut the legs at the hem, shorts colour above it, skin below
  for(const l of[p.l1,p.l2]){l.geometry=splitY(l.geometry,[-.17]);recol(l,cy=>cy>-.17?[bc[0]*.9,bc[1]*.9,bc[2]*.9]:cy>-.395?sk:null)}
  // rounded bust, in the vest colour
- for(const sx of[-1,1])ball(.062,sx*.068,1.25,.1,hx,p.up);
+ for(const sx of[-1,1])ball(.088,sx*.075,1.23,.105,hx,p.up);
  // feathered headband
  p.up.geometry.computeBoundingBox();const top=p.up.geometry.boundingBox.max.y;
  ring(.118,.035,top-.075,1,GOLD,p.up);
