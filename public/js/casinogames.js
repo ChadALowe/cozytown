@@ -150,17 +150,19 @@ function rouLoop(now){const R=RG;if(!R)return;const dt=Math.min(.05,(now-R.last)
 function rouClose(){const R=RG;if(!R||R.ph==='spin')return;rouClear();cancelAnimationFrame(R.raf);removeEventListener('keydown',R.kd);R.ov.remove();RG=null;gClose()}
 /* =================================================== BLACKJACK =================================================== */
 let BJ=null;const CARDS=new Map(),SUITS=['♠','♥','♦','♣'],RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-function cardTex(c){const key=c?c.r+c.s:'back';if(CARDS.has(key))return CARDS.get(key);const t=cvx(128,180,(g,W,H)=>{const rr=(x,y,w,h,r)=>{g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()};
+function cardTex(c){const key=c?c.r+c.s:'back';if(CARDS.has(key))return CARDS.get(key);const t=cvx(256,360,(g,W2,H2)=>{g.scale(2,2);const W=128,H=180;const rr=(x,y,w,h,r)=>{g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()};
  if(!c){g.fillStyle='#f8f4ea';rr(2,2,W-4,H-4,10);g.fill();g.fillStyle='#a01428';rr(9,9,W-18,H-18,6);g.fill();g.strokeStyle='#e8c050';g.lineWidth=2;for(let i=-H;i<W;i+=14){g.beginPath();g.moveTo(i,0);g.lineTo(i+H,H);g.stroke();g.beginPath();g.moveTo(i+H,0);g.lineTo(i,H);g.stroke()}g.fillStyle='#a01428';g.beginPath();g.arc(W/2,H/2,20,0,TAU);g.fill();g.strokeStyle='#e8c050';g.lineWidth=3;g.stroke();return}
  g.fillStyle='#f8f4ea';rr(2,2,W-4,H-4,10);g.fill();g.strokeStyle='#999';g.lineWidth=2;g.stroke();const red=c.s==='♥'||c.s==='♦';g.fillStyle=red?'#c01428':'#15151a';g.textAlign='center';g.textBaseline='middle';
- g.font='bold 30px Georgia,serif';g.fillText(c.r,22,26);g.font='26px "DejaVu Sans",Arial,sans-serif';g.fillText(c.s,22,54);g.save();g.translate(W-22,H-26);g.rotate(Math.PI);g.font='bold 30px Georgia,serif';g.fillText(c.r,0,0);g.font='26px "DejaVu Sans",Arial,sans-serif';g.fillText(c.s,0,28);g.restore();g.font='72px "DejaVu Sans",Arial,sans-serif';g.fillText(c.s,W/2,H/2+4)});CARDS.set(key,t);return t}
+ const rk=c.r,rf='bold '+(rk.length>1?26:32)+'px Arial,sans-serif',sf='24px "DejaVu Sans",Arial,sans-serif',corner=()=>{g.font=rf;g.fillText(rk,19,22);g.font=sf;g.fillText(c.s,19,47)};
+ corner();g.save();g.translate(W,H);g.rotate(Math.PI);corner();g.restore();g.font='58px "DejaVu Sans",Arial,sans-serif';g.fillText(c.s,W/2,H/2+3)});
+ t.generateMipmaps=true;t.minFilter=THREE.LinearMipmapLinearFilter;t.magFilter=THREE.LinearFilter;try{t.anisotropy=R.capabilities.getMaxAnisotropy()}catch(e){}t.needsUpdate=true;CARDS.set(key,t);return t}
 const cval=c=>c.r==='A'?11:'JQK'.includes(c.r)?10:+c.r;
 function hv(h){let t=0,a=0;for(const c of h){t+=cval(c);if(c.r==='A')a++}while(t>21&&a){t-=10;a--}return{t,soft:a>0}}
 function newShoe(){const s=[];for(let d=0;d<6;d++)for(const su of SUITS)for(const r of RANKS)s.push({r,s:su});for(let i=s.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[s[i],s[j]]=[s[j],s[i]]}return s}
 let SHOE=null;
 function bjCam(){DZ.look.copy(wv(BJ.cl));return wv(BJ.cp)}
 function bjOpen(vip){vip=vip===true;if(BJ||busy||needChips())return;BX=vip?0:6.2;BZ=vip?-6.3:-5.0;if(!SHOE||SHOE.length<60)SHOE=newShoe();
- const B=BJ={vip,ph:'bet',bet:0,chip:vip?25:5,pl:[],de:[],meshes:[],cp:[BX,1.85,BZ+1.85],cl:[BX,.9,BZ+.45],last:performance.now(),dbl:false,tm:[]};gOpen(bjCam,50);
+ const B=BJ={vip,ph:'bet',bet:0,chip:vip?25:5,pl:[],de:[],meshes:[],cp:[BX,1.62,BZ+1.45],cl:[BX,.9,BZ+.42],last:performance.now(),dbl:false,tm:[]};gOpen(bjCam,50);
  const ov=B.ov=mk('div','position:fixed;inset:0;z-index:60;font:bold 13px monospace;color:#fff;pointer-events:none;user-select:none;-webkit-user-select:none;touch-action:none');document.body.appendChild(ov);
  const top=mk('div','position:absolute;left:0;right:0;top:6px;display:flex;justify-content:space-between;align-items:flex-start;padding:0 8px;text-shadow:2px 2px 0 #000',null,ov);
  B.bal=mk('div','font-size:16px;color:#ffe890;min-width:110px',null,top);const mid=mk('div','text-align:center;flex:1',null,top);mk('div','color:#f5e6a0;font-size:15px',vip?'HIGH ROLLER BLACKJACK':'BLACKJACK',mid);B.msg=mk('div','min-height:18px;color:#9fe;margin-top:2px;font-size:14px',null,mid);
@@ -178,8 +180,8 @@ function bjUI(){const B=BJ;B.pn.textContent='';B.bal.textContent='CHIPS '+money(
  B.bal.textContent='CHIPS '+money(CHS.chips);bjScore()}
 function bjScore(){const B=BJ;if(!B)return;const p=hv(B.pl),dh=B.hole?hv(B.de.slice(0,1)):hv(B.de);B.sc.textContent=B.de.length?'DEALER '+(B.hole?cval(B.de[0])===11?'11':String(cval(B.de[0])):dh.t)+(B.pl.length?'\nYOU '+p.t+(p.soft&&p.t<21?' (soft)':'')+(B.bet?'   BET '+money(B.bet):''):''):'';B.sc.style.whiteSpace='pre'}
 function later(ms,fn){const B=BJ;B.tm.push(setTimeout(()=>{if(BJ===B)fn()},ms))}
-function cardMesh(c,fromP,toP,delay){const B=BJ,m=new THREE.Mesh(new THREE.PlaneGeometry(.1,.14).rotateX(-Math.PI/2),bmat({map:cardTex(c)}));m.userData={c,t:-delay,from:fromP,to:toP,tex:c?cardTex(c):null};m.position.set(fromP[0],fromP[1],fromP[2]);m.rotation.y=(Math.random()-.5)*.3;GG.add(m);B.meshes.push(m);return m}
-function slotPos(who,i,n){const sp=n>5?.09:.11,x0=BX-(n-1)*sp/2;return who==='p'?[x0+i*sp,TY+.014+i*.0008,BZ+.7]:[x0+i*sp,TY+.014+i*.0008,BZ+.2]}
+function cardMesh(c,fromP,toP,delay){const B=BJ,m=new THREE.Mesh(new THREE.PlaneGeometry(.15,.21).rotateX(-Math.PI/2),bmat({map:cardTex(c)}));m.userData={c,t:-delay,from:fromP,to:toP,tex:c?cardTex(c):null};m.position.set(fromP[0],fromP[1],fromP[2]);m.rotation.y=(Math.random()-.5)*.3;GG.add(m);B.meshes.push(m);return m}
+function slotPos(who,i,n){const sp=n>5?.125:.165,x0=BX-(n-1)*sp/2;return who==='p'?[x0+i*sp,TY+.014+i*.0008,BZ+.7]:[x0+i*sp,TY+.014+i*.0008,BZ+.2]}
 function reflow(who){const B=BJ,hand=who==='p'?B.pl:B.de,ms=B.meshes.filter(m=>m.userData.who===who);ms.forEach((m,i)=>{m.userData.to=slotPos(who,i,hand.length)})}
 function dealTo(who,hidden){const B=BJ,hand=who==='p'?B.pl:B.de;if(SHOE.length<12)SHOE=newShoe();const c=SHOE.pop();hand.push(c);const m=cardMesh(hidden?null:c,[BX+1.3,TY+.2,BZ+.2],slotPos(who,hand.length-1,hand.length),0);m.userData.who=who;m.userData.real=c;m.userData.hid=!!hidden;reflow(who);beep(1100,.03,'square',.03);return c}
 function bjDeal(){const B=BJ;if(B.ph!=='bet'||!B.bet)return;B.lastBet=B.bet;wager(B.bet);B.ph='deal';B.hole=true;B.msgT=0;B.msg.textContent='';B.pl=[];B.de=[];for(const m of B.meshes)GG.remove(m);B.meshes=[];bjChips();bjUI();

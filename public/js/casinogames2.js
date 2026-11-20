@@ -28,7 +28,7 @@ function eval5(cs){const v=cs.map(rv).sort((a,b)=>b-a),fl=cs.every(c=>c.s===cs[0
 function best(cs){let b=-1;const n=cs.length;(function rec(s,k,arr){if(k===5){const sc=eval5(arr);if(sc>b)b=sc;return}for(let i=s;i<=n-(5-k);i++){arr.push(cs[i]);rec(i+1,k+1,arr);arr.pop()}})(0,0,[]);return b}
 const catOf=sc=>Math.floor(sc/759375);
 const tweenList=(list,dt)=>{for(const m of list){const u=m.userData;if(!u.from)continue;if(u.t<1){u.t+=dt/.35;if(u.t>=0){const e=ease(clampf(u.t,0,1)),f=u.from,t=u.to;m.position.set(lerpf(f[0],t[0],e),lerpf(f[1],t[1],e)+Math.sin(e*Math.PI)*.1,lerpf(f[2],t[2],e))}}}};
-const mkCard=(c,hidden,from,to,delay,parent)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(.1,.14).rotateX(-Math.PI/2),bmat({map:C.cardTex(hidden?null:c)}));m.userData={c,from,to,t:-(delay||0)};m.position.set(from[0],from[1],from[2]);(parent||G2).add(m);return m};
+const mkCard=(c,hidden,from,to,delay,parent)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(.15,.21).rotateX(-Math.PI/2),bmat({map:C.cardTex(hidden?null:c)}));m.userData={c,from,to,t:-(delay||0)};m.position.set(from[0],from[1],from[2]);(parent||G2).add(m);return m};
 /* ---------------- 3D reel strip shared by all slot machines ---------------- */
 let STRIP=null;const strip=()=>STRIP||(STRIP=cvx(2048,188,(g,W,H)=>{g.fillStyle='#f6f0dc';g.fillRect(0,0,W,H);for(let k=0;k<10;k++){g.save();g.translate((k+.5)*W/10,H/2);g.rotate(Math.PI/2);drawSym(g,k,0,0,58);g.restore();g.strokeStyle='#b8a878';g.lineWidth=3;g.beginPath();g.moveTo(k*W/10,0);g.lineTo(k*W/10,H);g.stroke()}}));
 function mkReel(r,w){const g=new THREE.CylinderGeometry(r,r,w,40,1,true).rotateZ(Math.PI/2),pos=g.attributes.position,col=new Float32Array(pos.count*3);for(let i=0;i<pos.count;i++){const a=Math.atan2(pos.getY(i),pos.getZ(i)),f=.4+.6*Math.max(0,Math.cos(a));col[i*3]=col[i*3+1]=col[i*3+2]=f}g.setAttribute('color',new THREE.BufferAttribute(col,3));return new THREE.Mesh(g,bmat({map:strip(),vertexColors:true,side:THREE.FrontSide}))}
@@ -213,7 +213,7 @@ function crClose(){const R=CR;if(!R||R.ph!=='bet')return;for(const k in R.bets)S
 let PK=null;const PKT=[5.5,3.4];
 const SEAT=[[5.5,.92,4.45],[4.7,.92,3.4],[5.5,.92,2.5],[6.3,.92,3.4]];
 function pkOpen(){if(PK||busy||C.needChips())return;if(S.chips<60){toast('YOU NEED £60 IN CHIPS TO SIT DOWN');return}
- const R=PK={ph:'idle',dealer:3,meshes:[],tm:[],log:[],last:performance.now(),cam:{pos:[5.5,2.3,5.9],look:[5.5,.9,3.1]},pl:[{n:'YOU'},{n:'MARGOT',st:300,ag:1},{n:'DESMOND',st:300,ag:1.25},{n:'IVY',st:300,ag:.8}]};C.gOpen(mkCam(R.cam),55);
+ const R=PK={ph:'idle',dealer:3,meshes:[],tm:[],log:[],last:performance.now(),cam:{pos:[5.5,1.95,5.45],look:[5.5,.9,3.45]},pl:[{n:'YOU'},{n:'MARGOT',st:300,ag:1},{n:'DESMOND',st:300,ag:1.25},{n:'IVY',st:300,ag:.8}]};C.gOpen(mkCam(R.cam),55);
  const u=R.u=ovBase("TEXAS HOLD'EM (LIMIT)",()=>pkClose());R.ov=u.ov;R.kd=e=>{if(e.key==='Escape')pkClose()};addEventListener('keydown',R.kd);
  R.info=mk('div','position:absolute;left:8px;top:46px;font-size:13px;text-shadow:2px 2px 0 #000;line-height:1.45;white-space:pre',null,u.ov);
  R.lg=mk('div','position:absolute;right:8px;top:46px;font-size:12px;text-shadow:2px 2px 0 #000;line-height:1.4;white-space:pre;text-align:right;color:#cfe',null,u.ov);
@@ -231,7 +231,7 @@ function pkPot(){const R=PK;R.pot.children.slice().forEach(c=>R.pot.remove(c));l
 function pkHand(){const R=PK;if(R.ph!=='idle')return;if(S.chips<60){toast('YOU NEED £60 IN CHIPS TO PLAY ON');return}R.hands=(R.hands||0)+1;for(const m of R.meshes)G2.remove(m);R.meshes=[];R.pl.forEach(p=>{if(p.st<250)p.st=300});R.dealer=(R.dealer+1)%4;
  const Z=R.z={deck:newDeck(),board:[],hole:[],pot:0,street:0,bets:[0,0,0,0],put:[0,0,0,0],fold:[0,0,0,0],hi:10,rc:1,need:new Set([0,1,2,3]),cur:0};
  R.log=[];pkLog('HAND '+R.hands+' - DEALER: '+R.pl[R.dealer].n);const sb=(R.dealer+1)%4,bb=(R.dealer+2)%4;pkPay(sb,5);pkPay(bb,10);pkLog(R.pl[sb].n+' POSTS £5, '+R.pl[bb].n+' POSTS £10');
- for(let i=0;i<4;i++){Z.hole[i]=[Z.deck.pop(),Z.deck.pop()];Z.hole[i].forEach((c,k)=>{const to=[SEAT[i][0]+(k-.5)*.12,SEAT[i][1],SEAT[i][2]],m=mkCard(c,i!==0,[5.5,TY+.2,3.4],to,.1*(i*2+k));m.userData.who=i;R.meshes.push(m)})}
+ for(let i=0;i<4;i++){Z.hole[i]=[Z.deck.pop(),Z.deck.pop()];Z.hole[i].forEach((c,k)=>{const to=[SEAT[i][0]+(k-.5)*.17,SEAT[i][1],SEAT[i][2]-(i===0?.12:0)],m=mkCard(c,i!==0,[5.5,TY+.2,3.4],to,.1*(i*2+k));m.userData.who=i;R.meshes.push(m)})}
  R.ph='npc';Z.cur=(R.dealer+2)%4;pkUI();later(900,pkNext)}
 const alive=Z=>[0,1,2,3].filter(i=>!Z.fold[i]);
 function pkNext(){const R=PK,Z=R.z;if(alive(Z).length===1)return pkAward();if(!Z.need.size)return pkStreet();
@@ -251,7 +251,7 @@ function pkAct(i,a){const R=PK,Z=R.z;if(i===0){if(R.ph!=='you')return;const toCa
  Z.cur=i;pkUI();later(500,pkNext)}
 function pkStreet(){const R=PK,Z=R.z;Z.street++;Z.bets=[0,0,0,0];Z.hi=0;Z.rc=0;
  if(Z.street>3)return pkShow();
- const n=Z.street===1?3:1;for(let k=0;k<n;k++){const c=Z.deck.pop();Z.board.push(c);const idx=Z.board.length-1,m=mkCard(c,false,[5.5,TY+.2,3.4],[5.5+(idx-2)*.12,TY+.014,3.4],.12*k);R.meshes.push(m)}
+ const n=Z.street===1?3:1;for(let k=0;k<n;k++){const c=Z.deck.pop();Z.board.push(c);const idx=Z.board.length-1,m=mkCard(c,false,[5.5,TY+.2,3.4],[5.5+(idx-2)*.17,TY+.014,3.4],.12*k);R.meshes.push(m)}
  pkLog(['','--- FLOP ---','--- TURN ---','--- RIVER ---'][Z.street]);Z.need=new Set(alive(Z));Z.cur=R.dealer;R.ph='npc';pkUI();later(900,pkNext)}
 function pkShow(){const R=PK,Z=R.z,al=alive(Z);al.forEach(i=>{R.meshes.filter(m=>m.userData.who===i).forEach(m=>{m.material.map=C.cardTex(m.userData.c);m.material.needsUpdate=true})});
  const sc={};al.forEach(i=>sc[i]=best(Z.hole[i].concat(Z.board)));const top=Math.max(...al.map(i=>sc[i])),win=al.filter(i=>sc[i]===top);pkLog('SHOWDOWN: '+al.map(i=>R.pl[i].n+' '+CATN[catOf(sc[i])]).join(', '));pkEnd(win,CATN[catOf(top)])}
