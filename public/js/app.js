@@ -1556,9 +1556,18 @@ function mkPerson(sp,mat,parent){const w=sp.w,S=sp.sk,hr=sp.hr,tc=sp.tc,bc=sp.bc
  const hem=ts===3?.62:ts===4?.55:.86,topc=tc,tdk=dk(tc,.8);
  // torso
  const T=[{y:hem,rx:(ts===3||ts===4?(F?.27:.23):.165)*w,rz:(ts===3||ts===4?.15:.1),c:tdk},{y:.98,rx:(F?.145:.15)*w,rz:.095,c:topc},{y:1.14,rx:(F?.145:.168)*w,rz:.1,cz:st*.5,c:topc},{y:1.28,rx:(F?.165:.195)*w,rz:.11,cz:st,c:topc},{y:1.4,rx:(F?.18:.215)*w,rz:.105,cz:st*1.5,c:dk(topc,1.05)},{y:1.47,rx:.1*w,rz:.08,cz:st*2,c:ts===2?dk(topc,.9):S},{y:1.53,rx:.06,rz:.062,cz:st*2.4,c:S}];
- if(ts===3||ts===4){T.unshift({y:hem-.01,rx:T[0].rx,rz:T[0].rz,c:dk(tc,.6)})}
- if(ts===4){T[1].c=T[0].c=dk(bc,1.15);T[2].c=dk(bc,1.15)}
- T[T.length-1].top=0;lft(UP,T,8,true,true);
+  if(ts===3){const cc=tdk;T.splice(0,2,{y:.485,rx:.245*w,rz:.145,c:dk(tc,.55)},{y:.5,rx:.245*w,rz:.145,c:cc},{y:.72,rx:.237*w,rz:.138,c:cc},{y:.93,rx:.218*w,rz:.128,c:cc},{y:1.05,rx:(F?.15:.165)*w,rz:.106,c:topc})}
+  else if(ts===4){const sk=dk(bc,1.15);T.splice(0,2,{y:.535,rx:.262*w,rz:.15,c:dk(bc,.7)},{y:.55,rx:.262*w,rz:.15,c:sk},{y:.75,rx:.236*w,rz:.138,c:sk},{y:.93,rx:.214*w,rz:.126,c:sk},{y:1.04,rx:(F?.14:.155)*w,rz:.098,c:topc})}
+  T[T.length-1].top=0;lft(UP,T,8,true,true);
+  if(ts===3){const bk=dk(tc,.45),lt=dk(tc,1.12);
+   lft(UP,[{y:.9,rx:.222*w,rz:.132,c:[.3,.2,.12]},{y:.98,rx:.222*w,rz:.132,c:[.34,.23,.14]}],8,false);
+   pb(UP,0,.96,.136,.05,.07,.02,[.85,.75,.3]);
+   pb(UP,0,.76,.145,.018,.58,.016,bk);pb(UP,0,1.2,.122+st*1.2,.018,.34,.016,bk);
+   for(const y of[.62,.74,1.1,1.22])pb(UP,0,y,.152,.034,.034,.02,[.85,.82,.7]);
+   for(const sx of[-1,1]){pb(UP,sx*.13*w,.7,.142,.07,.012,.016,bk);pb(UP,sx*.14*w,.64,.143,.08,.07,.018,dk(tc,.85));
+    pb(UP,sx*.085,1.4,.108+st*1.6,.06,.2,.02,lt);pb(UP,sx*.06,1.47,.106+st*1.9,.08,.07,.02,lt)}
+   lft(UP,[{y:1.43,rx:.118,rz:.108,cz:st*2.1,c:lt},{y:1.56,rx:.1,rz:.1,cz:st*2.4,c:dk(tc,.95)}],8,false)}
+  if(ts===4){lft(UP,[{y:1.02,rx:(F?.142:.157)*w,rz:.1,c:dk(bc,.65)},{y:1.06,rx:(F?.142:.157)*w,rz:.1,c:dk(bc,.7)}],8,false)}
  if(ts===2){lft(UP,[{y:1.42,rx:.1,rz:.1,cz:st*2.2-.02,c:dk(tc,.8)},{y:1.52,rx:.095,rz:.1,cz:st*2.4-.04,c:dk(tc,.85)},{y:1.6,rx:.07,rz:.08,cz:st*2.4-.06,c:dk(tc,.9)}],8,false)}
  if(sp.scarf){const c=sp.scarf;lft(UP,[{y:1.44,rx:.095,rz:.09,cz:st*2.2,c:c},{y:1.55,rx:.088,rz:.085,cz:st*2.4,c:c}],8,false);pb(UP,0,1.36,.09+st*1.6,.07,.17,.03,c)}
  // head
@@ -1584,7 +1593,7 @@ function mkPerson(sp,mat,parent){const w=sp.w,S=sp.sk,hr=sp.hr,tc=sp.tc,bc=sp.bc
   if(sleeve>=1)R.push({y:-.51,rx:.036,rz:.038,c:S});R.push({y:-.56,rx:.04,rz:.024,c:S},{y:-.66,rx:.034,rz:.02,c:dk(S,.95)},{y:-.7,rx:.02,rz:.014,top:0,c:dk(S,.9)});return R};
  const sl=ts===0||ts===4?0:1;lft(A1,armR(sl),6,true);lft(A2,armR(sl),6,true);
  // legs
- const short=sp.sh||(ts===4&&0),skirt=ts===4,lg=y=>(short&&y<-.38)||(skirt&&y<-.35&&F)?(skirt?S:S):bc;
+ const short=sp.sh||(ts===4&&0),skirt=ts===4,lg=y=>(short&&y<-.38)||(skirt&&y<-.35)?S:bc;
  const legR=[{y:.02,rx:.1*w,rz:.1,c:bc},{y:-.3,rx:.092*w,rz:.095,c:lg(-.3)},{y:-.46,rx:.074*w,rz:.08,c:lg(-.46)},{y:-.7,rx:.066*w,rz:.07,c:lg(-.7)},{y:-.86,rx:.054*w,rz:.058,c:lg(-.86)},{y:-.9,rx:.056*w,rz:.06,c:lg(-.9)}];
  const shoe=[{z:-.07,rx:.05,ry:.05,cy:.055},{z:.04,rx:.053,ry:.046,cy:.047},{z:.15,rx:.045,ry:.034,cy:.033},{z:.23,rx:.02,ry:.018,cy:.02}];
  for(const Lb of[L1,L2]){lft(Lb,legR,6,false,true);lfz(Lb,shoe,6,sp.sc,-.92)}
@@ -1596,7 +1605,7 @@ function pb(B,x,y,z,sx,sy,sz,col){pbox(B,x,y-sy/2,z,sx,sy,sz,col)}
 for(let i=0;i<NPC.length;i++){const n=NPC[i];scene.remove(n.g);n.g=mkPerson(pSpec(i+3),mObj,scene)}
 {const u0=updPeds;updPeds=function(dt,now){u0(dt,now);for(const n of NPC){if(!n.g.visible)continue;const sw=Math.sin(n.ph)*.55;n.g.a1.rotation.x=-sw*.85;n.g.a2.rotation.x=sw*.85;n.g.up.rotation.y=sw*.09;n.g.up.position.y=-Math.abs(Math.cos(n.ph))*.012}}}
 /* interior people */
-const IMAT=new THREE.MeshBasicMaterial({vertexColors:true});
+const IMAT=new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide});
 function personIn(sp,x,z,ry,seated){const g=mkPerson(sp,IMAT,SG);g.position.set(x,seated?-.44*sp.h:0,z);g.rotation.y=ry||0;g.scale.setScalar(sp.h*.96);if(seated){g.l1.rotation.x=g.l2.rotation.x=-1.4;g.a1.rotation.x=g.a2.rotation.x=-.5}return g}
 visitor=function(n,x,z){const sp=pSpec(hash(n)%9973+11);personIn(sp,x,z,Math.PI+((hash(n)%5)-2)*.15);IROOM.push([x-.28,x+.28,z-.28,z+.28]);IA.push({r:[x-.7,x+.7,z-.7,z+.7],label:()=>'CHAT: '+n+' '+hearts(n),fn:()=>chat(n)})};
 {const b0=buildShop;buildShop=function(o){b0(o);if(SHK){SG.remove(SHK);const hs=hash(o.t)%9973+5,sp=pSpec(hs,{ts:1,tc:TH[o.t]&&TH[o.t].sh!=null?[(TH[o.t].sh>>16&255)/255,(TH[o.t].sh>>8&255)/255,(TH[o.t].sh&255)/255]:[.8,.3,.3]});SHK=new THREE.Group();SHK.position.set(0,0,-2.1);SG.add(SHK);mkPerson(sp,IMAT,SHK);SHK.children[0].scale.setScalar(sp.h*.96)}}}
