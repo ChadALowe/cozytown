@@ -118,7 +118,7 @@ function mkKart(col,hcol,num,seed,helm){const g=new THREE.Group();
  return g}
 const kartM=mkKart(0xd02828,0xffd820,7,41,0xd02020);kartM.visible=false;scene.add(kartM);
 const AICOL=[[0x2860d8,0xf4f4f4,'BLUEBELL',23,7,0x2860d8],[0x28a848,0xff9020,'MOSS',5,19,0x1a1a1e],[0x9030c8,0x20d0e0,'PLUM',88,33,0xf4f4f4]];
-for(const[i,y]of[[0,-20.5],[1,-26.5]]){const k=mkKart(i?0xffd820:0x2860d8,i?0xd02828:0xf4f4f4,i?42:11,i?12:3,i?0x1a1a1e:0xf4f4f4);k.position.set(-107.5,G0+.08,y);k.rotation.y=Math.PI/2;scene.add(k)}
+for(const[i,y]of[[0,-20.5],[1,-26.5]]){const k=mkKart(i?0xffd820:0x2860d8,i?0xd02828:0xf4f4f4,i?42:11,i?12:3,i?0x1a1a1e:0xf4f4f4);k.position.set(-107.5,G0+.08,y);k.rotation.y=Math.PI/2;bakeGroup(k);scene.add(k)}
 
 /* ---------- minimap ---------- */
 {const x=mb.getContext('2d');x.strokeStyle='#6a6a72';x.lineWidth=1.8;x.lineJoin='round';x.beginPath();S.forEach((s,i)=>i?x.lineTo(mx(s.x),mz(s.z)):x.moveTo(mx(s.x),mz(s.z)));x.closePath();x.stroke();

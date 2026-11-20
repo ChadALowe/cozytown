@@ -67,5 +67,6 @@ let cd=0,near=0;
   if(Math.abs(dx)<22&&dz>-1&&dz<18){if(!near){near=1;hint()}}else if(Math.abs(dx)>40||dz>45)near=0;
   if(cd>0)return;
   for(const bx of BAYS)if(Math.abs(GS.x-bx)<BW/2-.2&&GS.z<Z0+4.6&&GS.z>Z0-1){cd=4;GS.vx=GS.vz=GS.speed=0;window.JOEBAY={x:bx,z:Z0+9,psi:0};fade(()=>{GS.x=bx;GS.z=Z0+3;GS.psi=0;busy=0;openTune('perf');setTimeout(()=>{busy=1},350)});return}}}
+bakeGroup(grp);
 window.JOES={cx:CX,z0:Z0,bays:BAYS};
 })();
