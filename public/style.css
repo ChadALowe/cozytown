@@ -103,3 +103,5 @@ body:not(.mo) #art,body:not(.mo) #sky,body:not(.mo) #road{display:none}
 #mbtns .sec{background:#1b2250;color:#fff;border:3px solid #4a5590;box-shadow:0 .6vmin 0 #0a0d22;padding:1.2vmin 3vmin;font-size:max(14px,3vmin)}
 #mbtns .sec.warn{background:#a8141c;border-color:#fff}
 #saveInfo{font:800 max(11px,2.1vmin) ui-monospace,monospace;color:#9fd4ff;letter-spacing:.1em;margin:-.2vmin 0 1.4vmin;min-height:1.2em}
+
+body.nt #pad,body.nt #pedals{display:none!important}

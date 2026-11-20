@@ -31,12 +31,13 @@
  <div class="row"><b>MUSIC</b><button data-mus="1" class="on">ON</button><button data-mus="0">OFF</button></div>
  <div class="row"><b>QUALITY</b><button data-res="240">240p</button><button data-res="360" class="on">360p</button><button data-res="720">720p</button></div>
  <span id="sw" style="display:none"></span>
- <details class="hw"><summary>? HOW TO PLAY</summary><div class="how">Slide the left pad to steer. GAS and BRAKE on the right, HAND BRAKE to drift. EXIT to get out and walk (RUN sprints). PARCELS: load up at the Post Office, park near the address, EXIT, TAKE PARCEL at the boot, walk it to the door and DELIVER. Walk to your front door and tap ENTER HOUSE: bed saves, fridge refills stamina, wardrobe changes clothes. The garage bench is your shop for paint and upgrades. Drag anywhere on the screen to look around the camera. Tap outside a panel to close it. Best in landscape.</div>
+ <details class="hw"><summary>? HOW TO PLAY</summary><div class="how">On a computer: W/A/S/D or the arrow keys to drive and walk, SPACE for the hand brake (or run on foot), E or F for the action button. On a phone: slide the left pad to steer. GAS and BRAKE on the right, HAND BRAKE to drift. EXIT to get out and walk (RUN sprints). PARCELS: load up at the Post Office, park near the address, EXIT, TAKE PARCEL at the boot, walk it to the door and DELIVER. Walk to your front door and tap ENTER HOUSE: bed saves, fridge refills stamina, wardrobe changes clothes. The garage bench is your shop for paint and upgrades. Drag anywhere on the screen to look around the camera. Tap outside a panel to close it. Best in landscape.</div>
 </details>
  <div class="mb"><button id="optBack" class="sec">◀ BACK</button></div>
  <div class="dk">Keyboard: arrows/WASD · space = handbrake · C = camera · R = reset · E = use · Esc = menu</div>
 </div></div>
 <div id="shop"><div class="card"><div id="shopHead"><h2 id="shT">GARAGE</h2><div id="shCash" class="t"></div><div id="shMsg"></div></div><div id="shList"></div><div class="mb"><button id="shX" class="sec">CLOSE</button></div></div></div>
+<script>(function(){const b=document.body,m=matchMedia('(any-pointer:coarse)');const f=()=>b.classList.toggle('nt',!m.matches&&!window.__touched);f();addEventListener('touchstart',()=>{window.__touched=1;f()},{passive:true,once:true})})();</script>
 <script>
 (function(){
 var LIST=["vendor/three.min.js", "js/app.js", "js/newcars.js", "js/hay.js", "js/fp.js", "js/fpsdisp.js", "js/tune.js", "js/joes.js", "js/warm.js", "js/karts.js", "js/tvfootball.js", "js/tvracing.js", "js/milk.js", "js/herd.js", "js/gamble.js", "js/seagull.js", "js/depot.js", "js/casino.js", "js/casinogames.js", "js/casinogames2.js", "js/racing.js", "js/property.js", "js/stocks.js", "js/harbour.js", "js/airport.js", "js/airfields.js", "js/farm.js", "js/doors.js", "js/gauge.js", "js/hud.js", "js/darts.js"];
