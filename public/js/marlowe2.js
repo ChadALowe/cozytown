@@ -176,7 +176,7 @@ function openCityMap(){if(FOV||busy||menuOpen||(window.AIRPORT&&AIRPORT.CIN&&AIR
  const clamp=()=>{S.cu=Math.max(reg[0],Math.min(reg[1],S.cu));S.cv=Math.max(reg[2],Math.min(reg[3],S.cv))};
  const zoom=(f,px,py)=>{const r=cv.getBoundingClientRect(),w2=r.width/2,h2=r.height/2,qx=px==null?w2:px,qy=py==null?h2:py,ns=Math.max(.25,Math.min(8,S.s*f));const u=S.cu+(qx-w2)/S.s,v=S.cv-(qy-h2)/S.s;S.s=ns;S.cu=u-(qx-w2)/S.s;S.cv=v+(qy-h2)/S.s;clamp()};
  const toS=(u,v)=>{const r=cv.getBoundingClientRect();return[(u-S.cu)*S.s+r.width/2,-(v-S.cv)*S.s+r.height/2]};
- const pois=()=>{const L=CITY.poi.map(p=>({u:p.u,v:p.v,n:p.metro?'MARLOWE METRO':p.n,ic:p.metro?'Ⓜ':PICON[p.n]||'📍',c:p.metro?'#1d3e8a':p.taxi?'#ffd24a':'#ffffff'}));return L};
+ const pois=()=>{const L=CITY.poi.map(p=>({u:p.u,v:p.v,n:p.metro?'MARLOWE METRO':p.n,ic:p.metro?'Ⓜ':p.ic||PICON[p.n]||'📍',c:p.metro?'#1d3e8a':p.taxi?'#ffd24a':'#ffffff'}));return L};
  const close=()=>{cancelAnimationFrame(S.raf);removeEventListener('keydown',S.kd,true);removeEventListener('resize',fit);ov.remove();FOV=null;busy=0};
  bt('+',()=>zoom(1.5));bt('−',()=>zoom(1/1.5));bt('⌖',()=>{const t=play();S.cu=t.x-OX;S.cv=t.z-OZ;S.s=Math.max(S.s,1.4)});bt('▣',()=>{const r=cv.getBoundingClientRect();S.s=Math.min(r.width/(reg[1]-reg[0]),r.height/(reg[3]-reg[2]))*1.05;S.cu=(reg[0]+reg[1])/2;S.cv=(reg[2]+reg[3])/2});bt('✕',close);
  cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);S.ptr.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});S.drag=0;if(S.ptr.size===2){const a=[...S.ptr.values()];S.pd=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}cv.style.cursor='grabbing'});
