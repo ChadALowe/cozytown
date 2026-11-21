@@ -20,3 +20,6 @@ addEventListener('keydown',e=>{if(e.key!=='Escape'||e.repeat)return;if(typeof me
 })();
 /* the district name banner shouldn't sit on top of the pause menu */
 (function(){if(typeof setMenu!=='function')return;const s0=setMenu;setMenu=function(v){const r=s0.apply(this,arguments);try{const d=document.getElementById('crDis');if(v&&d)d.style.opacity=0}catch(e){}return r}})();
+/* one save: every full save carries the side data; a NEW GAME reload starts straight away */
+(function(){if(!window.CZSAVE)return;if(typeof cozySave==='function'){const s0=cozySave;cozySave=function(){return CZSAVE.attach(s0.apply(this,arguments)||{})}}
+ if(CZSAVE.fresh){const t=setInterval(()=>{if(window.__bootDone===1){clearInterval(t);const g=document.getElementById('go');if(g&&!g.disabled)g.click()}},200)}})();
