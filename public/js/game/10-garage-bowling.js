@@ -23,8 +23,8 @@ function buildShowroom(o){IA.splice(0,IA.length,LEAVE_IA());IROOM.splice(0,IROOM
  gbox(SG,0,0,-2.4,2.6,.95,.6,0x20242c);gbox(SG,0,.95,-2.4,2.7,.06,.7,0xc0c4cc);gbox(SG,.5,1.01,-2.5,.5,.35,.05,0x181c24);
  const sp=pSpec(9301,{f:false,gl:false,scarf:null,bp:false,bag:0,old:false,tc:[.12,.16,.3]});window.SHK=personIn(sp,0,-2.95,0);
  const XS=[-8.25,-5.5,-2.75,0,2.75,5.5,8.25];
- const PG=window.SHOWPG|0,NPG=Math.ceil(CARN.length/XS.length);
- XS.forEach((x,j)=>{const i=PG*XS.length+j;if(i>=CARN.length)return;const pod=new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.3,.14,20),new THREE.MeshBasicMaterial({color:0x303642}));pod.position.set(x,.07,-.6);SG.add(pod);
+ const STK=window.TRI&&TRI.villageStock?TRI.villageStock:[...CARN.keys()];if(window.TRI)TRI.curStock=STK;const NPG=Math.ceil(STK.length/XS.length),PG=(window.SHOWPG|0)%NPG;
+ XS.forEach((x,j)=>{const i=STK[PG*XS.length+j];if(i==null)return;const pod=new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.3,.14,20),new THREE.MeshBasicMaterial({color:0x303642}));pod.position.set(x,.07,-.6);SG.add(pod);
   const rg=new THREE.Mesh(new THREE.RingGeometry(1.1,1.24,28).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xe8c040}));rg.position.set(x,.145,-.6);SG.add(rg);
   const car=realCar(i);car.position.set(x,.14,-.6);car.scale.setScalar(.68);car.rotation.y=i*.7;SG.add(car);SHOWC.push(car);
   gbox(SG,x,0,.95,.08,.55,.08,0x303030);sPlane(1.5,.75,x,.9,.97,0,boardTex(i));

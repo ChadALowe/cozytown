@@ -69,7 +69,7 @@ function fitImg(){if(!imgBox)return;const c=IMG[ckI];if(!c)return;const W=innerW
 addEventListener('resize',fitImg);
 function updImg(v){if(!imgNeedles)return;const mph=v*2.237,f=Math.min(1,v/42);for(const[d,e]of imgNeedles){const p=d.k==='spd'?Math.min(1,mph/d.mx):(.12+.5*f+.15*((v*.35)%1));e.style.transform='rotate('+(d.a0+p*d.sw)+'deg)'}}
 let ckI=-1;
-function buildCk(i){if(IMG[i]){buildImg(i);fitImg();return}const c=CK[i]||(i>=6?CK[6]:CK[0]);ckI=i;
+function buildCk(i){if(IMG[i]){buildImg(i);fitImg();return}const c=CK[i]||(i>=6?(window.TRI&&TRI.isBike(i)?CK[4]:CK[6]):CK[0]);ckI=i;
  const P=(...a)=>a.join(' '),sv=[];
  // roof header (angled lower edge) + A-pillars + door tops
  if(c.roof)sv.push(`<polygon points="0,0 100,0 100,${c.roof-(c.tall?0:3)} 50,${c.roof+1.5} 0,${c.roof-(c.tall?0:3)}" fill="${c.roofc}"/>`);

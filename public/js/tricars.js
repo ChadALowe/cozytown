@@ -62,6 +62,7 @@ function build(S){
   if(b===0)return UNDER;
   if(b===6)return g>.06?(G.sill===undefined?CHR:G.sill):null;
   if(b===7){if(g<.05)return null;if(!inR(zm,G.side))return G.pillars&&g>.12?TRIM:null;for(const q of G.posts||[])if(inR(zm,q))return TRIM;return GLASS}
+  if(G.bed&&b>=7&&inR(zm,G.bed))return 0x1c1d20;
   if(b===8){if(g<.05)return null;if(G.pillars&&g>.12)return TRIM;if(G.roofCol!=null&&g>.15&&!inR(zm,G.ws)&&!inR(zm,G.rs))return G.roofCol;return null}
   if(b===9){if(g<.015)return null;if(inR(zm,G.ws)||inR(zm,G.rs))return WSC;if(G.roofCol!=null&&g>.15)return G.roofCol;return null}
   return null}
@@ -157,13 +158,14 @@ function gen(p){const NZ=p.L/2,W0=p.W/2,ZF=NZ-p.fo,ZB=ZF-p.WB,rd=p.round==null?1
  const rfd=p.rfd==null?.05:p.rfd;for(const s of[.25,.5,.75,1])rK.push([p.zpk+(p.rf1-p.zpk)*s,H-rfd*Math.pow(s,1.6)]);
  const yr1=H-rfd;
  if(sal){for(const s of[.15,.3,.45,.6,.75,.9,1])rK.push([p.rf1+(p.rs0-p.rf1)*s,p.deck-.01+(yr1-p.deck+.01)*Math.pow(Math.cos(s*Math.PI/2),p.rsp==null?1.1:p.rsp)]);rK.push([p.rs0-.03,0])}
+ else if(p.cabEnd!=null){rK.push([p.cabEnd,yr1-.03],[p.cabEnd-.1,p.beltR-.12])}
  else for(const s of[.25,.5,.75,1])rK.push([p.rf1+(-NZ-p.rf1)*s,yr1+(p.tail-yr1)*Math.pow(s,p.tp==null?1.5:p.tp)]);
  const side=[p.sideB!=null?p.sideB:sal?p.rs0+.3:-NZ+.42,p.ws0-.03];
  const S={NZ,W0,ZF,ZB,R:p.R,RA:p.R+.039,TW:p.TW||.1275,rimR:p.rimR||p.R*.715,inset:p.inset||.125,wK,ybK,beltK:bK,roofK:rK,
   roofW:p.roofW||W0*.70,aw:p.aw||.07,crown:p.crown==null?.066:p.crown,p3y:p.p3y||yb+.27,lx:W0-.32,rearExtra:!sal,
   bendF:{from:NZ-.62,pull:.13*rd,rake:p.rakeF==null?.05:p.rakeF,y0:p.nose-.2,y1:p.nose+.1},
   bendR:p.rakeR||p.pullR?{from:-NZ+.55,pull:p.pullR==null?.08*rd:p.pullR,rake:p.rakeR||0,y0:(sal?p.deck:p.beltR)-.05,y1:sal?p.deck+.05:p.tail}:null,
-  glass:{side,posts:p.posts||[],ws:[p.ws1,p.ws0+.02],rs:sal?[p.rs0,p.rf1]:p.rsGlass||null,sill:p.sill,pillars:p.pillars,roofCol:p.roofCol},
+  glass:{side,posts:p.posts||[],ws:[p.ws1,p.ws0+.02],rs:sal?[p.rs0,p.rf1]:p.rsGlass||null,sill:p.sill,pillars:p.pillars,roofCol:p.roofCol,bed:p.bed},
   mirror:Object.assign({x:W0+.04,y:p.cowl+.06,z:p.ws0-.16,s:[.15,.095,.075]},p.mirror||{}),rim:p.rim||{n:5,col:0xb8bdc3},
   deco:p.deco,extras:p.extras,capCol:p.capCol};
  return S}
@@ -368,29 +370,400 @@ SPECS.push({key:'prius',name:'TOYOTA PRIUS',desc:'SIPS FUEL + SMOOTH',price:340,
    doors:[1.0,-.19,-1.40],handles:[.15,-.95],wrapR:[-2.30,.93,-2.15,.99]})}),
  lamps:{f:[.64,.58,2.26],b:[.74,.96,-2.3]}});
 
+/* ================================================================ the big catalogue
+   One line per car: real size + a body type + a brand style. typeGen() turns the size and
+   type into a side profile; brandDeco() draws that brand's grille, lights and tail lights. */
+const TYPES={/* f: front-overhang share, nose/cowl/deck/beltR/tail as fractions of height, a: windscreen base behind front axle (share of wheelbase),
+               rk: windscreen run per rise, rl: roof length (share of length), R: wheel radius, d2: two doors */
+ hatchS:{f:.52,nose:.48,cowl:.65,beltR:.69,tail:.82,yb:.11,a:.16,rk:1.25,rl:.26,R:.29,rakeR:.18,tp:.85,hatch:1},
+ hatch:{f:.50,nose:.43,cowl:.63,beltR:.68,tail:.73,yb:.105,a:.20,rk:1.45,rl:.22,R:.31,rakeR:.30,tp:.85,hatch:1},
+ estate:{f:.47,nose:.42,cowl:.62,beltR:.68,tail:.93,yb:.105,a:.29,rk:1.55,rl:.42,R:.33,rakeR:.07,tp:1.6,hatch:1},
+ saloon:{f:.44,nose:.42,cowl:.63,deck:.69,yb:.105,a:.30,rk:1.6,rl:.21,rs:.15,R:.33,sal:1},
+ coupe:{f:.44,nose:.43,cowl:.62,deck:.71,yb:.1,a:.34,rk:1.8,rl:.14,rs:.20,R:.34,sal:1,d2:1},
+ gt:{f:.40,nose:.45,cowl:.64,deck:.73,yb:.1,a:.45,rk:1.8,rl:.12,rs:.19,R:.35,sal:1,d2:1,crown:.05},
+ roadster:{f:.42,nose:.45,cowl:.66,deck:.73,yb:.1,a:.40,rk:1.6,rl:.08,rs:.10,R:.33,sal:1,d2:1,soft:1},
+ super:{f:.42,nose:.33,cowl:.58,deck:.80,yb:.085,a:.03,rk:2.1,rl:.10,rs:.20,R:.35,sal:1,d2:1,crown:-.03,roofW:.60,q:.5,intakes:1},
+ suvS:{f:.48,nose:.49,cowl:.64,beltR:.68,tail:.87,yb:.125,a:.25,rk:1.3,rl:.34,R:.33,rakeR:.18,tp:1.3,hatch:1,p3:.33},
+ suv:{f:.47,nose:.50,cowl:.64,beltR:.69,tail:.90,yb:.13,a:.25,rk:1.3,rl:.40,R:.355,rakeR:.12,tp:1.4,hatch:1,p3:.35,round:.7},
+ suvL:{f:.45,nose:.52,cowl:.65,beltR:.69,tail:.93,yb:.14,a:.25,rk:1.25,rl:.44,R:.385,rakeR:.07,tp:1.5,hatch:1,p3:.37,round:.55,roofW:.76},
+ box4x4:{f:.40,nose:.55,cowl:.62,beltR:.64,tail:.97,yb:.14,a:.27,rk:.55,rl:.52,R:.385,rakeR:0,tp:1,hatch:1,p3:.36,round:.2,roofW:.86,spare:1},
+ van:{f:.47,nose:.48,cowl:.57,beltR:.61,tail:.975,yb:.13,a:-.02,rk:1.4,rl:.55,R:.34,rakeR:.02,tp:1,hatch:1,p3:.28,round:.35,roofW:.86,van:1},
+ vanL:{f:.33,nose:.40,cowl:.48,beltR:.50,tail:.98,yb:.11,a:-.06,rk:1.0,rl:.60,R:.36,rakeR:.01,tp:1,hatch:1,p3:.25,round:.25,roofW:.9,van:1},
+ pickup:{f:.42,nose:.54,cowl:.64,beltR:.62,tail:.62,yb:.15,a:.20,rk:1.25,rl:.12,R:.38,hatch:1,p3:.36,round:.5,roofW:.78,pickup:1},
+ classic:{f:.42,nose:.52,cowl:.66,beltR:.70,tail:.88,yb:.12,a:.22,rk:.95,rl:.28,R:.27,rakeR:.14,tp:1.2,hatch:1,round:1.2},
+ classicSaloon:{f:.44,nose:.50,cowl:.64,deck:.70,yb:.12,a:.30,rk:1.1,rl:.20,rs:.12,R:.29,sal:1,round:1.2},
+ gtclassic:{f:.40,nose:.42,cowl:.62,deck:.70,yb:.11,a:.52,rk:1.5,rl:.12,rs:.18,R:.33,sal:1,d2:1,round:1.2},
+ roadsterClassic:{f:.42,nose:.50,cowl:.68,deck:.72,yb:.12,a:.42,rk:1.2,rl:.08,rs:.10,R:.30,sal:1,d2:1,soft:1,round:1.2}};
+
+function typeGen(T,c){const L=c.L,W=c.W,H=c.H,WB=c.WB,NZ=L/2,ZF=NZ-(L-WB)*T.f,ZB=ZF-WB,R=c.R||T.R,yb=H*(T.yb||.11);
+ const nose=H*T.nose,cowl=H*T.cowl,ws0=ZF-T.a*WB,ws1=ws0-(H-.04-cowl)*T.rk,zpk=ws1-.12*L,rf1=Math.max(ws1-T.rl*L,-NZ+.35);
+ const p={L,W,H,WB,fo:NZ-ZF,R,yb,nose,cowl,ws0,ws1,zpk:Math.max(zpk,(ws1+rf1)/2),rf1,rfd:.04,q:T.q,crown:T.crown,round:T.round,roofW:T.roofW?W/2*T.roofW:null,p3y:T.p3?H*T.p3:null,rim:c.rim,sill:c.sill};
+ if(T.sal){p.type='saloon';p.deck=H*T.deck;p.rs0=Math.max(rf1-T.rs*L*(T.soft?.6:1),-NZ+.30);if(T.d2)p.posts=[];else{const bp=(ws1+rf1)/2+.02;p.posts=[[bp-.05,bp+.05]]}}
+ else{p.type='hatch';p.beltR=H*T.beltR;p.tail=H*T.tail;p.rakeR=T.rakeR;p.pullR=.08*(T.round==null?1:T.round);p.tp=T.tp;
+  if(T.van){p.sideB=ws1-.5;p.posts=[]}
+  else if(T.pickup){p.cabEnd=ws1-.95;p.rf1=p.cabEnd+.12;p.zpk=(ws1+p.rf1)/2;p.sideB=p.cabEnd+.05;p.bed=[-NZ-.1,p.cabEnd-.08];p.rsGlass=[p.cabEnd-.1,p.cabEnd+.01];const bp=(ws1+p.cabEnd)/2;p.posts=[[bp-.05,bp+.05]]}
+  else{p.sideB=-NZ+(T.tail>.9?.45:.55);const bp=(ws1+rf1)/2+.1;p.posts=[[bp-.05,bp+.05]];if(T.tail>.85&&!c.d2)p.posts.push([p.sideB+.32,p.sideB+.36])}}
+ if(T.soft)p.roofCol=0x1a1a1c;
+ if(c.pillars)p.pillars=1;if(c.roofCol!=null)p.roofCol=c.roofCol;
+ return p}
+
+/* brand looks: grille g, headlight h, tail light t (+ chrome-bumper classics) */
+const BRAND={audi:{g:'single',h:'slim',t:'wedgeBar'},bmw:{g:'kidney',h:'angled',t:'L'},merc:{g:'wide',h:'angled',t:'wedge'},vw:{g:'slot',h:'slim',t:'wedge'},
+ ford:{g:'trap',h:'swept',t:'wedge'},vauxhall:{g:'vizor',h:'inVizor',t:'slim'},toyota:{g:'lowbig',h:'hammer',t:'bar'},honda:{g:'slot',h:'slim',t:'wedge'},
+ nissan:{g:'vmotion',h:'boomerang',t:'wedge'},kia:{g:'tiger',h:'swept',t:'vertical'},hyundai:{g:'cascade',h:'pixel',t:'bar'},mazda:{g:'wing',h:'slim',t:'round2'},
+ skoda:{g:'square',h:'swept',t:'wedge'},seat:{g:'trap',h:'slim',t:'bar'},renault:{g:'wide',h:'cshape',t:'wedge'},peugeot:{g:'wide',h:'fang',t:'claw'},
+ citroen:{g:'slot',h:'split',t:'wedge'},dacia:{g:'wide',h:'swept',t:'vertical'},fiat:{g:'small',h:'round',t:'round'},suzuki:{g:'wide',h:'swept',t:'wedge'},
+ mg:{g:'wide',h:'swept',t:'wedge'},volvo:{g:'square',h:'thor',t:'vertical'},tesla:{g:'none',h:'slim',t:'wedge'},polestar:{g:'none',h:'thor',t:'bar'},
+ byd:{g:'none',h:'swept',t:'bar'},porsche:{g:'none',h:'round',t:'bar'},ferrari:{g:'super',h:'slim',t:'round2'},lambo:{g:'super',h:'yshape',t:'wedge'},
+ mclaren:{g:'super',h:'hammer2',t:'slim'},bugatti:{g:'horseshoe',h:'quadRound',t:'bar'},aston:{g:'trap',h:'swept',t:'bar'},bentley:{g:'matrix',h:'quadRound',t:'oval'},
+ rolls:{g:'tall',h:'slimRect',t:'vertical'},jeep:{g:'seven',h:'round',t:'square'},isuzu:{g:'wide',h:'swept',t:'vertical'},
+ classicmini:{g:'classicbar',h:'round',t:'square',chrome:1},jagclassic:{g:'oval',h:'round',t:'round',chrome:1},mgclassic:{g:'classicbar',h:'round',t:'round',chrome:1},
+ triumphc:{g:'classicbar',h:'round',t:'round',chrome:1},morris:{g:'classicbar',h:'round',t:'round',chrome:1},fordc:{g:'classicbar',h:'quadRound',t:'square',chrome:1},
+ astonc:{g:'trap',h:'round',t:'round',chrome:1},lrc:{g:'rect',h:'round',t:'square'}};
+
+function brandDeco(B,P,T){const W0=P.W/2,NZ=P.L/2,yF0=P.yb+.09,yF1=P.nose,yR0=P.yb+.16,yR1=(T.sal?P.deck-.05:P.beltR-.04);
+ const F=(u,v)=>[u*W0,yF0+v*(yF1-yF0)],Rr=(u,v)=>[u*W0,yR0+v*(yR1-yR0)],fp=a=>a.map(q=>F(q[0],q[1])),rp=a=>a.map(q=>Rr(q[0],q[1]));
+ return D=>{const{decal,both,sides,plate,circ,shrink}=D;const bx=(a,b)=>[[a[0],a[1]],[b[0],a[1]],[b[0],b[1]],[a[0],b[1]]];
+  const grille=(poly,col,sur,slat,vert)=>{if(sur!==false)decal('z',1,fp(poly),sur||0x55585e,1);decal('z',1,shrink(fp(poly),.92),col||0x0f1012,2);
+   if(slat){const P_=fp(poly),ys=P_.map(q=>q[1]),xs=P_.map(q=>q[0]),y0=Math.min(...ys),y1=Math.max(...ys),x1=Math.max(...xs)*.8;
+    if(vert)for(let x=-x1;x<x1;x+=slat)decal('z',1,rect(x,y0+.03,x+.012,y1-.03),B.slatCol||0x3a3d42,3);else for(let y=y0+.035;y<y1-.025;y+=slat)decal('z',1,rect(-x1,y,x1,y+.012),B.slatCol||0x34373c,3)}};
+  /* chrome bumpers for classics */
+  if(B.chrome){decal('z',1,fp(bx([-1.05,.0],[1.05,.13])),0xc8ccd2,0);decal('z',-1,rp(bx([-1.05,.0],[1.05,.14])),0xc8ccd2,0)}
+  else{decal('z',1,fp(bx([-1.05,-.05],[1.05,.06])),0x1a1b1e,0);decal('z',-1,rp(bx([-1.05,-.08],[1.05,.06])),0x1a1b1e,0)}
+  if(T.pickup||T.van||T.spare)decal('z',1,fp(bx([-1.05,-.05],[1.05,.22])),0x1e1f22,0);
+  /* grille */
+  const g=B.g;
+  if(g==='single'){grille([[-.42,.92],[.42,.92],[.50,.80],[.48,.30],[.38,.12],[-.38,.12],[-.48,.30],[-.50,.80]],0,0x55585e,.055)}
+  else if(g==='kidney'){for(const s of[1,-1]){const k=[[.03,.42],[.23,.42],[.26,.48],[.26,.86],[.22,.92],[.03,.92]].map(q=>[q[0]*s,q[1]]);decal('z',1,fp(s>0?k:k.reverse()),0xb4b8be,1);decal('z',1,shrink(fp(s>0?k:k.slice().reverse()),.86),0x0f1012,2)}
+   decal('z',1,fp([[-.42,.12],[.42,.12],[.46,.30],[-.46,.30]]),0x111214,1)}
+  else if(g==='wide'){grille([[-.52,.60],[.52,.60],[.52,.90],[-.52,.90]],0,0x6a6e74,.05);decal('z',1,fp([[-.45,.10],[.45,.10],[.5,.34],[-.5,.34]]),0x111214,1)}
+  else if(g==='slot'){decal('z',1,fp([[-.62,.82],[.62,.82],[.60,.90],[-.60,.90]]),0x111214,1);grille([[-.46,.10],[.46,.10],[.54,.44],[-.54,.44]],0x111214,false,.05)}
+  else if(g==='trap'){grille([[-.44,.88],[.44,.88],[.38,.40],[-.38,.40]],0,0x6a6e74,.05);decal('z',1,fp([[-.5,.10],[.5,.10],[.52,.26],[-.52,.26]]),0x111214,1)}
+  else if(g==='vizor'){decal('z',1,fp([[-.95,.70],[.95,.70],[.93,.95],[-.93,.95]]),0x101113,1);decal('z',1,fp([[-.44,.12],[.44,.12],[.48,.34],[-.48,.34]]),0x111214,1)}
+  else if(g==='lowbig'){decal('z',1,fp([[-.5,.86],[.5,.86],[.48,.92],[-.48,.92]]),0x111214,1);grille([[-.50,.10],[.50,.10],[.58,.50],[-.58,.50]],0x111214,false,.055)}
+  else if(g==='vmotion'){grille([[-.48,.88],[.48,.88],[.36,.40],[-.36,.40]],0x141518,0xb4b8be,.05);decal('z',1,fp([[-.5,.10],[.5,.10],[.52,.30],[-.52,.30]]),0x111214,1)}
+  else if(g==='tiger'){grille([[-.30,.88],[.30,.88],[.34,.76],[.28,.62],[-.28,.62],[-.34,.76]],0x121315,0x6a6e74,.045);decal('z',1,fp([[-.46,.10],[.46,.10],[.5,.38],[-.5,.38]]),0x111214,1)}
+  else if(g==='cascade'){grille([[-.5,.86],[.5,.86],[.56,.6],[.44,.18],[-.44,.18],[-.56,.6]],0x141518,0x3a3d42,.045)}
+  else if(g==='wing'){grille([[-.40,.84],[.40,.84],[.47,.62],[.36,.28],[-.36,.28],[-.47,.62]],0x141518,false,.05);decal('z',1,fp([[-.46,.80],[.46,.80],[.6,.86],[-.6,.86]]),0xb4b8be,3)}
+  else if(g==='square'){grille([[-.34,.92],[.34,.92],[.34,.46],[-.34,.46]],0x141518,0x8a8e94,.045,1);decal('z',1,fp([[-.5,.10],[.5,.10],[.52,.30],[-.52,.30]]),0x111214,1)}
+  else if(g==='rect'){grille([[-.50,.58],[.50,.58],[.50,.92],[-.50,.92]],0x15161a,0x3a3d42,.045)}
+  else if(g==='tall'){grille([[-.27,1.02],[.27,1.02],[.27,.36],[-.27,.36]],0xc8ccd2,0xdde0e4,.04,1)}
+  else if(g==='matrix'){grille([[-.36,.96],[.36,.96],[.40,.40],[-.40,.40]],0x2a2c30,0xc8ccd2,.04);grille([[-.36,.96],[.36,.96],[.40,.40],[-.40,.40]],0x2a2c30,false,.06,1)}
+  else if(g==='none'){decal('z',1,fp([[-.40,.10],[.40,.10],[.44,.28],[-.44,.28]]),0x111214,1)}
+  else if(g==='small'){decal('z',1,fp([[-.25,.28],[.25,.28],[.28,.40],[-.28,.40]]),0x111214,1)}
+  else if(g==='super'){decal('z',1,fp([[-.36,.06],[.36,.06],[.40,.30],[-.40,.30]]),0x0f1012,1);both('z',1,fp([[.52,.02],[.92,.02],[.96,.46],[.58,.40]]),0x0f1012,1)}
+  else if(g==='horseshoe'){grille([[-.16,.80],[.16,.80],[.18,.40],[.10,.24],[-.10,.24],[-.18,.40]],0x0f1012,0xc8ccd2,.03);both('z',1,fp([[.40,.06],[.90,.06],[.94,.40],[.46,.36]]),0x0f1012,1)}
+  else if(g==='seven'){for(let k=-3;k<=3;k++){const u=k*.11;decal('z',1,fp([[u-.035,.48],[u+.035,.48],[u+.035,.90],[u-.035,.90]]),0x111214,1)}}
+  else if(g==='classicbar'){grille([[-.30,.40],[.30,.40],[.30,.80],[-.30,.80]],0x2a2c30,0xc8ccd2,.045)}
+  else if(g==='oval'){decal('z',1,fp(circ(0,.42,.22,.16,16)),0xc8ccd2,1);decal('z',1,shrink(fp(circ(0,.42,.22,.16,16)),.85),0x111214,2)}
+  /* headlights */
+  const h=B.h,lamp=(poly,col)=>{both('z',1,fp(poly),col||0x262b31,1);both('z',1,shrink(fp(poly),.78,.003),0x9aa6b0,2)},
+   drl=poly=>both('z',1,fp(poly),0xf4f8ff,3),rnd=(u,v,r)=>{const c=F(u,v),R=r*W0;both('z',1,circ(c[0],c[1],R*1.15,R*1.15),B.chrome?0xc8ccd2:0x2a2c30,1);both('z',1,circ(c[0],c[1],R,R),0xb8c4ce,2);both('z',1,circ(c[0],c[1],R*.45,R*.45),0xf4f8ff,3)};
+  if(h==='slim'){lamp([[.50,.84],[.88,.82],[.93,.90],[.88,.97],[.52,.95]]);drl([[.54,.85],[.86,.83],[.87,.86],[.55,.88]])}
+  else if(h==='angled'){lamp([[.34,.78],[.82,.74],[.91,.84],[.84,.95],[.38,.92]]);drl([[.40,.80],[.80,.77],[.82,.80],[.42,.83]])}
+  else if(h==='swept'){lamp([[.46,.76],[.86,.78],[.95,.90],[.84,.98],[.50,.90]]);drl([[.52,.78],[.84,.80],[.86,.83],[.54,.81]])}
+  else if(h==='inVizor'){both('z',1,fp([[.62,.76],[.88,.78],[.88,.90],[.62,.88]]),0xa8b4c0,3);drl([[.62,.74],[.88,.76],[.88,.78],[.62,.76]])}
+  else if(h==='hammer'){lamp([[.44,.84],[.90,.86],[.93,.94],[.46,.93]]);drl([[.80,.6],[.84,.6],[.88,.85],[.84,.85]])}
+  else if(h==='boomerang'){lamp([[.52,.80],[.90,.82],[.93,.94],[.56,.92]]);drl([[.86,.5],[.90,.5],[.92,.82],[.88,.82]])}
+  else if(h==='pixel'){lamp([[.56,.80],[.92,.80],[.92,.93],[.56,.93]]);for(let k=0;k<4;k++)drl(bx([.6+k*.08,.83],[.65+k*.08,.88]))}
+  else if(h==='round'){rnd(.66,.74,.12)}
+  else if(h==='quadRound'){rnd(.52,.76,.09);rnd(.76,.76,.11)}
+  else if(h==='fang'){lamp([[.52,.82],[.88,.82],[.92,.92],[.56,.94]]);drl([[.78,.40],[.82,.40],[.86,.80],[.82,.80]])}
+  else if(h==='split'){drl([[.50,.90],[.90,.90],[.90,.95],[.50,.95]]);lamp([[.60,.58],[.86,.58],[.86,.72],[.60,.72]])}
+  else if(h==='thor'){lamp([[.52,.78],[.90,.78],[.92,.94],[.54,.94]]);drl(bx([.58,.85],[.86,.87]));drl(bx([.70,.80],[.72,.92]))}
+  else if(h==='slimRect'){lamp([[.56,.80],[.92,.80],[.92,.96],[.56,.96]]);drl(bx([.58,.81],[.90,.83]))}
+  else if(h==='yshape'){lamp([[.50,.78],[.95,.86],[.86,.98],[.56,.92]]);drl([[.60,.84],[.84,.88],[.80,.91],[.60,.87]])}
+  else if(h==='hammer2'){lamp([[.58,.70],[.92,.80],[.90,.96],[.56,.88]]);drl([[.62,.76],[.70,.76],[.70,.86],[.62,.84]])}
+  else if(h==='cshape'){lamp([[.52,.80],[.90,.80],[.92,.94],[.54,.94]]);drl(bx([.84,.45],[.88,.80]))}
+  /* plates, lower intakes */
+  if(!T.van&&!T.pickup&&g!=='super'&&g!=='horseshoe')both('z',1,fp([[.56,.10],[.80,.12],[.84,.34],[.60,.32]]),0x131416,1);
+  plate('z',1,F(0,.30)[1],F(0,.30)[1]+.11,0xeeeeea);
+  /* rear */
+  const t=B.t,tl=(poly,c2)=>{both('z',-1,rp(poly),0x6d0a10,1);both('z',-1,shrink(rp(poly),.8),c2||0xc31a26,2)},rr=(u,v,r)=>{const c=Rr(u,v),R=r*W0;both('z',-1,circ(c[0],c[1],R*1.12,R*1.12),B.chrome?0xc8ccd2:0x2a2c30,1);both('z',-1,circ(c[0],c[1],R,R),0xc31a26,2)};
+  if(t==='wedge'||t==='wedgeBar'){tl([[.40,.70],[.88,.72],[.95,.86],[.88,.98],[.44,.95]]);if(t==='wedgeBar')decal('z',-1,rp(bx([-.40,.80],[.40,.86])),0xc8ccd2,1)}
+  else if(t==='L'){tl(bx([.44,.80],[.92,.98]));tl(bx([.80,.56],[.92,.80]))}
+  else if(t==='bar'){decal('z',-1,rp(bx([-.92,.80],[.92,.90])),0xc31a26,1);decal('z',-1,rp(bx([-.90,.83],[.90,.87])),0xff4d58,2)}
+  else if(t==='vertical'){tl(bx([.80,.42],[.95,.99]))}
+  else if(t==='round'){rr(.72,.76,.09)}
+  else if(t==='round2'){rr(.56,.78,.08);rr(.80,.78,.08)}
+  else if(t==='slim'){tl([[.45,.84],[.92,.86],[.95,.95],[.47,.94]])}
+  else if(t==='claw'){tl(bx([.50,.72],[.92,.96]));for(let k=0;k<3;k++)both('z',-1,rp(bx([.56+k*.12,.76],[.62+k*.12,.92])),0xff4d58,3)}
+  else if(t==='square'){tl(bx([.70,.55],[.92,.85]))}
+  else if(t==='oval'){both('z',-1,rp(circ(.72,.78,.18,.12)),0x6d0a10,1);both('z',-1,shrink(rp(circ(.72,.78,.18,.12)),.8),0xc31a26,2)}
+  const rpY=T.sal?Rr(0,.45)[1]:Rr(0,.30)[1];plate('z',-1,rpY,rpY+.11,0xf0c418);
+  if(T.hatch&&!T.pickup){const a=W0*(T.van?.82:.64),b2=W0*(T.van?.80:.54),y0=P.beltR+.03,y1=P.tail-.07;if(y1-y0>.12){if(T.van){both('z',-1,[[.05,y0+.05],[a,y0+.05],[b2,y1],[.05,y1]],WSC,1);decal('z',-1,rect(-.008,yR0,.008,P.tail-.03),0x1b1c1f,1)}else decal('z',-1,[[-a,y0],[a,y0],[b2,y1],[-b2,y1]],WSC,1)}}
+  if(T.intakes)sides([[P.ZB+P.R+.1,P.yb+.25],[P.ZB+P.R+.85,P.yb+.25],[P.ZB+P.R+.85,P.deck-.2],[P.ZB+P.R+.3,P.deck-.25]],0x0f1012,1);
+  /* doors, handles, sills */
+  const ZF=NZ-P.fo,ZB=ZF-P.WB,RA=P.R+.039,d0=P.ws0-.06;let doors;
+  if(T.van)doors=[d0,P.ws1-.45,ZB+RA+.15];else if(T.d2)doors=[d0,(P.ws1+P.rf1)/2-.25];else{const bp=P.posts&&P.posts[0]?(P.posts[0][0]+P.posts[0][1])/2:(P.ws1+P.rf1)/2;doors=[d0,bp,Math.min(ZB+RA+.05,bp-.85)]}
+  for(const z of doors)sides(rect(z-.0035,P.yb+.13,z+.0035,D.beltAt(z)-.005),0x1b1c1f,1);
+  for(let k=1;k<doors.length;k++){const z=doors[k]+.06;sides(rect(z,D.beltAt(z)-.10,z+.16,D.beltAt(z)-.078),0x55595f,1)}
+  sides(rect(ZB+RA+.02,P.yb+.01,ZF-RA-.02,P.yb+.10),B.chrome?0xc8ccd2:0x26272b,1)}}
+
+/* spare wheel on the back door of the boxy 4x4s */
+const spareX=P=>D=>{const NZ=D.NZ,y=P.beltR*.82,r=P.R*.95;const L=[];for(let i=0;i<16;i++){const a=i/16*6.2832;L.push([r*Math.cos(a),y+r*Math.sin(a)])}D.decal('z',-1,L,0x18181b,4);D.decal('z',-1,L.map(q=>[q[0]*.55,y+(q[1]-y)*.55]),0x8a8e94,5)};
+
+const RIMS={silver:{n:5,col:0xb8bdc3},twin:{n:5,col:0xc0c4c9,twin:true},dark:{n:5,col:0x3a3d42,twin:true,lip:0x55585e},fine:{n:10,col:0x9aa0a6,twin:false,w0:.012,w1:.009},
+ super:{n:10,col:0x2a2c30,twin:false,w0:.013,w1:.01,lip:0x3a3c40},y:{n:6,col:0xb8bdc3,twin:true},steel:{n:4,col:0xd0d4d8,twin:false,w0:.05,w1:.05,hub:0xdde0e4,cap:0xc8ccd2},
+ offroad:{n:6,col:0x55585e,twin:false,w0:.024,w1:.02,hub:0x3a3c40},wire:{n:16,col:0xd8dce0,twin:false,w0:.006,w1:.004,hub:0xc8ccd2}};
+const PAL={every:[[.92,.92,.93],[.08,.08,.09],[.45,.47,.5],[.72,.74,.76],[.12,.24,.5],[.62,.06,.08]],
+ prem:[[.06,.06,.07],[.92,.92,.93],[.36,.38,.41],[.1,.14,.28],[.68,.7,.72]],
+ super:[[.78,.05,.05],[.95,.76,.08],[.92,.42,.06],[.18,.5,.22],[.94,.94,.95],[.06,.06,.07]],
+ classic:[[.92,.88,.76],[.06,.24,.14],[.66,.06,.06],[.58,.72,.82],[.08,.1,.22]],
+ trade:[[.95,.95,.95],[.95,.95,.95],[.72,.74,.76],[.08,.08,.09],[.1,.2,.42]],
+ ev:[[.94,.94,.95],[.08,.08,.09],[.4,.42,.45],[.16,.3,.5],[.7,.08,.1]]};
+
+/* key, name, brand, type, length, width, height, wheelbase, price, performance 0-11, palette, extra */
+const CAT=[
+ // ---- BUDGET WHEELS
+ ['fiat500','FIAT 500','fiat','hatchS',3.571,1.627,1.488,2.300,140,2,'every',{rim:'silver'}],
+ ['panda','FIAT PANDA','fiat','hatchS',3.686,1.672,1.551,2.300,120,1,'every'],
+ ['sandero','DACIA SANDERO','dacia','hatch',4.088,1.848,1.499,2.604,130,2,'every'],
+ ['picanto','KIA PICANTO','kia','hatchS',3.595,1.595,1.485,2.400,125,2,'every'],
+ ['i10','HYUNDAI i10','hyundai','hatchS',3.670,1.680,1.480,2.425,130,2,'every'],
+ ['aygox','TOYOTA AYGO X','toyota','hatchS',3.700,1.740,1.510,2.430,150,2,'every'],
+ ['up','VW UP!','vw','hatchS',3.600,1.645,1.504,2.420,120,2,'every'],
+ ['swift','SUZUKI SWIFT','suzuki','hatchS',3.860,1.735,1.495,2.450,150,3,'every'],
+ ['corsa','VAUXHALL CORSA','vauxhall','hatch',4.060,1.765,1.435,2.538,170,3,'every'],
+ ['clio','RENAULT CLIO','renault','hatch',4.050,1.798,1.440,2.583,175,3,'every'],
+ ['p208','PEUGEOT 208','peugeot','hatch',4.055,1.745,1.430,2.540,180,3,'every'],
+ ['c3','CITROEN C3','citroen','hatch',3.996,1.749,1.474,2.540,160,2,'every'],
+ ['fabia','SKODA FABIA','skoda','hatch',4.108,1.780,1.459,2.564,160,3,'every'],
+ ['mg3','MG3','mg','hatch',4.113,1.797,1.502,2.570,155,2,'every'],
+ ['micra','NISSAN MICRA','nissan','hatch',3.999,1.743,1.455,2.525,140,2,'every'],
+ ['polo','VW POLO','vw','hatch',4.074,1.751,1.451,2.552,190,3,'every'],
+ ['yaris','TOYOTA YARIS','toyota','hatch',3.940,1.745,1.500,2.560,190,3,'every'],
+ ['jazz','HONDA JAZZ','honda','hatchS',4.044,1.694,1.526,2.517,190,2,'every'],
+ // ---- FAMILY MOTORS (European)
+ ['focus','FORD FOCUS','ford','hatch',4.378,1.825,1.454,2.700,240,4,'every'],
+ ['puma','FORD PUMA','ford','suvS',4.207,1.805,1.537,2.588,250,4,'every'],
+ ['kuga','FORD KUGA','ford','suv',4.614,1.883,1.666,2.710,320,4,'every'],
+ ['astra','VAUXHALL ASTRA','vauxhall','hatch',4.374,1.860,1.470,2.675,250,4,'every'],
+ ['mokka','VAUXHALL MOKKA','vauxhall','suvS',4.151,1.791,1.532,2.557,240,3,'every',{pillars:1,roofCol:0x111214}],
+ ['octavia','SKODA OCTAVIA ESTATE','skoda','estate',4.689,1.829,1.468,2.686,280,4,'every'],
+ ['kodiaq','SKODA KODIAQ','skoda','suv',4.758,1.864,1.659,2.791,380,4,'every',{rim:'twin'}],
+ ['tiguan','VW TIGUAN','vw','suv',4.539,1.842,1.639,2.680,380,4,'every',{rim:'twin'}],
+ ['passat','VW PASSAT ESTATE','vw','estate',4.917,1.852,1.506,2.841,390,4,'prem',{rim:'twin'}],
+ ['leon','SEAT LEON','seat','hatch',4.368,1.800,1.456,2.686,260,5,'every',{rim:'dark'}],
+ ['p3008','PEUGEOT 3008','peugeot','suv',4.542,1.895,1.641,2.739,340,4,'every',{pillars:1,roofCol:0x111214}],
+ ['captur','RENAULT CAPTUR','renault','suvS',4.239,1.797,1.576,2.639,230,3,'every',{roofCol:0x111214}],
+ ['duster','DACIA DUSTER','dacia','suv',4.343,1.813,1.656,2.657,200,3,'every',{rim:'offroad'}],
+ ['xc40','VOLVO XC40','volvo','suvS',4.440,1.863,1.652,2.702,380,5,'prem',{roofCol:0xeeeeec}],
+ ['xc90','VOLVO XC90','volvo','suvL',4.953,1.958,1.776,2.984,650,5,'prem',{rim:'twin'}],
+ // ---- FAR EAST AUTOS
+ ['corolla','TOYOTA COROLLA','toyota','hatch',4.370,1.790,1.435,2.640,280,4,'every'],
+ ['rav4','TOYOTA RAV4','toyota','suv',4.600,1.855,1.685,2.690,370,4,'every',{rim:'dark'}],
+ ['yariscross','TOYOTA YARIS CROSS','toyota','suvS',4.180,1.765,1.590,2.560,250,3,'every'],
+ ['civic','HONDA CIVIC','honda','hatch',4.551,1.802,1.408,2.734,320,5,'every'],
+ ['crv','HONDA CR-V','honda','suv',4.706,1.866,1.681,2.700,420,4,'every'],
+ ['juke','NISSAN JUKE','nissan','suvS',4.210,1.800,1.593,2.636,230,4,'every',{pillars:1,roofCol:0x111214}],
+ ['xtrail','NISSAN X-TRAIL','nissan','suv',4.680,1.840,1.725,2.705,400,4,'every'],
+ ['sportage','KIA SPORTAGE','kia','suv',4.515,1.865,1.645,2.680,330,4,'every',{pillars:1}],
+ ['ceed','KIA CEED','kia','hatch',4.310,1.800,1.447,2.650,240,4,'every'],
+ ['tucson','HYUNDAI TUCSON','hyundai','suv',4.500,1.865,1.650,2.680,330,4,'every'],
+ ['kona','HYUNDAI KONA','hyundai','suvS',4.350,1.825,1.580,2.660,280,4,'every'],
+ ['mazda3','MAZDA 3','mazda','hatch',4.460,1.795,1.435,2.725,270,4,'every'],
+ ['cx5','MAZDA CX-5','mazda','suv',4.575,1.845,1.680,2.700,340,4,'every'],
+ ['gr86','TOYOTA GR86','toyota','coupe',4.265,1.775,1.310,2.575,320,7,'super',{rim:'dark'}],
+ ['supra','TOYOTA GR SUPRA','toyota','coupe',4.379,1.854,1.292,2.470,560,8,'super',{rim:'dark'}],
+ ['civicr','HONDA CIVIC TYPE R','honda','hatch',4.594,1.890,1.407,2.735,480,8,'super',{rim:'dark'}],
+ // ---- PRESTIGE GERMANY
+ ['aclass','MERCEDES A-CLASS','merc','hatch',4.419,1.796,1.440,2.729,320,5,'prem',{rim:'twin'}],
+ ['cclass','MERCEDES C-CLASS','merc','saloon',4.751,1.820,1.438,2.865,450,5,'prem',{rim:'twin'}],
+ ['eclass','MERCEDES E-CLASS','merc','saloon',4.949,1.880,1.468,2.961,600,6,'prem',{rim:'twin'}],
+ ['sclass','MERCEDES S-CLASS','merc','saloon',5.179,1.921,1.503,3.106,1050,7,'prem',{rim:'fine'}],
+ ['gclass','MERCEDES G-CLASS','merc','box4x4',4.873,1.984,1.969,2.890,1400,6,'prem',{rim:'dark'}],
+ ['glc','MERCEDES GLC','merc','suv',4.716,1.890,1.640,2.888,550,5,'prem',{rim:'twin'}],
+ ['bmw1','BMW 1 SERIES','bmw','hatch',4.361,1.800,1.459,2.670,300,5,'prem',{rim:'twin'}],
+ ['bmw5','BMW 5 SERIES','bmw','saloon',5.060,1.900,1.515,2.995,600,6,'prem',{rim:'twin'}],
+ ['x5','BMW X5','bmw','suvL',4.922,2.004,1.745,2.975,750,6,'prem',{rim:'y'}],
+ ['m4','BMW M4','bmw','coupe',4.794,1.887,1.393,2.857,800,9,'super',{rim:'dark'}],
+ ['z4','BMW Z4','bmw','roadster',4.324,1.864,1.304,2.470,500,7,'prem',{rim:'twin'}],
+ ['a3','AUDI A3','audi','hatch',4.343,1.816,1.449,2.636,300,5,'prem',{rim:'twin'}],
+ ['q5','AUDI Q5','audi','suv',4.682,1.893,1.662,2.819,520,5,'prem',{rim:'twin'}],
+ ['rs6','AUDI RS6 AVANT','audi','estate',4.995,1.951,1.460,2.928,1000,9,'prem',{rim:'dark'}],
+ ['tt','AUDI TT','audi','coupe',4.191,1.832,1.353,2.505,400,7,'prem',{rim:'twin'}],
+ ['cayenne','PORSCHE CAYENNE','porsche','suvL',4.930,1.983,1.698,2.895,800,7,'prem',{rim:'twin'}],
+ ['taycan','PORSCHE TAYCAN','porsche','saloon',4.963,1.966,1.379,2.900,850,9,'super',{rim:'dark'}],
+ ['macan','PORSCHE MACAN','porsche','suv',4.726,1.922,1.622,2.807,600,7,'prem',{rim:'twin'}],
+ ['boxster','PORSCHE BOXSTER','porsche','roadster',4.379,1.801,1.281,2.475,650,8,'super',{rim:'twin'}],
+ ['golfgti','VW GOLF GTI','vw','hatch',4.289,1.789,1.471,2.627,350,7,'every',{rim:'dark'}],
+ // ---- ELECTRIC AVENUE
+ ['modely','TESLA MODEL Y','tesla','suvS',4.751,1.921,1.624,2.890,500,7,'ev',{rim:'dark',roofCol:0x1a222c}],
+ ['models','TESLA MODEL S','tesla','saloon',4.970,1.964,1.445,2.960,850,9,'ev',{rim:'dark',roofCol:0x1a222c}],
+ ['polestar2','POLESTAR 2','polestar','saloon',4.606,1.859,1.479,2.735,480,7,'ev',{rim:'twin'}],
+ ['leaf','NISSAN LEAF','nissan','hatch',4.490,1.791,1.540,2.700,280,3,'ev'],
+ ['ev6','KIA EV6','kia','suvS',4.695,1.890,1.550,2.900,450,7,'ev',{rim:'dark'}],
+ ['ioniq5','HYUNDAI IONIQ 5','hyundai','suvS',4.635,1.890,1.605,3.000,450,6,'ev',{rim:'fine'}],
+ ['atto3','BYD ATTO 3','byd','suvS',4.455,1.875,1.615,2.720,360,5,'ev'],
+ ['mg4','MG4','mg','hatch',4.287,1.836,1.504,2.705,270,5,'ev',{rim:'dark'}],
+ ['id3','VW ID.3','vw','hatch',4.261,1.809,1.568,2.770,350,4,'ev',{rim:'dark'}],
+ ['zoe','RENAULT ZOE','renault','hatchS',4.087,1.787,1.562,2.588,240,2,'ev'],
+ ['i4','BMW i4','bmw','saloon',4.783,1.852,1.448,2.856,580,7,'ev',{rim:'twin'}],
+ // ---- SUPERCAR SALON
+ ['f296','FERRARI 296 GTB','ferrari','super',4.565,1.958,1.187,2.600,2400,10,'super',{rim:'super'}],
+ ['sf90','FERRARI SF90','ferrari','super',4.710,1.972,1.186,2.650,3800,10,'super',{rim:'super'}],
+ ['roma','FERRARI ROMA','ferrari','gt',4.656,1.974,1.301,2.670,1900,9,'super',{rim:'fine'}],
+ ['huracan','LAMBORGHINI HURACAN','lambo','super',4.520,1.933,1.165,2.620,2200,10,'super',{rim:'super'}],
+ ['revuelto','LAMBORGHINI REVUELTO','lambo','super',4.947,2.033,1.160,2.779,4500,11,'super',{rim:'super'}],
+ ['urus','LAMBORGHINI URUS','lambo','suvL',5.112,2.016,1.638,3.003,1900,9,'super',{rim:'super'}],
+ ['m750s','McLAREN 750S','mclaren','super',4.569,1.930,1.196,2.670,2500,10,'super',{rim:'super'}],
+ ['artura','McLAREN ARTURA','mclaren','super',4.539,1.976,1.193,2.640,1900,9,'super',{rim:'super'}],
+ ['db12','ASTON MARTIN DB12','aston','gt',4.725,1.980,1.295,2.805,1900,9,'super',{rim:'fine'}],
+ ['vantage','ASTON MARTIN VANTAGE','aston','gt',4.495,1.980,1.275,2.705,1650,9,'super',{rim:'dark'}],
+ ['contgt','BENTLEY CONTINENTAL GT','bentley','gt',4.850,1.966,1.405,2.851,1900,8,'prem',{rim:'fine'}],
+ ['bentayga','BENTLEY BENTAYGA','bentley','suvL',5.125,1.998,1.728,2.995,1700,7,'prem',{rim:'fine'}],
+ ['phantom','ROLLS-ROYCE PHANTOM','rolls','saloon',5.762,2.018,1.646,3.552,4600,6,'prem',{rim:'fine',R:.40}],
+ ['cullinan','ROLLS-ROYCE CULLINAN','rolls','suvL',5.341,2.000,1.835,3.295,3400,6,'prem',{rim:'fine'}],
+ ['chiron','BUGATTI CHIRON','bugatti','super',4.544,2.038,1.212,2.711,25000,11,'super',{rim:'super'}],
+ // ---- BRITISH CLASSICS
+ ['mini59','CLASSIC MINI','classicmini','classic',3.054,1.410,1.346,2.036,150,2,'classic',{rim:'steel',R:.25,roofCol:0xeeeeea}],
+ ['etype','JAGUAR E-TYPE','jagclassic','gtclassic',4.453,1.657,1.226,2.438,1500,7,'classic',{rim:'wire'}],
+ ['mgb','MG B ROADSTER','mgclassic','roadsterClassic',3.890,1.520,1.250,2.310,350,3,'classic',{rim:'wire'}],
+ ['spitfire','TRIUMPH SPITFIRE','triumphc','roadsterClassic',3.785,1.450,1.200,2.110,300,3,'classic',{rim:'steel'}],
+ ['minor','MORRIS MINOR','morris','classicSaloon',3.760,1.550,1.520,2.180,200,1,'classic',{rim:'steel'}],
+ ['escort','FORD ESCORT MK1','fordc','classicSaloon',3.978,1.570,1.346,2.400,450,4,'classic',{rim:'steel'}],
+ ['db5','ASTON MARTIN DB5','astonc','gtclassic',4.570,1.680,1.340,2.490,6000,6,'classic',{rim:'wire'}],
+ ['series3','LAND ROVER SERIES III','lrc','box4x4',3.620,1.680,1.970,2.240,400,2,'classic',{rim:'steel',roofCol:0xeeeeea}],
+ // ---- TRADE & 4X4
+ ['sprinter','MERCEDES SPRINTER','merc','vanL',5.932,2.020,2.640,3.665,560,1,'trade',{rim:'steel'}],
+ ['transporter','VW TRANSPORTER','vw','van',4.904,1.904,1.990,3.000,420,2,'trade',{rim:'steel'}],
+ ['vivaro','VAUXHALL VIVARO','vauxhall','van',4.959,1.920,1.890,2.975,380,2,'trade',{rim:'steel'}],
+ ['hilux','TOYOTA HILUX','toyota','pickup',5.325,1.855,1.815,3.085,420,3,'trade',{rim:'offroad'}],
+ ['ranger','FORD RANGER','ford','pickup',5.370,1.918,1.884,3.270,450,4,'trade',{rim:'offroad'}],
+ ['dmax','ISUZU D-MAX','isuzu','pickup',5.277,1.870,1.790,3.125,360,2,'trade',{rim:'offroad'}],
+ ['wrangler','JEEP WRANGLER','jeep','box4x4',4.882,1.894,1.848,3.008,560,4,'every',{rim:'offroad'}],
+ ['jimny','SUZUKI JIMNY','suzuki','box4x4',3.645,1.645,1.720,2.250,200,2,'every',{rim:'offroad',R:.34}],
+ ['landcruiser','TOYOTA LAND CRUISER','toyota','suvL',4.920,1.980,1.870,2.850,700,4,'prem',{rim:'offroad'}]];
+
+const CATLABEL={hatchS:'CITY CAR',hatch:'HATCHBACK',estate:'ESTATE',saloon:'SALOON',coupe:'COUPE',gt:'GRAND TOURER',roadster:'ROADSTER',super:'SUPERCAR',suvS:'SMALL SUV',suv:'SUV',suvL:'BIG SUV',
+ box4x4:'4X4',van:'VAN',vanL:'BIG VAN',pickup:'PICKUP',classic:'CLASSIC',classicSaloon:'CLASSIC',gtclassic:'CLASSIC GT',roadsterClassic:'CLASSIC ROADSTER'};
+const PERF=['GENTLE','EASYGOING','STEADY','LIVELY','PERKY','QUICK','BRISK','FAST','VERY FAST','RAPID','BLISTERING','HYPERCAR'];
+for(const row of CAT){const[key,name,brand,type,L,W,H,WB,price,pf,pal,ex]=row,T=TYPES[type],X=ex||{};
+ const P=typeGen(T,{L,W,H,WB,R:X.R,rim:RIMS[X.rim||(pf>=8?'dark':'silver')],sill:X.sill,pillars:X.pillars,roofCol:X.roofCol,d2:T.d2});
+ const B=BRAND[brand]||BRAND.vw;const body=brandDeco(B,P,T);
+ P.deco=T.spare?(D=>{body(D);spareX(P)(D)}):body;
+ if(type==='super')P.extras=D=>{D.box([0,P.deck+.03,-L/2+.18],[W*.62,.025,.14],0,null)};
+ const S=gen(P);const big=T===TYPES.suvL||T===TYPES.box4x4||T===TYPES.van||T===TYPES.vanL||T===TYPES.pickup;
+ const grip=.95+pf*.035+(big?.04:0),stat=[Math.round(pf*1.6-3),+(0.88+pf*.055).toFixed(2),+grip.toFixed(2)];
+ SPECS.push({key,name,desc:CATLABEL[type]+' · '+PERF[Math.min(11,pf)],price,stat,hgt:Math.min(1.6,Math.max(.9,H*.78)),rad:+(L*.235).toFixed(2),
+  far:type==='hatchS'||type==='classic'?0:type==='hatch'?1:type.startsWith('van')?3:big||type.startsWith('suv')?4:2,
+  stock:PAL[pal][[...key].reduce((h,c)=>h*31+c.charCodeAt(0)>>>0,7)%PAL[pal].length],pal:PAL[pal],cat:type,brand,S,lamps:{f:[W*.36,P.nose-.08,L/2-.05],b:[W*.38,(P.deck||P.beltR)-.08,-L/2+.02]}})}
+
+/* ================================================================ motorbikes
+   Built from lofted octagon sections (fairing, tank, seat, tail), beams (frame, fork, swingarm)
+   and a seated rider. Same output as the cars: paint buffer + trim buffer, wheels separate. */
+function buildBike(S){const PB={p:[],c:[]},FB={p:[],c:[]};
+ const tri=(a,b,c,hex,ref)=>{let n=nrm(crs(sub(b,a),sub(c,a)));if(!n)return;if(ref&&n[0]*ref[0]+n[1]*ref[1]+n[2]*ref[2]<0){const t=b;b=c;c=t;n=[-n[0],-n[1],-n[2]]}
+  const s=shade(n),k=hex==null?[1,1,1]:hx(hex),B=hex==null?PB:FB;B.p.push(...a,...b,...c);for(let i=0;i<3;i++)B.c.push(k[0]*s,k[1]*s,k[2]*s)};
+ const oct=(z,cx,cy,w,h)=>{const o=[];for(let i=0;i<8;i++){const a=(i+.5)/8*6.2832;o.push([cx+Math.cos(a)*w/2/Math.cos(Math.PI/8),cy+Math.sin(a)*h/2/Math.cos(Math.PI/8),z])}return o};
+ /* loft through sections [z,cy,w,h] (or [z,cy,w,h,cx]) */
+ const loft=(secs,hex)=>{const R=secs.map(q=>oct(q[0],q[4]||0,q[1],q[2],q[3]));let cx=0,cy=0,cz=0,n=0;for(const r of R)for(const p of r){cx+=p[0];cy+=p[1];cz+=p[2];n++}const C=[cx/n,cy/n,cz/n];
+  const out=(a,b,c)=>{const m=[(a[0]+b[0]+c[0])/3-C[0],(a[1]+b[1]+c[1])/3-C[1],(a[2]+b[2]+c[2])/3-C[2]];tri(a,b,c,hex,m)};
+  for(let i=0;i<R.length-1;i++)for(let k=0;k<8;k++){const a=R[i][k],b=R[i][(k+1)%8],c=R[i+1][(k+1)%8],d=R[i+1][k];out(a,b,c);out(a,c,d)}
+  for(const r of[R[0],R[R.length-1]]){let x=0,y=0,z=0;for(const p of r){x+=p[0];y+=p[1];z+=p[2]}const m=[x/8,y/8,z/8];for(let k=0;k<8;k++)out(m,r[k],r[(k+1)%8])}};
+ /* square beam from a to b */
+ const beam=(a,b,w,hex)=>{const d=nrm(sub(b,a));if(!d)return;let u=Math.abs(d[1])<.9?[0,1,0]:[1,0,0];const s1=nrm(crs(d,u)),s2=crs(s1,d),h=w/2;
+  const P=(p,i,j)=>[p[0]+s1[0]*i*h+s2[0]*j*h,p[1]+s1[1]*i*h+s2[1]*j*h,p[2]+s1[2]*i*h+s2[2]*j*h];
+  const q=[[1,1],[-1,1],[-1,-1],[1,-1]],m=[(a[0]+b[0])/2,(a[1]+b[1])/2,(a[2]+b[2])/2];
+  for(let k=0;k<4;k++){const A=P(a,...q[k]),B=P(a,...q[(k+1)%4]),C=P(b,...q[(k+1)%4]),D=P(b,...q[k]),o=sub([(A[0]+C[0])/2,(A[1]+C[1])/2,(A[2]+C[2])/2],m);tri(A,B,C,hex,o);tri(A,C,D,hex,o)}
+  for(const[p,sg]of[[a,-1],[b,1]]){const A=P(p,1,1),B=P(p,-1,1),C=P(p,-1,-1),D=P(p,1,-1),o=d.map(v=>v*sg);tri(A,B,C,hex,o);tri(A,C,D,hex,o)}};
+ const box=(c,sz,hex,rx)=>{const[a,b,d]=sz.map(v=>v/2),cr=Math.cos(rx||0),sr=Math.sin(rx||0),P=(x,y,z)=>[c[0]+x,c[1]+y*cr-z*sr,c[2]+y*sr+z*cr];
+  const F=[[[1,0,0],[[1,-1,-1],[1,1,-1],[1,1,1],[1,-1,1]]],[[-1,0,0],[[-1,-1,-1],[-1,-1,1],[-1,1,1],[-1,1,-1]]],[[0,1,0],[[-1,1,-1],[-1,1,1],[1,1,1],[1,1,-1]]],[[0,-1,0],[[-1,-1,-1],[1,-1,-1],[1,-1,1],[-1,-1,1]]],[[0,0,1],[[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]]],[[0,0,-1],[[-1,-1,-1],[-1,1,-1],[1,1,-1],[1,-1,-1]]]];
+  for(const[n,q]of F){const v=q.map(k=>P(k[0]*a,k[1]*b,k[2]*d)),r=[n[0],n[1]*cr-n[2]*sr,n[1]*sr+n[2]*cr];tri(v[0],v[1],v[2],hex,r);tri(v[0],v[2],v[3],hex,r)}};
+ const t=S.type,R=S.R,zf=S.WB/2,zr=-S.WB/2,BLK=0x17181b,ENG=0x4a4d52,CH=0xc8ccd2,GL=0x2a3a4a,LT=0xf4f8ff,RD=0xc31a26,FR=S.frame||0x2a2c30;
+ const sc=t==='scooter',cr=t==='cruiser',adv=t==='adv',sp=t==='sport',cl=t==='classic';
+ const head=[0,R+(sc?.62:cr?.58:adv?.78:.62),zf-(sc?.12:cr?.32:.24)];
+ /* fork and steering head */
+ for(const s of[1,-1])beam([s*.075,R,zf],[s*.06,head[1],head[2]],.045,sc?null:cr||cl?CH:0x8a8e94);
+ /* frame, engine, swingarm, exhaust */
+ const piv=[0,R+.12,-.18];
+ if(!sc){beam(head,[0,R+.40,-.15],.07,FR);beam([0,R+.40,-.15],piv,.07,FR);
+  box([0,R+.06,.02],[.30,cr?.42:.36,cr?.58:.48],ENG);if(cr||cl)for(const s of[1,-1])box([s*.17,R+.16,.10],[.06,.20,.22],CH);
+  for(const s of[1,-1])beam([s*.10,piv[1],piv[2]],[s*.07,R,zr],.05,FR);
+  const ex=cr||cl?[[1,-1],CH]:[[1],sp?ENG:0x6a6e74];for(const s of ex[0])beam([s*.14,R-.06,.05],[s*.16,R+.02,zr-.08],.07,ex[1])}
+ /* bodywork */
+ if(sp){loft([[zf-.02,R+.58,.08,.10],[zf-.18,R+.60,.30,.30],[zf-.40,R+.52,.40,.42],[zf-.55,R+.40,.36,.46]],null);
+  loft([[zf-.58,R+.04,.30,.16],[zf-.78,R-.02,.32,.14],[-.10,R+.0,.24,.10]],null);
+  box([0,R+.82,zf-.30],[.30,.02,.24],GL,-1.0);box([0,R+.60,zf+.0],[.12,.06,.02],LT)}
+ else if(adv){loft([[zf-.10,R+.82,.10,.08],[zf-.26,R+.80,.30,.24],[zf-.42,R+.72,.40,.30]],null);box([0,R+1.02,zf-.32],[.34,.02,.32],GL,-1.15);box([0,R+.80,zf-.08],[.16,.08,.02],LT);
+  loft([[zf+.12,R+.28,.10,.02],[zf-.10,R+.36,.16,.03]],null)}
+ else if(cr){loft([[zf-.12,R+.62,.20,.16],[zf-.28,R+.66,.78,.36],[zf-.42,R+.60,.80,.30]],null);box([0,R+.92,zf-.38],[.52,.02,.16],GL,-.6);box([0,R+.66,zf-.10],[.18,.12,.02],LT);
+  loft([[zf+.20,R+.10,.20,.04],[zf,R+.36,.24,.06],[zf-.24,R+.38,.24,.06]],null);loft([[zr+.18,R+.40,.26,.06],[zr-.04,R+.36,.26,.06],[zr-.24,R+.16,.24,.04]],null);
+  for(const s of[1,-1])loft([[zr+.30,R+.30,.20,.32,s*.34],[zr-.08,R+.30,.22,.34,s*.34],[zr-.22,R+.24,.18,.24,s*.33]],null)}
+ else if(sc){loft([[zf-.04,R+.20,.36,.10],[zf-.10,R+.72,.40,.10],[zf-.22,R+.86,.32,.10]],null);box([0,R+.02,-.05],[.36,.05,.62],BLK);
+  loft([[-.30,R+.05,.30,.20],[-.40,R+.32,.42,.42],[zr+.12,R+.40,.40,.34],[zr-.06,R+.36,.24,.18]],null);box([0,R+.92,zf-.24],[.24,.10,.08],LT);
+  loft([[zf+.10,R+.06,.16,.04],[zf-.14,R+.30,.16,.06]],null)}
+ else{/* naked / classic: round headlight, mudguards */const hl=[0,R+.62,zf-.10];loft([[hl[2]+.06,hl[1],.12,.12],[hl[2],hl[1],.18,.18],[hl[2]-.08,hl[1],.14,.14]],cl?CH:BLK);box([0,hl[1],hl[2]+.07],[.12,.12,.01],LT);
+  loft([[zf+.14,R+.24,.12,.03],[zf,R+.36,.14,.04],[zf-.14,R+.30,.12,.03]],cl?CH:null);if(cl)loft([[zr+.20,R+.42,.16,.04],[zr,R+.40,.16,.05],[zr-.24,R+.20,.14,.04]],CH)}
+ /* tank, seat, tail */
+ if(!sc){const tz=cr?.0:-.02,ty=R+(adv?.66:cr?.54:.56);loft([[tz+.34,ty-.02,.24,.14],[tz+.18,ty+.06,.36,.22],[tz-.06,ty+.06,.34,.20],[tz-.18,ty,.24,.12]],null);
+  const sy=R+(adv?.66:cr?.42:sp?.60:.54);box([0,sy,-.36],[.28,.08,cr?.34:.42],BLK);
+  if(sp)loft([[-.36,sy+.02,.26,.12],[-.62,sy+.10,.20,.10],[-.82,sy+.16,.06,.05]],null);
+  else if(!cr)loft([[-.50,sy-.02,.22,.08],[zr+.10,sy-.06,.18,.06],[zr-.06,sy-.12,.10,.04]],cl?CH:null)}
+ else box([0,R+.62,-.32],[.28,.10,.50],BLK);
+ /* tail light, bars, mirrors */
+ box([0,R+(sp?.74:sc?.46:cr?.42:.56),zr-(sp?.02:.06)],[.10,.04,.02],RD);
+ const bar=[0,head[1]+(cr?.18:adv?.10:sp?-.06:.08),head[2]-.06],bw=cr?.42:adv?.40:sc?.30:sp?.30:.36;beam([-bw,bar[1],bar[2]-.04],[bw,bar[1],bar[2]-.04],.03,BLK);
+ for(const s of[1,-1])beam([s*bw*.8,bar[1],bar[2]],[s*(bw*.8+.06),bar[1]+.14,bar[2]+.02],.02,BLK),box([s*(bw*.8+.08),bar[1]+.16,bar[2]+.02],[.08,.05,.02],BLK);
+ if(adv)for(const s of[1,-1])box([s*.30,R+.40,zr+.30],[.14,.34,.44],0x3a3c40);
+ /* rider: helmet, torso, arms, legs, boots */
+ const J=S.jacket||0x1c1d22,PN=0x22242a,HL=S.helmet||0xe8e8ea,lean=sp?.95:adv?.25:cr?-.1:sc?.05:.35,seat=[0,R+(adv?.74:cr?.50:sp?.68:sc?.70:.62),sc?-.30:cr?-.36:-.30];
+ const hip=[0,seat[1]+.10,seat[2]],sh=[0,hip[1]+.50*Math.cos(lean*.6),hip[2]+.50*Math.sin(lean*.6)+(sp?.08:0)],hd=[0,sh[1]+.20-(sp?.06:0),sh[2]+.06];
+ beam(hip,sh,.30,J);box([0,sh[1]-.02,sh[2]],[.40,.12,.20],J);loft([[hd[2]+.13,hd[1],.12,.12],[hd[2]+.08,hd[1],.25,.26],[hd[2]-.06,hd[1],.27,.28],[hd[2]-.15,hd[1],.14,.16]],HL);box([0,hd[1]+.01,hd[2]+.12],[.18,.07,.04],0x111418);
+ for(const s of[1,-1]){const S0=[s*.20,sh[1]-.02,sh[2]],H_=[s*bw*.75,bar[1]+.02,bar[2]],E_=[(S0[0]+H_[0])/2+s*.06,(S0[1]+H_[1])/2-.06,(S0[2]+H_[2])/2-.02];
+  beam(S0,E_,.09,J);beam(E_,H_,.08,J);box(H_,[.07,.07,.08],0x111214);
+  const K=sc?[s*.16,R+.62,.05]:cr?[s*.20,R+.52,.12]:[s*.16,R+(adv?.68:.56),-.02+(sp?.08:0)],F_=sc?[s*.14,R+.10,.06]:cr?[s*.24,R+.12,.42]:[s*.16,R+(adv?.20:.18),-.18+(sp?-.08:0)];
+  beam([s*.12,hip[1]-.02,hip[2]],K,.13,PN);beam(K,F_,.11,PN);box([F_[0],F_[1]-.02,F_[2]+.06],[.10,.08,.22],0x101012)}
+ return{PB,FB,tris:(PB.p.length+FB.p.length)/9}}
+
+const BIKES=[ // key,name,type,wheelbase,R,tyre half-width,price,perf,colours,frame,jacket,helmet
+ ['cbr600','HONDA CBR600RR','sport',1.375,.30,.06,120,9,[[.8,.06,.06],[.06,.06,.07],[.94,.94,.95]],0x2a2c30,0x1c1d22,0xc81818],
+ ['panigale','DUCATI PANIGALE V4','sport',1.47,.31,.065,280,11,[[.8,.04,.04],[.06,.06,.07]],0x8a1010,0xb01818,0xe8e8ea],
+ ['ninja650','KAWASAKI NINJA 650','sport',1.41,.30,.055,75,7,[[.28,.62,.12],[.06,.06,.07]],0x2a2c30,0x1c1d22,0x2a8a18],
+ ['r1','YAMAHA YZF-R1','sport',1.405,.31,.06,200,11,[[.08,.18,.6],[.06,.06,.07]],0x3a3d42,0x14245a,0x1a2c8a],
+ ['mt07','YAMAHA MT-07','naked',1.40,.30,.055,75,7,[[.12,.14,.2],[.4,.42,.46]],0x2a6ab0,0x1c1d22,0x2a2c30],
+ ['z900','KAWASAKI Z900','naked',1.45,.31,.06,95,8,[[.06,.06,.07],[.28,.62,.12]],0x2a8a18,0x1c1d22,0x0f1012],
+ ['streettriple','TRIUMPH STREET TRIPLE','naked',1.40,.31,.06,110,9,[[.36,.38,.42],[.9,.4,.06]],0x8a1010,0x2a2016,0xe8e8ea],
+ ['duke390','KTM 390 DUKE','naked',1.36,.29,.05,55,6,[[.96,.42,.04],[.94,.94,.95]],0xe06010,0x1c1d22,0xe06010],
+ ['bonneville','TRIUMPH BONNEVILLE T120','classic',1.45,.33,.055,120,6,[[.06,.2,.12],[.06,.06,.07],[.6,.06,.08]],0x111214,0x3a2416,0xd8d0b8],
+ ['enfield','ROYAL ENFIELD CLASSIC 350','classic',1.39,.32,.05,45,3,[[.5,.06,.06],[.1,.14,.3],[.06,.06,.07]],0x111214,0x4a3a22,0x2a2c30],
+ ['streetglide','HARLEY-DAVIDSON STREET GLIDE','cruiser',1.625,.33,.07,280,6,[[.06,.06,.07],[.5,.06,.06],[.1,.14,.3]],0x111214,0x111111,0x111111],
+ ['gs1300','BMW R 1300 GS','adv',1.52,.34,.065,200,8,[[.94,.94,.95],[.1,.2,.55]],0x2a2c30,0x3a3d42,0xe8e8ea],
+ ['africatwin','HONDA AFRICA TWIN','adv',1.575,.35,.06,150,7,[[.94,.94,.95],[.8,.06,.06]],0xb01010,0x2a2c30,0xc81818],
+ ['vespa','VESPA PRIMAVERA','scooter',1.34,.20,.05,45,2,[[.7,.86,.84],[.94,.94,.92],[.8,.1,.1]],0x111214,0x8a6a3a,0xe8e8ea],
+ ['pcx','HONDA PCX125','scooter',1.31,.22,.05,35,1,[[.94,.94,.95],[.08,.08,.09],[.6,.06,.08]],0x111214,0x1c1d22,0x2a2c30]];
+const BIKELABEL={sport:'SPORTS BIKE',naked:'NAKED BIKE',classic:'CLASSIC BIKE',cruiser:'CRUISER',adv:'ADVENTURE BIKE',scooter:'SCOOTER'};
+for(const b of BIKES){const[key,name,type,WB,R,tw,price,pf,pal,frame,jacket,helmet]=b;
+ const S={bike:1,type,WB,R,TW:tw,rimR:R*(type==='scooter'?.65:.72),inset:0,ZF:WB/2,ZB:-WB/2,W0:.4,NZ:WB/2+R,frame,jacket,helmet,
+  rim:type==='classic'||type==='cruiser'?RIMS.wire:type==='scooter'?{n:5,col:0xb8bdc3,twin:false,w0:.03,w1:.025}:{n:3,col:0x2a2c30,twin:true,w0:.016,w1:.012}};
+ SPECS.push({key,name,desc:BIKELABEL[type]+' · '+PERF[Math.min(11,pf)],price,bike:1,cat:'bike',stat:[Math.round(pf*1.7-4),+(1.0+pf*.07).toFixed(2),+(.9+pf*.02).toFixed(2)],
+  hgt:type==='scooter'?1.45:1.4,rad:.7,far:0,stock:pal[0],pal,S,lamps:{f:[.04,R+.62,WB/2+.05],b:[.04,R+.5,-WB/2-.2]}})}
+
 /* ================================================================ register */
 const FIRST=6,MAT=c=>new THREE.MeshBasicMaterial({vertexColors:true,color:c||0xffffff});
 const geo=B=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(B.p,3));g.setAttribute('color',new THREE.Float32BufferAttribute(B.c,3));g.computeBoundingSphere();return g};
 const lit=(m,base)=>{m.onBeforeRender=function(){const l=U.uLight.value,c=base||[1,1,1];this.material.color.setRGB(c[0]*l.x,c[1]*l.y,c[2]*l.z)};return m};
-const TRI={specs:SPECS,ids:[],build,gen};
-SPECS.forEach((C,k)=>{const id=FIRST+k,S=C.S;C.id=id;TRI.ids.push(id);
- let G=null;const ensure=()=>{if(G)return G;const t0=performance.now(),o=build(S);
-  const st={p:o.FB.p.slice(),c:o.FB.c.slice()};for(const sx of[1,-1])for(const z of[S.ZF,S.ZB])wheelArr(S,sx,sx*(S.W0-S.inset),z,st);
+const TRI={specs:SPECS,ids:[],build,gen,byKey:{}};
+SPECS.forEach((C,k)=>{const id=FIRST+k,S=C.S;C.id=id;C.k=k;TRI.ids.push(id);TRI.byKey[C.key]=id;
+ let G=null;const ensure=()=>{if(G)return G;const t0=performance.now(),o=C.bike?buildBike(S):build(S);
+  const st={p:o.FB.p.slice(),c:o.FB.c.slice()};for(const sx of[1,-1])for(const z of[S.ZF,S.ZB])wheelArr(S,sx,C.bike?0:sx*(S.W0-S.inset),z,st);
   G={P:geo(o.PB),F:geo(o.FB),SF:geo(st),RG:{1:geo(rimArr(1,S,{p:[],c:[]})),'-1':geo(rimArr(-1,S,{p:[],c:[]}))},tris:o.tris,ms:performance.now()-t0};return G};
  /* the drivable car: lazily built the first time it is shown */
  const pM=MAT(),fM=MAT(),rM=MAT(),tyreM=new THREE.MeshBasicMaterial({color:0x151518}),dM=new THREE.MeshBasicMaterial({color:0x2a2c30});
  const grp=new THREE.Group();grp.visible=false;car.add(grp);const wl=[];
  const N={id,grp,ready:1,pc:C.stock,spec:C,built:0,
-  load(){if(N.built)return;N.built=1;const g=ensure();grp.add(new THREE.Mesh(g.P,pM),new THREE.Mesh(g.F,fM));
+  load(){if(N.built||CARI!==id)return;N.built=1;const g=ensure();grp.add(new THREE.Mesh(g.P,pM),new THREE.Mesh(g.F,fM));
    const tyreG=new THREE.CylinderGeometry(S.R*.985,S.R*.985,S.TW*2,24).rotateZ(Math.PI/2);
-   for(const sx of[1,-1])for(const[f,z]of[[1,S.ZF],[0,S.ZB]]){const piv=new THREE.Group(),spin=new THREE.Group();piv.position.set(sx*(S.W0-S.inset),S.R,z);
-    const dg=new THREE.CircleGeometry(S.rimR*.992,24);dg.rotateY(sx>0?Math.PI/2:-Math.PI/2);dg.translate(sx*(S.TW+.001),0,0);
-    spin.add(new THREE.Mesh(tyreG,tyreM),new THREE.Mesh(dg,dM),new THREE.Mesh(g.RG[sx],rM));piv.add(spin);grp.add(piv);wl.push({piv,spin,front:f})}
+   const dG=sx=>{const dg=new THREE.CircleGeometry(S.rimR*.992,24);dg.rotateY(sx>0?Math.PI/2:-Math.PI/2);dg.translate(sx*(S.TW+.001),0,0);return dg};
+   for(const sx of C.bike?[1]:[1,-1])for(const[f,z]of[[1,S.ZF],[0,S.ZB]]){const piv=new THREE.Group(),spin=new THREE.Group();piv.position.set(C.bike?0:sx*(S.W0-S.inset),S.R,z);
+    spin.add(new THREE.Mesh(tyreG,tyreM),new THREE.Mesh(dG(sx),dM),new THREE.Mesh(g.RG[sx],rM));if(C.bike)spin.add(new THREE.Mesh(dG(-1),dM),new THREE.Mesh(g.RG[-1],rM));piv.add(spin);grp.add(piv);wl.push({piv,spin,front:f})}
    N.upd(1)},
   paint(){const w=paintC[0]>.97&&paintC[1]>.97&&paintC[2]>.97;N.pc=w?C.stock:paintC.slice();N.upd(1)},
   upd(still){const l=U.uLight.value,c=N.pc;pM.color.setRGB(c[0]*l.x,c[1]*l.y,c[2]*l.z);fM.color.setRGB(l.x,l.y,l.z);rM.color.setRGB(l.x,l.y,l.z);
    tyreM.color.setRGB(.085*l.x,.085*l.y,.09*l.z);dM.color.setRGB(.17*l.x,.17*l.y,.19*l.z);if(still)return;
-   for(const w of wl){w.spin.rotation.x=GS_SPIN*.275/S.R;if(w.front)w.piv.rotation.y=GS.steer*.5}},
+   for(const w of wl){w.spin.rotation.x=GS_SPIN*.275/S.R;if(w.front)w.piv.rotation.y=GS.steer*.5}
+   if(C.bike){const v=Math.min(1,Math.abs(GS.speed||0)/10),tl=-(GS.steer||0)*v*.55;grp.rotation.z+=(tl-grp.rotation.z)*.2}},
   /* a static copy: showroom pods (stock paint) and traffic (any colour) */
   inst(col){const g=ensure(),o=new THREE.Group();o.add(lit(new THREE.Mesh(g.P,MAT()),col||C.stock),lit(new THREE.Mesh(g.SF,MAT())));return o},
   geo:ensure};
@@ -403,6 +776,7 @@ TRI.stat=i=>{const C=SPECS[i-FIRST];return C?C.stat:[0,1,1]};
 TRI.rad=i=>{const C=SPECS[i-FIRST];return C?C.rad:1.1};
 TRI.hgt=i=>{const C=SPECS[i-FIRST];return C?C.hgt:1.15};
 TRI.isTri=i=>i>=FIRST&&i<FIRST+SPECS.length;
+TRI.isBike=i=>{const C=SPECS[i-FIRST];return!!(C&&C.bike)};
 TRI.FIRST=FIRST;
 TRI.N=SPECS.length;
 TRI.len=k=>SPECS[k].S.NZ*2;
@@ -410,23 +784,25 @@ TRI.len=k=>SPECS[k].S.NZ*2;
 TRI.civ=(k,col)=>NC.cars[FIRST+k].inst(col);
 TRI.pal=(k,r)=>{const p=SPECS[k].pal;return p[Math.floor(r*p.length)%p.length]};
 TRI.geoK=k=>NC.cars[FIRST+k].geo();
+/* models the Marlowe city traffic draws (instanced); the black cab is TRI.cityCab */
+TRI.city=['a6','golf','m3','911','mini','3s','qq','prius','focus','corsa','tiguan','modely','eclass','rr','sprinter','mt07','vespa','tx'].map(k=>TRI.byKey[k]-FIRST);TRI.cityCab=TRI.city.length-1;
 TRI.mat=MAT;TRI.lit=lit;
 window.TRI=TRI;
 
-/* ---- gallery: one button per car ---- */
-{const SHORT=['A6','GOLF','RANGE ROVER','MODEL 3','911','MINI','3 SERIES','TRANSIT','QASHQAI','TAXI','PRIUS'];
- const b0=document.querySelector('#galP button[data-g="car"]');
- if(b0){const row=b0.parentNode;TRI.ids.forEach((id,k)=>{const b=document.createElement('button');b.textContent=SHORT[k]||CARN[id];b.dataset.g='car';
-  b.onclick=e=>{e.stopPropagation();setCar(id);for(const x of row.querySelectorAll('button[data-g="car"]'))x.classList.toggle('on',x===b)};row.appendChild(b)})}}
+/* ---- gallery: step through cars (the dealer's stock in a showroom, otherwise the cars you own) ---- */
+{const b0=document.querySelector('#galP button[data-g="car"]');
+ if(b0){const row=b0.parentNode,list=()=>{if(typeof GAL!=='undefined'&&GAL.mode==='show'&&TRI.curStock)return TRI.curStock;const o=[];for(let i=0;i<CARN.length;i++)if(i<6||OWN.car[i]||i===CARI)o.push(i);return o};
+  const step=d=>{const L=list();let j=L.indexOf(CARI);j=j<0?0:(j+d+L.length)%L.length;setCar(L[j]);for(const x of row.querySelectorAll('button[data-g="car"]'))x.classList.remove('on')};
+  for(const[t,d]of[['◀',-1],['▶',1]]){const b=document.createElement('button');b.textContent=t;b.dataset.g='carstep';b.style.flex='0 0 44px';b.onclick=e=>{e.stopPropagation();step(d)};row.appendChild(b)}}}
 
 /* ---- black cab: fares pay 20% more (village taxi and Marlowe cab careers) ---- */
 try{if(typeof crPay==='function'){const p0=crPay;crPay=function(k,base,msg){return p0(k,CARI===FIRST+9&&(k==='taxi'||k==='mcab')?base*1.2:base,msg)}}}catch(e){}
 
 /* ---- village/town traffic: about half the small cars and some vans become fleet models ---- */
-{const CARK=[0,1,2,3,4,5,6,8,10],hash=(o,n)=>{const v=Math.sin((o.x||0)*12.9898+(o.z||0)*78.233+n*37.719)*43758.5453;return v-Math.floor(v)};let n=0;
+{const CARK=['a6','golf','m3','mini','3s','qq','prius','corsa','polo','focus','puma','fiat500','corolla','juke','sportage','tiguan','modely','cclass','xc40','clio'].map(k=>TRI.byKey[k]-FIRST),hash=(o,n)=>{const v=Math.sin((o.x||0)*12.9898+(o.z||0)*78.233+n*37.719)*43758.5453;return v-Math.floor(v)};let n=0;
  const swap=o=>{n++;if(o.m===3||o.m>=10)return o;const r=hash(o,n);
   if((o.m===0||o.m===1)&&r<.55){const k=CARK[Math.floor(hash(o,n+7)*CARK.length)%CARK.length];o.m=10+k;o.col=TRI.pal(k,hash(o,n+13))}
-  else if(o.m===2&&r<.4){o.m=10+7;o.col=TRI.pal(7,hash(o,n+13))}
+  else if(o.m===2&&r<.4){const k=TRI.byKey[r<.2?'tc':'transporter']-FIRST;o.m=10+k;o.col=TRI.pal(k,hash(o,n+13))}
   return o};
  if(typeof CIV!=='undefined')for(const o of CIV){const m=o.m;swap(o);if(o.m!==m&&o.inst){scene.remove(o.inst);o.inst=null}if(o.m!==m&&o.far){scene.remove(o.far);o.far=null}}
  try{if(typeof civAdd==='function'){const c0=civAdd;civAdd=function(o){return c0(swap(o))}}}catch(e){}}
