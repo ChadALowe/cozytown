@@ -124,7 +124,7 @@ function buildEstate(o){const H=shell(o,0xf2eef4,'carpet');B(0,0,-RZ+1.6,3.4,.78
  SHOPCUR={o,k:['ESTATE AGENT','Looking for a place in Marlowe? Take a look at our listings.']};ia(-1.8,1.8,-RZ+2.2,-RZ+3.2,'BROWSE HOMES FOR SALE',()=>openShop('mest'));ia(-RX,-RX+1.2,-3,3,'LOOK AT THE LISTINGS',()=>openShop('mest'));leave()}
 function buildMotors(o){const H=shell(o,0xe8eaee,'tile');B(0,0,-RZ+1.4,4,1.0,.8,0x101820);B(0,1.0,-RZ+1.4,4.1,.06,.9,0xd0d4d8);blk(-2.1,2.1,-RZ,-RZ+1.9);
  npc(7717,0,-RZ+.7,0,{f:false,ts:3,tc:[.12,.12,.16],hs:1});sign(5,.8,0,2.6,-RZ+.03,0,'#101820','#ff5a3a','MARLOWE MOTORS',46);
- const cols=[0xc8102e,0x1d56b8,0xf0f0f0];[-5,0,5].forEach((x,i)=>{const z=1.2,c=cols[i];B(x,0,z,3.2,.08,4.8,0x9aa0a8);B(x,.35,z,1.8,.65,4.2,c);B(x,1.0,z-.2,1.6,.55,2.2,0x1a2430);B(x,1.52,z-.2,1.5,.06,2.0,c);for(const sx of[-.85,.85])for(const sz of[-1.35,1.35])B(x+sx,.05,z+sz,.25,.6,.62,0x111111);blk(x-1.1,x+1.1,z-2.2,z+2.2)});
+ const ms=(window.TRI&&TRI.motorsStock)||[],pick=[0,Math.floor(ms.length/2),ms.length-1].map(k=>ms[k]).filter(v=>v!=null);[-5,0,5].forEach((x,i)=>{const z=1.2;B(x,0,z,3.2,.08,4.8,0x9aa0a8);let car=null;if(pick[i]!=null&&typeof realCar==='function'){try{car=realCar(pick[i])}catch(e){car=null}}if(car){car.position.set(x,.08,z);car.scale.setScalar(.8);car.rotation.y=[.5,0,-.5][i];SG.add(car)}blk(x-1.1,x+1.1,z-2.2,z+2.2)});
  for(const x of[-RX+.6,RX-.6])plant(x,RZ-1);
  SHOPCUR={o,k:['DEALER','Every model on the forecourt. Buy one or swap to a car you already own.']};ia(-2,2,-RZ+1.9,-RZ+2.9,'BUY OR SWAP CARS',()=>{MS.gar='dealer';openShop('mgar')});leave()}
 {const b0=buildShop;buildShop=function(o){if(!o||!o.mc)return b0(o);
