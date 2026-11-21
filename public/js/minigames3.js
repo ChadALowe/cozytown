@@ -155,10 +155,10 @@ function dive(){let n=0,tot=0;const one=()=>{const st={ph:'bounce',b:0,bd:1,y:0,
 
 /* ================================================================ places: pubs, cue club, bingo, golf club, outdoor spots */
 {const b0=buildShop;buildShop=function(o){b0(o);if(!o)return;const Bx=(x,y,z,w,h,d,hex)=>sbox(x,y,z,w,h,d,fmc(hex));
- if(o.pub){Bx(4.4,0,4.4,2.2,.25,1.4,0x3a1a3a);Bx(4.4,.25,4.3,.06,1.4,.06,0x202020);Bx(4.4,1.6,4.3,.12,.18,.12,0x404040);IA.push({r:[3.2,5.6,3.3,5.1],label:'🎤 KARAOKE',fn:()=>{if(GT<18&&GT>3)return toast('KARAOKE STARTS AT 6PM');karaoke()}},{r:[-1.0,.6,2.6,3.6],label:'🧠 QUIZ NIGHT (£60 PRIZE)',fn:()=>{if(GT<19&&GT>3)return toast('QUIZ NIGHT IS FROM 7PM');quiz()}});Bx(-.2,0,3.1,.9,1.3,.06,0x1c2a24)}
- if(o.t==='THE CUE CLUB'){for(const x of[-2.4,2.2]){Bx(x,0,1.2,1.5,.8,2.8,0x3a2210);Bx(x,.8,1.2,1.4,.04,2.7,0x16703a);IROOM.push([x-.8,x+.8,-.2,2.6])}for(const a of IA)if(typeof a.label==='string'&&/^BUY /.test(a.label)){a.label='🍺 A PINT £3';const f=a.fn;a.fn=()=>{if(cash<3)return toast('NOT ENOUGH CASH');cash-=3;HN.en=Math.min(100,HN.en+5);toast('A PINT OF BITTER. ENERGY +5')}}IA.push({r:[-3.2,3.0,2.6,3.0],label:'🎱 SNOOKER: BREAK BUILDER (£3)',fn:()=>{if(pay(3))snooker()}})}
- if(o.t==='COZY BINGO'){for(let r=0;r<2;r++)for(const x of[-2.6,2.4]){Bx(x,0,.6+r*1.4,1.8,.72,.7,0x8a1a5a);for(const d of[-.6,0,.6])Bx(x+d,0,.6+r*1.4+.6,.4,.45,.4,0xd04090);IROOM.push([x-1,x+1,.2+r*1.4,1.2+r*1.4])}for(const a of IA)if(typeof a.label==='string'&&/^BUY /.test(a.label)){a.label='🎱 BUY A BINGO CARD (£2)';a.fn=()=>bingo()}}
- if(o.t==='COZY GOLF CLUB'){for(const a of IA)if(typeof a.label==='string'&&/^BUY /.test(a.label)){a.label='⛳ PLAY FOUR HOLES (£10)';a.fn=()=>golf()}}}}
+ if(o.pub){Bx(4.4,0,4.4,2.2,.25,1.4,0x3a1a3a);Bx(4.4,.25,4.3,.06,1.4,.06,0x202020);Bx(4.4,1.6,4.3,.12,.18,.12,0x404040);IA.push({r:[3.2,5.6,3.3,5.1],label:'🎤 KARAOKE',fn:()=>{if(GT<18&&GT>3)return toast('KARAOKE STARTS AT 6PM');G3D.karaoke()}},{r:[-1.0,.6,2.6,3.6],label:'🧠 QUIZ NIGHT (£60 PRIZE)',fn:()=>{if(GT<19&&GT>3)return toast('QUIZ NIGHT IS FROM 7PM');G3D.quiz()}});Bx(-.2,0,3.1,.9,1.3,.06,0x1c2a24)}
+ if(o.t==='THE CUE CLUB'){for(const x of[-2.4,2.2]){Bx(x,0,1.2,1.5,.8,2.8,0x3a2210);Bx(x,.8,1.2,1.4,.04,2.7,0x16703a);IROOM.push([x-.8,x+.8,-.2,2.6])}for(const a of IA)if(typeof a.label==='string'&&/^BUY /.test(a.label)){a.label='🍺 A PINT £3';const f=a.fn;a.fn=()=>{if(cash<3)return toast('NOT ENOUGH CASH');cash-=3;HN.en=Math.min(100,HN.en+5);toast('A PINT OF BITTER. ENERGY +5')}}IA.push({r:[-3.2,3.0,2.6,3.0],label:'🎱 SNOOKER: BREAK BUILDER (£3)',fn:()=>{if(pay(3))G3D.snooker()}})}
+ if(o.t==='COZY BINGO'){for(let r=0;r<2;r++)for(const x of[-2.6,2.4]){Bx(x,0,.6+r*1.4,1.8,.72,.7,0x8a1a5a);for(const d of[-.6,0,.6])Bx(x+d,0,.6+r*1.4+.6,.4,.45,.4,0xd04090);IROOM.push([x-1,x+1,.2+r*1.4,1.2+r*1.4])}for(const a of IA)if(typeof a.label==='string'&&/^BUY /.test(a.label)){a.label='🎱 BUY A BINGO CARD (£2)';a.fn=()=>G3D.bingo()}}
+ if(o.t==='COZY GOLF CLUB'){for(const a of IA)if(typeof a.label==='string'&&/^BUY /.test(a.label)){a.label='⛳ PLAY FOUR HOLES (£10)';a.fn=()=>G3D.golf()}}}}
 Object.assign(TH,{'THE CUE CLUB':{wall:0x2a3a2a,fl:'carpet',cnt:0x3a2210,top:0x5a3a20,pal:[0x16703a],back:0,left:0,sh:0x0a3a1a},'COZY BINGO':{wall:0xf0d0e8,fl:'carpet',cnt:0xa0106a,top:0xffe040,pal:[0xff60c0],back:0,left:0,sh:0xa0106a},'COZY GOLF CLUB':{wall:0xe8f0e0,fl:'wood',cnt:0x1a4a2a,top:0xd8c8a0,pal:[0x1a4a2a,0xf0f0f0],back:1,left:0,sh:0x1a4a2a}});
 Object.assign(KEEP,{'THE CUE CLUB':['STEVE "INTERESTING" DAVIES','Chalk your cue, son.'],'COZY BINGO':['CALLER CLIVE','Eyes down for a full house!'],'COZY GOLF CLUB':['THE CLUB SECRETARY','Collared shirts only. Well, we\'ll let it go.']});Object.assign(HRS,{'THE CUE CLUB':[12,24],'COZY BINGO':[11,23],'COZY GOLF CLUB':[8,20]});
 /* outdoor: fishing spots, tackle kiosk, scramblers, paintball hut, lido, CozyFest */
@@ -167,10 +167,10 @@ const SCR=[903,-822];{const g=new THREE.Group(),B=new Builder(3);pbox(B,0,0,0,3,
 T.pois.push({x:PBH[0],z:PBH[1],n:'COZE WOOD PAINTBALL',c:'fun',ic:'🔫',r:60},{x:SCR[0],z:SCR[1],n:'QUARRY SCRAMBLES',c:'car',ic:'🏍',r:60});
 {const c0=ctx;ctx=function(){const b=c0();if(busy||!GS.onFoot||GS.inside||!C.inTown())return b;
  if(T.tackle&&dist(T.tackle[0],T.tackle[1])<2.6)return{label:PT.fish.rod?'🎣 TACKLE & BAIT: "TIGHT LINES!"':'🎣 BUY A FISHING ROD (£25)',fn:()=>{if(PT.fish.rod)return toast('"FISH OFF THE END OF THE PIER, MATE."');if(!pay(25))return;PT.fish.rod=1;toast('🎣 GOT A ROD! FISH THE PIER, THE CANAL TOWPATH OR COZE MERE.')}};
- for(const s of T.fishSpots||[])if(dist(s[0],s[1])<3.2)return{label:'🎣 FISH HERE',fn:()=>fishing(s[2])};
- if(dist(SCR[0],SCR[1])<4)return{label:'🏍 QUARRY SCRAMBLES (£5)',fn:scrambler};
- if(dist(PBH[0],PBH[1])<5)return{label:'🔫 PAINTBALL (£8)',fn:paintball};
- if(T.lido&&dist(T.lido[0],T.lido[1])<3.5)return{label:'🏊 DIVING BOARD (£2)',fn:()=>{if(GT<8||GT>20)return toast('THE LIDO IS SHUT. 8AM TO 8PM.');if(pay(2))dive()}};
+ for(const s of T.fishSpots||[])if(dist(s[0],s[1])<3.2)return{label:'🎣 FISH HERE',fn:()=>G3D.fishing(s[2])};
+ if(dist(SCR[0],SCR[1])<4)return{label:'🏍 QUARRY SCRAMBLES (£5)',fn:()=>G3D.scrambler()};
+ if(dist(PBH[0],PBH[1])<5)return{label:'🔫 PAINTBALL (£8)',fn:()=>G3D.paintball()};
+ if(T.lido&&dist(T.lido[0],T.lido[1])<3.5)return{label:'🏊 DIVING BOARD (£2)',fn:()=>{if(GT<8||GT>20)return toast('THE LIDO IS SHUT. 8AM TO 8PM.');G3D.dive()}};
  if(T.fest&&dist(T.fest[0],T.fest[1]-14)<12){const wk=dow()>=5;return{label:wk?'🎸 WATCH THE BAND AT COZYFEST (£6)':'🎪 COZYFEST: BANDS EVERY SAT & SUN',fn:()=>{if(!wk)return toast('NEXT GIG: SATURDAY. COME BACK THEN!');if(!pay(6))return;fade(()=>{GT+=1.5;HN.en=Math.min(100,HN.en+18);toast('🎸 '+pk(['THE COZY KINGS','MOONSHOT','THE NARROWBOATS','KING ZORP & THE PROBES'])+' WERE AMAZING! ENERGY +18')})}}}
  return b}}
 /* busy weekend crowds at CozyFest */{const crowd=[];let on=0;const u0=updCozy;updCozy=function(dt){u0(dt);if(!T.fest)return;const near=!GS.inside&&Math.hypot(cam.position.x-T.fest[0],cam.position.z-T.fest[1])<260,want=near&&dow()>=5&&GT>12&&GT<23;
@@ -181,5 +181,5 @@ T.pois.push({x:PBH[0],z:PBH[1],n:'COZE WOOD PAINTBALL',c:'fun',ic:'🔫',r:60},{
  A('BOXING','PURSES £60-£800','Train and climb the ladder at Cozytown Boxing Club on Foundry Lane.',d('COZYTOWN BOXING CLUB'));A('FISHING','SELL YOUR CATCH','Buy a rod at the pier. Fish the pier, canal towpath or Coze Mere.',T.tackle?{x:T.tackle[0],z:T.tackle[1]}:null);
  A('SNOOKER','BREAK PRIZES','Break-building at The Cue Club, Foundry Lane.',d('THE CUE CLUB'));A('BINGO','£60 FULL HOUSE','Eyes down at Cozy Bingo, Bridge Street.',d('COZY BINGO'));A('GOLF','£80 UNDER PAR','Four holes at Cozy Golf Club, off Golf Lane.',d('COZY GOLF CLUB'));
  A('PAINTBALL','£30 WIN','Coze Wood, off King\'s Way.',{x:PBH[0],z:PBH[1]});A('QUARRY SCRAMBLES','£60 GOLD','Dirt bikes at the old quarry.',{x:SCR[0],z:SCR[1]});if(T.lido)A('LIDO DIVING','£40 PRIZE','Cozy Lido in the park, 8am-8pm.',{x:T.lido[0],z:T.lido[1]});A('PUB NIGHTS','KARAOKE + QUIZ','Any pub after 6pm: karaoke, and the quiz from 7pm.',d('THE ROYAL OAK'));return L}}
-window.PASTIMES2={karaoke,quiz,snooker,bingo,fishing,scrambler,paintball,golf,dive,PT};
+window.PASTIMES2={QS,karaoke,quiz,snooker,bingo,fishing,scrambler,paintball,golf,dive,PT};
 })();
