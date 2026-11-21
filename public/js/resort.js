@@ -256,6 +256,8 @@ function* landmarks(m){
  /* ---- clifftop campsite (east of the runway) ---- */{const TC=[[.95,.6,.2],[.2,.6,.4],[.3,.5,.9],[.9,.3,.3]];for(let k=0;k<12;k++){const u=rr(70,150),v=rr(250,520),c=pick(TC),t=T(u,v),p=W(u,v);if(k<5){pbox(t.o,p[0],Y,p[1],2.2,2,4.4,[.95,.95,.92],rnd());pbox(t.o,p[0],Y+.9,p[1],2.24,.3,4.44,c,0);cBox(u-1.6,u+1.6,v-2.6,v+2.6)}else{const a=P3(u-1.2,Y,v-1.4),b=P3(u+1.2,Y,v-1.4),cc=P3(u,Y+1.6,v-1.4),d=P3(u-1.2,Y,v+1.4),e=P3(u+1.2,Y,v+1.4),f=P3(u,Y+1.6,v+1.4);t.o.tri(a,cc,f,c,c,c,true);t.o.tri(a,f,d,c,c,c,true);t.o.tri(b,e,f,c,c,c,true);t.o.tri(b,f,cc,c,c,c,true)}}
   {const u=110,v=230;cy(u,Y,v,1.2,.4,8,[.5,.5,.5]);for(let k=0;k<6;k++)bx(u+Math.cos(k)*.6,Y+.3,v+Math.sin(k)*.6,.15,.15,1,[.4,.25,.15],k);RS.fire={u,v}}poi('CLIFFTOP CAMPSITE',110,380,'⛺')}
  /* ---- welcome plaza outside the terminal ---- */{flat(-217,-262,-168,-138,[.86,.82,.72],Y+.03);for(let k=0;k<6;k++){palm(-212,-255+k*22,1);palm(-175,-255+k*22,.9)}sign(-206,-138.5,Y+4.2,'WELCOME TO SUNHAVEN BAY',14,1.8,0,'#1a6a8a','#ffffff');for(const s of[-6.4,6.4])cy(-206+s,Y,-138.5,.15,4.2,6,[.9,.9,.9]);cy(-192,Y,-200,5,.6,16,[.9,.86,.78]);cy(-192,Y+.55,-200,4.4,.1,16,[.3,.7,.85]);cCirc(-192,-200,5)}
+ /* airport car park (your car waits here) */{flat(-229,-336,-186,-286,[.24,.24,.26],Y+.035,1);for(let u=-226;u<=-190;u+=4){flat(u-.08,-334,u+.08,-326,[.95,.95,.92],Y+.06,1);flat(u-.08,-296,u+.08,-288,[.95,.95,.92],Y+.06,1)}flat(-229,-311.2,-186,-310.8,[.95,.8,.2],Y+.06,1);
+  for(const v of[-338,-284])for(let u=-229;u<=-186;u+=3)bx(u,Y,v,.12,.7,.12,[.9,.9,.9]);cy(-188,Y,-284.5,.08,3.4,6,[.3,.3,.32]);sign(-188,-284.4,Y+3.2,'P  CAR PARK',4.4,1,0,'#1a4aa0','#ffffff','Arial');poi('CAR PARK',-205,-310,'🅿')}
  /* palms along the main streets */for(const r of NS)if(r.i<3)for(let v=-370;v<370;v+=36){if(Math.abs(v)<14)continue;palm(r.u+r.h+1.6,v,rr(.8,1))}
  yield}
 /* ------------------------------------------------------------------ state + arrival */
@@ -295,4 +297,9 @@ const inRes=()=>{const T_=GS.onFoot?P:GS;return RS.built&&!GS.inside&&inReg(T_.x
 addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('#mm')&&inRes()){e.stopPropagation();e.preventDefault();openMap()}},true);
 addEventListener('keydown',e=>{if((e.key==='m'||e.key==='M')&&inRes()&&!e.repeat){const t=e.target;if(t&&/INPUT|TEXTAREA/.test(t.tagName))return;e.stopPropagation();openMap()}},true);
 Object.assign(RS,{openMap,where,inRes,mmBuild,onRoad,STERM});
+/* your car: parked in the Sunhaven Airport car park when you land, sent back home when you fly home */
+function parkHere(){const p=W(-205,-310.5);GS.x=p[0];GS.z=p[1];GS.psi=-Math.PI/2;GS.vx=GS.vz=0;GS.y=Y+.1;GS.vy=0;GS.prevGY=GS.y;GS.pitch=GS.roll=0;GS.speed=0}
+{const a0=RM.arrive;RM.arrive=function(sv){a0(sv);const V=window.MARLOWE2&&MARLOWE2.VAL,MW=window.MARLOWE;if(V&&!inReg(GS.x,GS.z)&&!(MW&&MW.inReg(GS.x,GS.z))){V.has=1;V.x=GS.x;V.z=GS.z;V.psi=GS.psi}parkHere();setTimeout(()=>{try{phText('COZY VALET',"Your car is waiting in the Sunhaven Airport car park, just south of the terminal. Enjoy the seaside!")}catch(e){}},2500)}}
+{const H=window.AIRFIELDS.HOME,a0=H.arrive;H.arrive=function(sv){a0(sv);if(inReg(GS.x,GS.z)){const V=window.MARLOWE2&&MARLOWE2.VAL;if(V&&V.has){GS.x=V.x;GS.z=V.z;GS.psi=V.psi;V.has=0}else respawn(false);GS.vx=GS.vz=0;GS.y=gH(GS.x,GS.z)+.1;GS.prevGY=GS.y}}}
+RS.parkHere=parkHere;
 })();
