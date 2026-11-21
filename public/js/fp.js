@@ -1,7 +1,7 @@
 /* ---- first-person view: CAM button / C key cycles to it (4th camera) ---- */
 (function(){
 CAMS.push({d:0,h:1.2,f:76,fp:1});
-const FPI=CAMS.length-1,HGT=[1.12,1.08,1.5,1.45,.92,1.2],SEAT=-.34;
+const FPI=CAMS.length-1,HGT=[1.12,1.08,1.5,1.45,.92,1.2,1.13],SEAT=-.34;
 const dash=document.createElement('div');
 dash.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:0;display:none;overflow:hidden';
 {const h=document.getElementById('hud');h?h.parentNode.insertBefore(dash,h):document.body.appendChild(dash)}
@@ -39,7 +39,8 @@ const CK=[
  {n:'VAN',roof:9,pT:5,pB:13,pw:5,dY:60,dash:'#4a4e55',dash2:'#5b6068',belt:56,door:'#6e6258',mir:{x:9,y:44,w:6,h:20,r:1,c:'#222'},wheel:{s:31,t:2.2,sp:'three',c:'#1a1a1c'},cl:[{x:0,y:0,d:11,c:'#e8e0b0'}],stack:{x:70,y:65,w:16,h:8,c:'#33363b'},roofc:'#8a8f98',tall:1},
  {n:'DEFENDER',roof:10,pT:3,pB:6,pw:4,dY:63,dash:'#4b5a3a',dash2:'#5a6b46',belt:59,door:'#3f4a30',mir:{x:6,y:48,w:5,h:16,r:1,c:'#161616'},wheel:{s:44,t:2,sp:'three',c:'#161616'},cl:[{x:-9,y:0,d:8,c:'#e6e2c8'},{x:9,y:0,d:8,c:'#e6e2c8'}],stack:{x:46,y:63,w:8,h:5,c:'#2b2f24'},roofc:'#4b5a3a',boxy:1},
  {n:'MX5',roof:0,pT:15,pB:20,pw:3.2,dY:76,dash:'#17181b',dash2:'#2a2b30',belt:70,door:'#8e9097',mir:{x:23,y:63,w:6,h:7,r:50,c:'#c8c8cc'},wheel:{s:38,t:2.2,sp:'three',c:'#141416'},cl:[{x:-6,y:0,d:8,c:'#f2f2f2'},{x:0,y:0,d:7,c:'#e6e6e6'},{x:6,y:0,d:8,c:'#f2f2f2'}],stack:{x:46,y:77,w:8,h:7,c:'#202126'},roofc:null,hdr:3},
- {n:'V60',roof:10,pT:8,pB:19,pw:5.5,dY:64,dash:'#202226',dash2:'#2f3238',belt:61,door:'#1d1f22',mir:{x:19,y:55,w:9,h:9,r:4,c:'#b9b9bc'},wheel:{s:45,t:2.4,sp:'three',c:'#18181a'},cl:[{x:-5.5,y:0,d:10,c:'#dfe4ea'},{x:5.5,y:0,d:10,c:'#dfe4ea'}],stack:{x:42,y:66,w:16,h:15,c:'#15171b',scr:'#4aa0e0'},roofc:'#2a2c30'}
+ {n:'V60',roof:10,pT:8,pB:19,pw:5.5,dY:64,dash:'#202226',dash2:'#2f3238',belt:61,door:'#1d1f22',mir:{x:19,y:55,w:9,h:9,r:4,c:'#b9b9bc'},wheel:{s:45,t:2.4,sp:'three',c:'#18181a'},cl:[{x:-5.5,y:0,d:10,c:'#dfe4ea'},{x:5.5,y:0,d:10,c:'#dfe4ea'}],stack:{x:42,y:66,w:16,h:15,c:'#15171b',scr:'#4aa0e0'},roofc:'#2a2c30'},
+ {n:'A6',roof:10,pT:8,pB:20,pw:5,dY:65,dash:'#1b1c20',dash2:'#2c2e33',belt:62,door:'#1a1b1e',mir:{x:19,y:55,w:9,h:9,r:4,c:'#b4b7bc'},wheel:{s:45,t:2.4,sp:'three',c:'#151517'},cl:[{x:-5.5,y:0,d:10,c:'#e4e8ee'},{x:5.5,y:0,d:10,c:'#e4e8ee'}],stack:{x:40,y:64,w:20,h:16,c:'#101114',scr:'#3c3f46'},roofc:'#2a2c30'}
 ];
 
 // image-based cockpit (made from supplied artwork) for cars that have it
@@ -68,7 +69,7 @@ function fitImg(){if(!imgBox)return;const c=IMG[ckI];if(!c)return;const W=innerW
 addEventListener('resize',fitImg);
 function updImg(v){if(!imgNeedles)return;const mph=v*2.237,f=Math.min(1,v/42);for(const[d,e]of imgNeedles){const p=d.k==='spd'?Math.min(1,mph/d.mx):(.12+.5*f+.15*((v*.35)%1));e.style.transform='rotate('+(d.a0+p*d.sw)+'deg)'}}
 let ckI=-1;
-function buildCk(i){if(IMG[i]){buildImg(i);fitImg();return}const c=CK[i]||CK[0];ckI=i;
+function buildCk(i){if(IMG[i]){buildImg(i);fitImg();return}const c=CK[i]||(i>=6?(window.TRI&&TRI.isBike(i)?CK[4]:CK[6]):CK[0]);ckI=i;
  const P=(...a)=>a.join(' '),sv=[];
  // roof header (angled lower edge) + A-pillars + door tops
  if(c.roof)sv.push(`<polygon points="0,0 100,0 100,${c.roof-(c.tall?0:3)} 50,${c.roof+1.5} 0,${c.roof-(c.tall?0:3)}" fill="${c.roofc}"/>`);
@@ -109,7 +110,7 @@ updateCam=function(dt){
  if(!fp)return;
  let x,y,z,psi,pitch=0;
  if(GS.onFoot){psi=P.psi;const bob=Math.sin(P.phase*1)*.03*Math.min(1,P.speed/3);x=P.x+Math.sin(psi)*.12;z=P.z+Math.cos(psi)*.12;y=P.y+1.62+bob}
- else{psi=GS.psi;pitch=(GS.pitch+GS.dp)*.6;const h=HGT[CARI]||1.15,c=Math.cos(psi),s=Math.sin(psi);
+ else{psi=GS.psi;pitch=(GS.pitch+GS.dp)*.6;const h=(window.TRI&&TRI.isTri(CARI)?TRI.hgt(CARI):HGT[CARI])||1.15,c=Math.cos(psi),s=Math.sin(psi);
   // local +x is the car's left; SEAT<0 puts the driver on the right
   x=GS.x+c*SEAT+s*.1;z=GS.z-s*SEAT+c*.1;y=GS.y+h;
   fpSteer+=(GS.steer-fpSteer)*Math.min(1,dt*8);{const v=Math.hypot(GS.vx||0,GS.vz||0),f=Math.min(1,v/42);updImg(v);if(needles)for(const[k,el]of needles)el.style.transform='rotate('+(k==='spd'?125+f*270:125+(.12+.5*f+.15*((v*.35)%1))*270)+'deg)'}if(wheel)wheel.style.transform='rotate('+(-fpSteer*120)+'deg)'}

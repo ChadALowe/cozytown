@@ -352,7 +352,7 @@ const PERF=[
  {k:'brk',n:'BRAKES',d:['STOCK','SPORT','RACE','CARBON'],p:()=>[35,70,120],max:3,get:()=>TN.brk|0,set:v=>{TN.brk=v}},
  {k:'nos',n:'NITROUS KIT',d:['NOT FITTED','FITTED'],p:()=>[150],max:1,get:()=>TN.nos|0,set:v=>{TN.nos=v},desc:'HOLD THE NOS BUTTON FOR A BIG BOOST'},
  {k:'tank',n:'NITROUS TANK',d:['STANDARD','LARGE','XL'],p:()=>[100,160],max:2,get:()=>TN.tank|0,set:v=>{TN.tank=v},req:()=>TN.nos,desc:'MORE BOOST BEFORE IT RUNS DRY'}];
-const CPRs=i=>(typeof CPR==='function'?CPR(i):[0,220,380,420,480,400][i]);
+const CPRs=i=>(typeof CPR==='function'?CPR(i):[0,220,380,420,480,400,520][i]);
 const S={tab:'cars',sel:null,commit:null,msg:'',sl:[.6,.8,.5],view:'34'};let on=0;
 const cashTxt=()=>'£'+Math.round(cash);
 
@@ -374,7 +374,7 @@ function pay(n){if(cash<n){setMsg('NOT ENOUGH CASH');flash(0);return false}cash-
 
 /* ---- tab: cars ---- */
 function tabCars(){const B=$q('#tnBody');B.innerHTML='';
- for(let i=0;i<6;i++){const own=OWN.car[i],cur=i===S.commit.car,r=document.createElement('div');r.className='tnRow'+(CARI===i?' sel':'')+(cur?' cur':'');
+ for(let i=0;i<CARN.length;i++){if(window.TUNEHOME?!OWN.car[i]&&i!==0:i>5&&!OWN.car[i]&&i!==CARI)continue;const own=OWN.car[i],cur=i===S.commit.car,r=document.createElement('div');r.className='tnRow'+(CARI===i?' sel':'')+(cur?' cur':'');
   r.innerHTML=`<div class="n">${CARN[i]}<small>${CARSD[i]}</small></div><div class="pr ${cur?'ok':own?'ok':cash>=CPRs(i)?'':'no'}">${cur?'DRIVING':own?'OWNED':'£'+CPRs(i)}</div>`;
   r.onclick=()=>{setCar(i);neonPrev=null;neonNow();tabCars();head();carBtn()};B.appendChild(r)}
  carBtn()}
@@ -384,7 +384,7 @@ function carBtn(){const i=CARI,own=OWN.car[i],cur=i===S.commit.car;
  if(!S.msg)setMsg('TAP A CAR TO PREVIEW IT')}
 
 /* ---- tab: paint ---- */
-const pName=i=>(CARI===3&&!i?'STOCK GREEN':CARI>=4&&!i?'STOCK SILVER':PN[i]);
+const pName=i=>(CARI===3&&!i?'STOCK GREEN':CARI>=6&&!i?'STOCK COLOUR':CARI>=4&&!i?'STOCK SILVER':PN[i]);
 function hsl(h,s,l){const a=s*Math.min(l,1-l),f=n=>{const k=(n+h*12)%12;return l-a*Math.max(-1,Math.min(k-3,9-k,1))};return[f(0),f(8),f(4)]}
 function tabPaint(){const B=$q('#tnBody');B.innerHTML='<div class="tnH">COLOURS · £'+PAINTP+' EACH, FREE ONCE OWNED</div><div class="tnGrid"></div><div class="tnH">CUSTOM MIX · £15</div><div id="tnCu"></div><div class="tnH">FINISH · £30 EACH, FREE ONCE OWNED</div><div class="tnGrid" id="tnFin"></div>';
  const g=B.querySelector('.tnGrid');

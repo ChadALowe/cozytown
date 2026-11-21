@@ -144,7 +144,7 @@ function step(dt){
  if(hAt(nx,nz)<.25){GS.vx*=-.3;GS.vz*=-.3;nx=GS.x;nz=GS.z;impact=Math.max(impact,6)}
  const cf=[Math.sin(GS.psi),Math.cos(GS.psi)];
  for(const off of[1.1,-1,0]){const px=nx+cf[0]*off,pz=nz+cf[1]*off;
-  {const CL_=colQ(px,pz);for(let i=0;i<CL_.length;i++){const c=CL_[i];if(c.d&&dOpen>.7)continue;const dx=px-c[0],dz=pz-c[1];if(dx>c[2]+2||dx<-c[2]-2||dz>c[2]+2||dz<-c[2]-2)continue;const dd=Math.hypot(dx,dz),rr=c[2]+(CARI===5?1.12:CARI===4?.92:CARI===2?1.05:CARI===3?1.0:CARI?.95:.85);if(dd<rr&&dd>1e-3){const ux=dx/dd,uz=dz/dd;nx+=ux*(rr-dd);nz+=uz*(rr-dd);const vn=GS.vx*ux+GS.vz*uz;if(vn<0){GS.vx-=vn*ux*1.35;GS.vz-=vn*uz*1.35;GS.vx*=.94;GS.vz*=.94;impact=Math.max(impact,-vn)}}}}}
+  {const CL_=colQ(px,pz);for(let i=0;i<CL_.length;i++){const c=CL_[i];if(c.d&&dOpen>.7)continue;const dx=px-c[0],dz=pz-c[1];if(dx>c[2]+2||dx<-c[2]-2||dz>c[2]+2||dz<-c[2]-2)continue;const dd=Math.hypot(dx,dz),rr=c[2]+(CARI>=6&&window.TRI?TRI.rad(CARI):CARI===5?1.12:CARI===4?.92:CARI===2?1.05:CARI===3?1.0:CARI?.95:.85);if(dd<rr&&dd>1e-3){const ux=dx/dd,uz=dz/dd;nx+=ux*(rr-dd);nz+=uz*(rr-dd);const vn=GS.vx*ux+GS.vz*uz;if(vn<0){GS.vx-=vn*ux*1.35;GS.vz-=vn*uz*1.35;GS.vx*=.94;GS.vz*=.94;impact=Math.max(impact,-vn)}}}}}
  GS.x=nx;GS.z=nz;
  const F=1.17,Sd=.72,hf=gH(nx+cf[0]*F,nz+cf[1]*F),hb=gH(nx-cf[0]*F,nz-cf[1]*F),hl=gH(nx+lx*Sd,nz+lz*Sd),hr=gH(nx-lx*Sd,nz-lz*Sd);
  const hc=gH(nx,nz),gy=Math.max((hf+hb+hl+hr)/4,hc)+.08+Math.abs(Math.sin(GS.roll))*.35+Math.abs(Math.sin(GS.pitch))*.5;GS.gy=gy;const gvy=(gy-GS.prevGY)/dt;GS.prevGY=gy;

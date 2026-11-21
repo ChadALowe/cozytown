@@ -156,7 +156,7 @@ CUSTOM_SHOP.mest=function(msg){H$('shT').textContent='MARLOWE ESTATES';H$('shMsg
 function kerbSpot(o){const d=o.door,k=d.pw-1.4+2.6;return{x:d.x+d.ou*k,z:d.z+d.ov*k,psi:d.psi+Math.PI/2}}
 function deliver(o){const s=kerbSpot(o);GS.x=s.x;GS.z=s.z;GS.psi=s.psi;GS.vx=GS.vz=GS.vy=0;GS.speed=0;GS.y=gH(s.x,s.z)+.1;GS.prevGY=GS.y;GS.pitch=GS.roll=0}
 CUSTOM_SHOP.mgar=function(msg){const o=SHOPCUR.o,dealer=MS.gar==='dealer';H$('shT').textContent=dealer?'MARLOWE MOTORS':'YOUR GARAGE';H$('shMsg').textContent=msg||('DRIVING: '+CARN[CARI]+'  ·  YOUR CAR IS BROUGHT ROUND TO THE KERB');
- CARN.forEach((n,i)=>{const own=OWN.car[i];const b=[];if(own)b.push(i===CARI?['DRIVING',()=>{},1]:['DRIVE IT',()=>{setCar(i);deliver(o);renderShop('YOUR '+n+' IS WAITING OUTSIDE')}]);
+ CARN.forEach((n,i)=>{const own=OWN.car[i];if(!own&&!(dealer&&(!window.TRI||i<6||TRI.motorsStock.includes(i))))return;const b=[];if(own)b.push(i===CARI?['DRIVING',()=>{},1]:['DRIVE IT',()=>{setCar(i);deliver(o);renderShop('YOUR '+n+' IS WAITING OUTSIDE')}]);
   else if(dealer)b.push(['BUY £'+CPR(i).toLocaleString('en-GB'),()=>{const p=CPR(i);if(cash<p)return renderShop('NOT ENOUGH CASH FOR THE '+n);cash-=p;OWN.car[i]=1;setCar(i);deliver(o);beep(880,.1,'square',.05);renderShop('SOLD! YOUR NEW '+n+' IS OUTSIDE')}]);else b.push(['NOT OWNED',()=>renderShop('BUY IT AT MARLOWE MOTORS ON TERMINAL ROAD')]);
   dRow(n+' · '+CARSD[i],b)});
  dRow('BRING MY CAR TO THE DOOR',[['CALL IT',()=>{deliver(o);renderShop('YOUR '+CARN[CARI]+' IS PARKED OUTSIDE')}]]);dRow('',[['BACK',()=>closeShop()]])};
