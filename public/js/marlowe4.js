@@ -107,15 +107,60 @@ function buildHome(o){const T=o.def.tier,pent=T===3,town=T===2;const H=shell(o,p
  ia(RX-1.4,RX,RZ-1.9,RZ-.5,'GARAGE: YOUR CARS',()=>{MS.gar='home';openShop('mgar')});
  if(pent)ia(RX-2.6,RX-.6,RZ-1.2,RZ-.4,'PLAY THE PIANO',()=>{for(let i=0;i<8;i++)setTimeout(()=>beep([523,587,659,698,784,698,659,523][i],.18,'triangle',.06),i*190);toast('♪ A LITTLE NIGHT MUSIC ♪')});
  leave();toast(o.def.sn+' · WELCOME HOME')}
-function buildFood(o){const f=o.def,[c1,c2]=f.th,H=shell(o,c2,f.pub?'wood':'tile');
- B(0,0,-RZ+1.5,5,1.0,.7,c1);B(0,1.0,-RZ+1.5,5.1,.06,.8,f.pub?0x8a6a3a:0xe8e4dc);blk(-2.6,2.6,-RZ,-RZ+1.9);
- if(f.pub){for(let k=0;k<6;k++)B(-2+k*.8,1.06,-RZ+1.3,.08,.5,.08,0xd8c070);B(0,1.6,-RZ+.3,4.6,.9,.3,0x3a2a1a);for(let k=0;k<10;k++)B(-2.1+k*.47,1.65,-RZ+.36,.12,.32,.12,[0x2a6a3a,0x8a2a1a,0xd8a020][k%3])}
- else{B(0,1.06,-RZ+1.5,.8,.35,.5,0xc0c4c8);B(1.6,1.06,-RZ+1.5,.4,.3,.35,0x202228)}
- const menu=f.items.map(i=>i[0]+'  £'+i[1]).join('   ');sign(4.6,.9,0,2.5,-RZ+.03,0,'#14141a','#ffe9a8',f.t,46);sign(5.4,.32,0,1.85,-RZ+.04,0,'#14141a','#ffffff',menu,13);
+function buildFood(o){const f=o.def,[c1,c2]=f.th,V=FOODLOOK[f.t]||{},H=shell(o,V.wall!=null?V.wall:c2,V.floor||(f.pub?'wood':'tile'));
+ /* counter (each venue dresses it differently below) */
+ B(0,0,-RZ+1.5,5,1.0,.7,V.cnt!=null?V.cnt:c1);B(0,1.0,-RZ+1.5,5.1,.06,.8,V.top!=null?V.top:(f.pub?0x8a6a3a:0xe8e4dc));blk(-2.6,2.6,-RZ,-RZ+1.9);
+ const menu=f.items.map(i=>i[0]+'  £'+i[1]).join('   ');sign(4.6,.9,0,2.5,-RZ+.03,0,V.sbg||'#14141a',V.sfg||'#ffe9a8',f.t,46);sign(5.4,.32,0,1.85,-RZ+.04,0,V.sbg||'#14141a','#ffffff',menu,13);
  npc(f.t.length*97+3,0,-RZ+.85,0,{f:f.t.length%2===0,ts:1,tc:[(c1>>16&255)/255,(c1>>8&255)/255,(c1&255)/255],hs:f.t.length%5});
- for(const[x,z]of[[-3.2,0],[0,1.2],[3.2,0],[-3.2,2.6],[3.2,2.6]]){B(x,0,z,.9,.75,.9,f.pub?0x4a2a14:0xf0f0ee);B(x,0,z,.12,.73,.12,0x333);for(const s of[-1,1])B(x+s*.75,0,z,.4,.45,.4,c1);blk(x-1,x+1,z-.5,z+.5)}
- SHOPCUR={o,k:[f.pub?'LANDLORD':'STAFF',f.pub?'What\'ll it be?':'Hi! What can I get you?']};
+ (V.dress||dressPlain)(f,c1,c2,H);
+ SHOPCUR={o,k:[f.pub?'LANDLORD':'STAFF',V.hi||(f.pub?'What\'ll it be?':'Hi! What can I get you?')]};
  ia(-2.4,2.4,-RZ+1.9,-RZ+2.9,f.pub?'ORDER AT THE BAR':'ORDER',()=>openShop('mfood'));leave()}
+/* ---- each Marlowe eatery gets its own room: floor, colours, furniture and props ---- */
+const stool=(x,z,col)=>{B(x,0,z,.08,.7,.08,0x555a60);B(x,.7,z,.42,.08,.42,col);blk(x-.25,x+.25,z-.25,z+.25)};
+const lamp=(x,y,z,col)=>{B(x,y,z,.03,Hroom()-y,.03,0x222);B(x,y-.25,z,.4,.25,.4,col)};
+const Hroom=()=>IH+.9;
+const table=(x,z,w,d,top,leg)=>{B(x,0,z,.1,.72,.1,leg||0x333);B(x,.72,z,w,.06,d,top);blk(x-w/2-.1,x+w/2+.1,z-d/2-.1,z+d/2+.1)};
+const frame=(x,y,z,ry,w,h,col)=>{if(ry)B(x,y,z,.04,h,w,0x2a1a0a),B(x+(x<0?.03:-.03),y+.06,z,.02,h-.12,w-.12,col);else B(x,y,z,w,h,.04,0x2a1a0a),B(x,y+.06,z+(z<0?.03:-.03),w-.12,h-.12,.02,col)};
+function dressPlain(f,c1){for(const[x,z]of[[-3.2,0],[0,1.2],[3.2,0],[-3.2,2.6],[3.2,2.6]]){table(x,z,.9,.9,f.pub?0x4a2a14:0xf0f0ee);for(const s of[-1,1])B(x+s*.75,0,z,.4,.45,.4,c1)}}
+const FOODLOOK={
+ 'THE COFFEE HOUSE':{floor:'wood',wall:0xd9c7a8,cnt:0x3a2416,top:0xb08a5a,sbg:'#2a1a10',sfg:'#f4d9a0',hi:'Oat, soy or proper milk?',dress(f){
+  /* espresso machine, grinder, pastry cabinet, chalkboard */B(-1.2,1.06,-RZ+1.5,1.0,.55,.5,0xc0c4c8);B(-1.2,1.3,-RZ+1.25,.8,.08,.06,0x202020);B(-.4,1.06,-RZ+1.5,.25,.5,.25,0x1a1a1a);
+  B(1.4,1.06,-RZ+1.5,1.4,.45,.6,0xe8f4f8);for(let k=0;k<4;k++)B(.9+k*.33,1.12,-RZ+1.45,.24,.1,.24,[0xd8a050,0x8a5a2a,0xe8c890,0x6a3a1a][k]);
+  B(-RX+.05,1.4,-1.5,.04,1.2,1.8,0x1a1a1a);/* chalkboard */
+  for(const[x,z,c]of[[-3.6,.2,0x6a3a2a],[-3.6,2.6,0x2a4a5a],[3.4,.6,0x6a3a2a]]){B(x,0,z,1,.45,1,c);B(x-.4,.45,z,.2,.45,1,c);blk(x-.5,x+.5,z-.5,z+.5)}
+  for(const[x,z]of[[-2.2,1.4],[0,.6],[1.8,2.4],[3.6,2.6]]){table(x,z,.8,.8,0x8a5a32);stool(x-.7,z,0x3a2416);stool(x+.7,z,0x3a2416)}
+  for(const x of[-2,0,2])lamp(x,2.3,0,0xffd890);plant(RX-.6,-RZ+2.4);plant(-RX+.6,RZ-1)}},
+ 'MARLOWE FISH BAR':{floor:'tile2',wall:0xe8f0f6,cnt:0xb8c0c8,top:0xe8ecee,sbg:'#0a2a5a',sfg:'#ffffff',hi:'Salt and vinegar on that?',dress(){
+  /* fryer range and hot cabinet */B(0,0,-RZ+.35,4.6,1.0,.6,0xa8b0b8);for(let k=0;k<3;k++)B(-1.5+k*1.5,1.0,-RZ+.35,1.1,.08,.5,0xd8a020);
+  B(0,1.06,-RZ+1.5,3.2,.55,.55,0xd8eef8);B(0,1.15,-RZ+1.5,3,.12,.45,0xe0a040);
+  /* blue and white wall tiles, a fish on the wall */B(0,0,RZ-.05,2*RX,1.2,.06,0x1a4a8a);B(RX-.05,0,0,.06,1.2,2*RZ,0x1a4a8a);B(-RX+.05,0,0,.06,1.2,2*RZ,0x1a4a8a);
+  B(RX-.08,1.9,0,.04,.5,1.6,0xf0a030);/* long bench + ledge seating */B(-RX+.5,0,.8,.6,.45,4.6,0x2a5a9a);B(-RX+.25,.9,.8,.3,.06,4.6,0xe8ecee);blk(-RX,-RX+.85,-1.5,3.1);
+  for(const[x,z]of[[1.2,.8],[3.4,.8],[1.2,2.8],[3.4,2.8]]){table(x,z,1.1,.8,0xe8ecee,0x1a4a8a);B(x,0,z-.7,1.1,.45,.3,0x2a5a9a);B(x,0,z+.7,1.1,.45,.3,0x2a5a9a)}}},
+ 'SUSHI BAR':{floor:'wood',wall:0x2a2420,cnt:0x5a3a24,top:0xd8c8a0,sbg:'#1a0a0a',sfg:'#ff6a5a',hi:'Irasshaimase! Grab a stool at the belt.',dress(){
+  /* conveyor belt loop with stools and coloured plates */const bx=0,bz=1.2,bw=6.4,bd=2.4;B(bx,0,bz,bw,.9,bd,0x3a2416);B(bx,.9,bz,bw+.1,.04,bd+.1,0xc0c4c8);
+  for(let k=0;k<22;k++){const t=k/22,per=2*(bw+bd),d=t*per;let x,z;if(d<bw){x=bx-bw/2+d;z=bz-bd/2}else if(d<bw+bd){x=bx+bw/2;z=bz-bd/2+(d-bw)}else if(d<2*bw+bd){x=bx+bw/2-(d-bw-bd);z=bz+bd/2}else{x=bx-bw/2;z=bz+bd/2-(d-2*bw-bd)}
+   B(x,.95,z,.28,.04,.28,[0xd02a2a,0x2a6ad0,0xf0c020,0x2a9a4a][k%4]);B(x,.99,z,.16,.06,.1,k%2?0xff8a6a:0xf4f4f0)}
+  blk(bx-bw/2-.1,bx+bw/2+.1,bz-bd/2-.1,bz+bd/2+.1);for(let k=0;k<5;k++){stool(-2.6+k*1.3,bz-bd/2-.55,0xc8302a);stool(-2.6+k*1.3,bz+bd/2+.55,0xc8302a)}
+  /* paper lanterns, noren curtain, bamboo */for(const x of[-3.5,-1.2,1.2,3.5])lamp(x,2.4,bz,0xff4a3a);
+  for(let k=0;k<5;k++)B(-1+k*.5,1.7,-RZ+.06,.45,.7,.02,k%2?0x1a2a5a:0x2a3a6a);for(const z of[-2,0,2])B(RX-.3,0,z,.12,2.6,.12,0x6a9a3a)}},
+ 'BURGER BAR':{floor:'tile',wall:0xf6e8c4,cnt:0xc8301a,top:0xe8e8ec,sbg:'#c8301a',sfg:'#ffffff',hi:'Welcome to the Burger Bar! Shake with that?',dress(){
+  /* red booths along both walls, chrome stools at the counter, a jukebox */for(const z of[-.6,1.9]){for(const sx of[-1,1]){const x=sx*(RX-1.0);table(x,z,.9,1.1,0xe8e8ec,0x9aa0a8);B(x,0,z-.8,1.4,.5,.4,0xc8301a);B(x,.5,z-.95,1.4,.6,.12,0xc8301a);B(x,0,z+.8,1.4,.5,.4,0xc8301a);B(x,.5,z+.95,1.4,.6,.12,0xc8301a);blk(x-.75,x+.75,z-1.05,z+1.05)}}
+  for(let k=0;k<4;k++)stool(-1.8+k*1.2,-RZ+2.35,0xc8301a);
+  B(-1.3,0,RZ-.5,.8,1.5,.5,0x8a2a6a);B(-1.3,1.0,RZ-.24,.6,.35,.02,0xffd040);/* jukebox */blk(-1.75,-.85,RZ-.8,RZ);
+  B(0,2.15,-RZ+.06,3.6,.06,.02,0xff3a8a);B(0,0,0,2*RX,.02,.4,0xc8301a);/* stripe */for(const x of[-2.5,0,2.5])lamp(x,2.3,1,0xffffff)}},
+ 'THE TEA ROOM':{floor:'carpet',wall:0xf4e6ea,cnt:0xf6efe2,top:0xd8b8c0,sbg:'#5a8a7a',sfg:'#fff6e8',hi:'A pot for one? The scones are still warm.',dress(){
+  /* cake stand display, round tables with cloths, teapots, pictures */B(1.6,1.06,-RZ+1.5,.5,.06,.5,0xf4f4f4);B(1.6,1.12,-RZ+1.5,.06,.5,.06,0xd8c070);for(const y of[1.2,1.42,1.62])B(1.6,y,-RZ+1.5,.42-(y-1.2)*.4,.03,.42-(y-1.2)*.4,0xf8f4f0);
+  for(const[x,z]of[[-3,0],[0,.9],[3,0],[-3,2.6],[0,3],[3,2.6]]){B(x,0,z,1.1,.72,1.1,0xffffff);B(x,.72,z,1.15,.04,1.15,0xf8e8ee);B(x,.76,z,.22,.2,.22,[0x5a8a7a,0xd87a9a,0x8a7ad8][(x+z+6|0)%3]);B(x+.3,.76,z+.2,.12,.08,.12,0xffffff);blk(x-.6,x+.6,z-.6,z+.6);for(const s of[-1,1])B(x+s*.85,0,z,.4,.45,.4,0x8a6a5a),B(x+s*1.02,.45,z,.08,.55,.4,0x8a6a5a)}
+  for(const[x,z,c]of[[-RX+.05,-1.4,0x9ac8a8],[-RX+.05,.6,0xe8b8c8],[RX-.05,-1.4,0xa8b8e8],[RX-.05,.6,0xf0d8a0]])frame(x,1.5,z,1,.9,.7,c);plant(-RX+.6,-RZ+2.4);plant(RX-.6,RZ-1)}},
+ 'NOODLE HOUSE':{floor:'stone',wall:0x3a2418,cnt:0x8a2a1a,top:0x2a1a10,sbg:'#d8a020',sfg:'#2a1a10',hi:'Sit anywhere! Ramen is extra spicy today.',dress(){
+  /* open kitchen: steaming pots behind the counter, red lanterns, long shared tables */B(0,0,-RZ+.35,4.8,.95,.6,0x9aa0a8);for(const x of[-1.6,-.4,.8,2])B(x,.95,-RZ+.35,.6,.45,.5,0x3a3a3a),B(x,1.4,-RZ+.35,.5,.04,.4,0xf0e0c0);
+  for(const z of[.2,2.4]){B(0,0,z,6,.72,.9,0x6a3a1a);B(0,.72,z,6.1,.06,1.0,0xb87a3a);B(0,0,z-.75,6,.45,.35,0x4a2a14);B(0,0,z+.75,6,.45,.35,0x4a2a14);blk(-3.1,3.1,z-.95,z+.95);for(let k=0;k<5;k++)B(-2.4+k*1.2,.78,z+(k%2?.2:-.2),.3,.12,.3,0xf4f0e8)}
+  for(const x of[-3.6,-1.8,0,1.8,3.6])lamp(x,2.3,1.3,0xd02a1a);for(const x of[-RX+.06,RX-.06])B(x,1.5,0,.03,1,.7,0xd8a020)}},
+ 'THE CROWN':{floor:'wood',wall:0x3a2418,cnt:0x4a2a14,top:0x8a6a3a,sbg:'#1e3a26',sfg:'#e8c25a',hi:'What\'ll it be? Darts are on Thursday.',dress(f){
+  for(let k=0;k<6;k++)B(-2+k*.8,1.06,-RZ+1.3,.08,.5,.08,0xd8c070);B(0,1.6,-RZ+.3,4.6,.9,.3,0x3a2a1a);for(let k=0;k<10;k++)B(-2.1+k*.47,1.65,-RZ+.36,.12,.32,.12,[0x2a6a3a,0x8a2a1a,0xd8a020][k%3]);
+  /* fireplace, dartboard, booths, bar stools */B(-RX+.35,0,1.4,.6,1.2,1.8,0x6a5a4a);B(-RX+.5,.15,1.4,.3,.5,1.0,0x1a1a1a);B(-RX+.55,.2,1.4,.2,.25,.6,0xff7a2a);B(-RX+.35,1.2,1.4,.7,.1,2,0x4a2a14);blk(-RX,-RX+.8,.4,2.4);
+  B(RX-.06,1.55,-1,.04,.5,.5,0x1a1a1a);B(RX-.09,1.58,-1,.02,.4,.4,0xd8c8a0);for(let k=0;k<4;k++)stool(-1.8+k*1.2,-RZ+2.35,0x2a1a10);
+  for(const[x,z]of[[2.6,1.2],[2.6,3.2],[-1.6,3.2]]){table(x,z,1,.8,0x4a2a14);B(x,0,z-.7,1,.5,.35,0x6a1a1a);B(x,0,z+.7,1,.5,.35,0x6a1a1a)}for(const x of[-2,2])lamp(x,2.4,1,0xffc860)}}};
 function buildEstate(o){const H=shell(o,0xf2eef4,'carpet');B(0,0,-RZ+1.6,3.4,.78,1.0,0x3a1a4a);B(0,.78,-RZ+1.6,3.5,.05,1.1,0xf0f0f0);B(.9,.83,-RZ+1.5,.5,.35,.05,0x202228);blk(-1.8,1.8,-RZ,-RZ+2.2);
  npc(9191,0,-RZ+.8,0,{f:true,ts:3,tc:[.25,.1,.3],hs:9,gl:true});sign(4,.7,0,2.6,-RZ+.03,0,'#3a1a4a','#ffffff','MARLOWE ESTATES',44);
  HOMES.forEach((h,i)=>{const x=-RX+.04,z=-2.4+i*1.6;const tx=cvx(256,192,(g,W_,H_)=>{const gr=g.createLinearGradient(0,0,0,H_);gr.addColorStop(0,'#8ac0f0');gr.addColorStop(1,'#e8f0f8');g.fillStyle=gr;g.fillRect(0,0,W_,H_);g.fillStyle=['#7a4a34','#d8dce0','#efe4cc','#8a98b0'][i];const bw=[120,100,140,70][i],bh=[80,120,90,170][i];g.fillRect(W_/2-bw/2,H_-bh,bw,bh);g.fillStyle='#2a3a4a';for(let y=H_-bh+10;y<H_-12;y+=18)for(let x2=W_/2-bw/2+8;x2<W_/2+bw/2-10;x2+=16)g.fillRect(x2,y,8,10);g.fillStyle='#3a1a4a';g.fillRect(0,H_-34,W_,34);g.fillStyle='#fff';g.font='bold 15px Arial';g.textAlign='center';g.fillText(h.sn+' £'+h.price.toLocaleString('en-GB'),W_/2,H_-12);if(MS.own[h.id]){g.fillStyle='#c8102e';g.font='bold 34px Arial';g.save();g.translate(W_/2,70);g.rotate(-.3);g.fillText('SOLD',0,0);g.restore()}});
