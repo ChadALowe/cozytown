@@ -81,7 +81,8 @@ function drawMap(){const T0=GS.inside?{x:HM.x,z:HM.z}:GS.onFoot?P:GS,VW=MMS*1.9,
  for(const d of DEPOTS){mc.fillStyle=d.type==='food'?'#ffd23a':'#4aa8ff';mc.fillRect(mx(d.x)-2.5,mz(d.z)-2.5,5,5)}
  if(JOB.on)for(const s of JOB.stops){if(s.done)continue;mc.fillStyle='#ff4a2a';mc.beginPath();mc.arc(mx(s.dx),mz(s.dz),3,0,6.3);mc.fill()}
  const T=GS.inside?{x:HM.x,z:HM.z,psi:P.psi}:GS.onFoot?P:GS;if(GS.onFoot){mc.fillStyle='#4af';mc.fillRect(mx(GS.x)-2,mz(GS.z)-2,5,5)}
- mc.save();mc.translate(mx(T.x),mz(T.z));mc.rotate(Math.atan2(-Math.cos(T.psi),Math.sin(T.psi)));mc.fillStyle='#fff';mc.strokeStyle='#d00';mc.lineWidth=1.5;mc.beginPath();mc.moveTo(6/sc,0);mc.lineTo(-4/sc,-3.5/sc);mc.lineTo(-4/sc,3.5/sc);mc.closePath();mc.fill();mc.stroke();mc.restore();mc.setTransform(1,0,0,1,0,0)}
+ mc.save();mc.translate(mx(T.x),mz(T.z));mc.rotate(Math.atan2(-Math.cos(T.psi),Math.sin(T.psi)));mc.fillStyle='#fff';mc.strokeStyle='#d00';mc.lineWidth=1.5;mc.beginPath();mc.moveTo(6/sc,0);mc.lineTo(-4/sc,-3.5/sc);mc.lineTo(-4/sc,3.5/sc);mc.closePath();mc.fill();mc.stroke();mc.restore();for(const f of MMH)try{f(mc,mx,mz,sc)}catch(e){}mc.setTransform(1,0,0,1,0,0)}
+var MMH=[];
 
 /* ---------- main loop ---------- */
 let last=performance.now(),hudT=0;

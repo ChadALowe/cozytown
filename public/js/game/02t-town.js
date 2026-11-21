@@ -88,7 +88,7 @@ function plDz(x){for(let i=0;i<CAN.length-1;i++){const a=CAN[i],b=CAN[i+1];if(x>
   S.door=[S.bx,bz+d/2+1.6];S.plat=[(S.px[0]+S.px[1])/2,RAILZ+5];TOWN.stations.push(S)}}
 
 /* ---------------------------------------------------------------- reserved open spaces (so houses keep out) */
-reserve(-725,106,318,86);reserve(731,75,120,58);reserve(-185,-558,80,56);reserve(ZONE.windmill[0],ZONE.windmill[1],40,40);reserve(-20,-312,44,26);reserve(90,-850,40,30);
+reserve(-725,106,318,86);/* crime + secret spots */reserve(-1005,-780,34,28);reserve(922,-800,40,34);reserve(-1095,222,10,10);reserve(938,232,26,16);reserve(731,75,120,58);reserve(-185,-558,80,56);reserve(ZONE.windmill[0],ZONE.windmill[1],40,40);reserve(-20,-312,44,26);reserve(90,-850,40,30);
 
 /* ---------------------------------------------------------------- MARKET PLACE: cobbles, town hall + clock tower, stalls */
 {const[x0,x1,z0,z1]=ZONE.square,K=ck(-20,-312);quadXZ(K.rd,[x0,z0],[x1,z0],[x1,z1],[x0,z1],[.6,.56,.5],Y0+.04);
@@ -143,6 +143,7 @@ special({kind:'shop',units:1,w:30,d:22,eaves:7,ridge:.6,fg:14,wall:'render',wc:[
 special({kind:'shop',units:1,w:14,d:12,eaves:5,ridge:.6,fg:10,wall:'render',wc:[.9,.2,.15],roof:'slate',names:[S_('BURGER BARN','#c81e1e','#ffe040',[.7,.1,.1])]},600,115,0,1,1);
 special({kind:'church',w:20,d:8.5,eaves:6.5,ridge:3.8,fg:8,wall:'brick',wc:[.82,.55,.45],roof:'slate'},-840,-470,0,1,1);
 special({kind:'school',sname:'MEADOW PRIMARY SCHOOL',w:30,d:9,eaves:3.6,ridge:2.2,fg:6,wall:'brick',wc:[.95,.82,.72],roof:'tile',hip:1},760,-200,1,0,1);
+special({kind:'shop',units:1,w:24,d:12,eaves:7,ridge:.6,fg:8,wall:'brick',wc:[.75,.78,.9],roof:'slate',names:[S_('COZYTOWN POLICE','#0a2a6a','#ffffff',[.05,.15,.45])]},150,-380,1,0,-1);
 /* country pub at the end of Plough Lane */
 {const r=ROADS.find(q=>q.n==='PLOUGH LANE'),a=r.p[1],b=r.p[2],dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz);special({kind:'pub',pname:'THE PLOUGH',pbg:'#3a2a10',w:15,d:10,eaves:4.8,ridge:3,fg:6,wall:'stone',wc:[1,.94,.8],roof:'thatch'},a[0]+dx*.7,a[1]+dz*.7,dx/l,dz/l,1)}
 /* farm shop + farmhouse on Moor Lane */
@@ -235,9 +236,9 @@ TOWNFILL=0;
   if(FT[ft]==='hay')for(let k=0;k<5;k++){const hx=rr(x0+10,x1-10),hz=rr(z0+10,z1-10);if(onRoadish(hx,hz,3))continue;const K=ck(hx,hz);pcyl(K.o,hx,Y0,hz,.75,1.5,10,[.86,.74,.36]);COL.push([hx,hz,.9])}}
  TOWN.fields=fi;
  /* edge woodland so the town fades into countryside */
- for(let x=TB.x0+6;x<TB.x1-6;x+=7)for(const z of[TB.z0+8+rnd()*8,TB.z0+20+rnd()*10])if(!onRoadish(x,z,3)&&!wetAt(x,z)){if(rnd()<.5)conifer(x,z,1.2+rnd()*.8);else tree(x,z,1.1+rnd()*.7);COL.push([x,z,.6])}
- for(let z=TB.z0+20;z<coastZ(TB.x0)-30;z+=7)for(const x of[TB.x0+8+rnd()*8,TB.x0+20+rnd()*10])if(!onRoadish(x,z,3)&&Math.abs(z-RAILZ)>8&&!inZone(ZONE.park,x,z)){if(rnd()<.5)conifer(x,z,1.2+rnd()*.8);else tree(x,z,1.1+rnd()*.7);COL.push([x,z,.6])}
- for(let z=TB.z0+20;z<coastZ(TB.x1)-30;z+=7)for(const x of[TB.x1-8-rnd()*8,TB.x1-20-rnd()*10])if(!onRoadish(x,z,3)&&Math.abs(z-RAILZ)>8){if(rnd()<.5)conifer(x,z,1.2+rnd()*.8);else tree(x,z,1.1+rnd()*.7);COL.push([x,z,.6])}
+ for(let x=TB.x0+6;x<TB.x1-6;x+=7)for(const z of[TB.z0+8+rnd()*8,TB.z0+20+rnd()*10])if(!onRoadish(x,z,3)&&!inAnyBld(x,z,1)&&!wetAt(x,z)){if(rnd()<.5)conifer(x,z,1.2+rnd()*.8);else tree(x,z,1.1+rnd()*.7);COL.push([x,z,.6])}
+ for(let z=TB.z0+20;z<coastZ(TB.x0)-30;z+=7)for(const x of[TB.x0+8+rnd()*8,TB.x0+20+rnd()*10])if(!onRoadish(x,z,3)&&!inAnyBld(x,z,1)&&Math.abs(z-RAILZ)>8&&!inZone(ZONE.park,x,z)){if(rnd()<.5)conifer(x,z,1.2+rnd()*.8);else tree(x,z,1.1+rnd()*.7);COL.push([x,z,.6])}
+ for(let z=TB.z0+20;z<coastZ(TB.x1)-30;z+=7)for(const x of[TB.x1-8-rnd()*8,TB.x1-20-rnd()*10])if(!onRoadish(x,z,3)&&!inAnyBld(x,z,1)&&Math.abs(z-RAILZ)>8){if(rnd()<.5)conifer(x,z,1.2+rnd()*.8);else tree(x,z,1.1+rnd()*.7);COL.push([x,z,.6])}
  /* COZE WOOD: a little wood on the river north of the railway */
  for(let k=0;k<180;k++){const x=rr(-560,-250),z=rr(-1150,-700);if(wetAt(x,z)||plD(x,z,RIV)[0]<rivW(z)+3||onRoadish(x,z,3)||Math.abs(z-RAILZ)<9)continue;if(rnd()<.4)conifer(x,z,1.2+rnd()*.8);else tree(x,z,1+rnd()*.9);COL.push([x,z,.6])}}
 

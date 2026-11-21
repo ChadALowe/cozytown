@@ -25,10 +25,10 @@ const catOf=t=>{t=t.toUpperCase();
 const ICON={'THE ROYAL OAK':'🍺','POST OFFICE':'📮','CHEMIST':'💊','HAIRDRESSER':'✂','VET':'🐾','BOOKSHOP':'📚','FLORIST':'🌸',"PENNY'S BARGAINS":'🏷','HARRINGTON & CO':'🧥',"MAISON D'OR":'👑',"RANI'S SILK HOUSE":'🥻',"SINGH'S CORNER SHOP":'🏪','STRIKE BOWL':'🎳','BULLSEYE RANGE':'🎯','NEON ARCADE':'🕹','VILLAGE ROVERS FC':'⚽','CASINO':'🎰','LUCKY BETS':'🎲','COZY STOCK EXCHANGE':'📈','VILLAGE MOTORS':'🚗',"JOE'S GARAGE":'🔧','COZY MOTORSPORT CLUB':'🏁','COZY HARBOUR FERRY':'⛴','COZY AIRWAYS':'✈','BAKERY':'🥖','CAFE':'☕',"FRANKIE'S FISH & CHIPS":'🍟','BUTCHER':'🥩','DELI':'🧀','CO-OP':'🛒','NEWSAGENT':'📰','ESTATE AGENT':'🔑'};
 const BC={station:'#5a6a8a',townhall:'#c8bca0',shop:'#b08a5a',pub:'#9a5a3a',church:'#8a8a94',school:'#c8b060',terr:'#a2705c',semi:'#a2705c',cot:'#b88a6a',det:'#9a6a5a',bung:'#b08a78',casino:'#7a3a9a',club:'#8a4a4a',stocks:'#3a7a5a',ferry:'#3a7a9a',airport:'#3a8a9a'};
 let OVR=null,pts=null;
-function places(){if(pts)return pts;pts=[];const seen={};
+function places(){pts=[];const seen={};
  for(const s of SHOPD){if(s.x<TB.x0||s.x>TB.x1||s.z<TB.z0||s.z>300)continue;const c=catOf(s.t);pts.push({x:s.x,z:s.z,n:s.t,c,ic:ICON[s.t]||CAT[c].i})}
  for(const b of BLD){if(b.k==='church'&&!seen.ch){seen.ch=1;pts.push({x:b.x,z:b.z,n:'CHURCH',c:'church',ic:CAT.church.i})}if(b.k==='school'&&!seen.sc){seen.sc=1;pts.push({x:b.x,z:b.z,n:'SCHOOL',c:'school',ic:CAT.school.i})}}
- if(typeof HM!=='undefined')pts.push({x:HM.x,z:HM.z,n:'YOUR HOME',c:'home',ic:'🏠'});if(window.TOWN&&TOWN.pois)for(const q of TOWN.pois)pts.push(q);
+ if(typeof HM!=='undefined')pts.push({x:HM.x,z:HM.z,n:'YOUR HOME',c:'home',ic:'🏠'});if(window.TOWN&&TOWN.pois)for(const q of TOWN.pois)if(q.d)pts.push(q);
  pts.push({x:-102,z:141.5,n:'FARMLAND ROAD (DRIVE HERE)',c:'farm',ic:'🚜'});
  return pts}
 function open(){if(OVR||busy||CIN_ON()||menuOpen)return;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;places();
