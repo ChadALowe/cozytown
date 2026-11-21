@@ -4,9 +4,10 @@
 (function(){
 const T=window.TOWN;if(!T)return;const TAU=Math.PI*2;
 const pos=()=>GS.onFoot?P:GS,nearC=(x,z,r)=>{const dx=x-cam.position.x,dz=z-cam.position.z;return dx*dx+dz*dz<r*r};
-const inTown=()=>{const p=pos();return !GS.inside&&p.x>TB.x0-20&&p.x<TB.x1+20&&p.z>TB.z0-20&&p.z<300&&!(window.MOON&&MOON.MN&&MOON.MN.on)};
+const inTown=()=>{const p=pos();return !GS.inside&&p.x>TB.x0-20&&p.x<TB.x1+20&&p.z>TB.z0-20&&p.z<470&&!(window.MOON&&MOON.MN&&MOON.MN.on)};
 T.pois=[...T.stations.map(s=>({x:s.door[0],z:s.door[1],n:s.n,c:'trav',ic:'🚆'})),{x:T.hall[0],z:T.hall[1],n:'TOWN HALL',c:'serv',ic:'🕰'},{x:-20,z:-312,n:'MARKET PLACE',c:'shop',ic:'🍎'},{x:-725,z:106,n:'COZY PARK',c:'fun',ic:'🌳'},
  {x:ZONE.windmill[0],z:ZONE.windmill[1]+36,n:'WINDMILL HILL',c:'fun',ic:'🌾'},{x:-185,z:-558,n:'CRICKET CLUB',c:'fun',ic:'🏏'},{x:600,z:228,n:'THE BEACH',c:'fun',ic:'🏖'},{x:150,z:-466,n:'CANAL LOCKS',c:'fun',ic:'⛵'},{x:-980,z:100,n:'ALLOTMENTS',c:'farm',ic:'🥕'}];
+T.pois.push(...(T.extraPois||[]),{x:-850,z:-845,n:'COZE MERE',c:'fun',ic:'🚣',r:80},{x:-145,z:-1085,n:'SUNNY VALE CARAVANS',c:'fun',ic:'🏕',r:80},{x:800,z:-1040,n:'COZYFEST FIELD',c:'fun',ic:'🎪',r:80},{x:450,z:-810,n:'COZY GOLF CLUB',c:'fun',ic:'⛳',r:120},{x:480,z:300,n:'COZYTOWN PIER',c:'fun',ic:'🎡',r:60},{x:344,z:-574,n:"SCRAPPY'S YARD",c:'car',ic:'🚗',r:50},{x:600,z:-605,n:'THE GASHOLDER',c:'fun',ic:'🏭',r:90});
 
 /* ---------------------------------------------------------------- the train */
 const mk=(fn)=>{const B=new Builder(3),L=new Builder(3);fn(B,L);const g=new THREE.Group();g.add(B.mesh(mObj));if(L.p.length)g.add(L.mesh(gLit));return g};
