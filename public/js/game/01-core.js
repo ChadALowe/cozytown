@@ -226,6 +226,40 @@ Builder.prototype.tri=function(a,b,c,ca,cb,cc,up,cen){
  this.p.push(a[0],a[1],a[2],b[0],b[1],b[2],c[0],c[1],c[2]);
  this.c.push(ca[0]*lt,ca[1]*lt,ca[2]*lt,cb_[0]*lt,cb_[1]*lt,cb_[2]*lt,cc_[0]*lt,cc_[1]*lt,cc_[2]*lt)};
 Builder.prototype.mesh=function(mat){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(this.p,3));g.setAttribute('color',new THREE.Float32BufferAttribute(this.c,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(this.u,2));return new THREE.Mesh(g,mat)};
+/* Compact builder for the town chunks: grows typed arrays instead of JS arrays (a JS number array costs 8 bytes a value
+   and dominated the load-time memory peak), stores colours as bytes at half scale (the chunk material doubles them back)
+   and positions as 16-bit ints round the mesh centre. About 17 bytes a vertex instead of 32. */
+function CBuilder(us){this.us=us||6;this.n=0;this.P=new Float32Array(3*768);this.C=new Uint8Array(3*768);this.U=new Float32Array(2*768);this.p={length:0};this.c=this.u=null}
+CBuilder.prototype.grow=function(){const k=this.P.length*2;let a=new Float32Array(k);a.set(this.P);this.P=a;a=new Uint8Array(k);a.set(this.C);this.C=a;a=new Float32Array(k/3*2);a.set(this.U);this.U=a};
+CBuilder.prototype.tri=function(a,b,c,ca,cb,cc,up,cen){
+ const ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2],vx=c[0]-a[0],vy=c[1]-a[1],vz=c[2]-a[2];
+ let nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;const l=Math.hypot(nx,ny,nz)||1;nx/=l;ny/=l;nz/=l;
+ if(up){if(ny<0){nx=-nx;ny=-ny;nz=-nz}}else if(cen){if(nx*(a[0]-cen[0])+ny*(a[1]-cen[1])+nz*(a[2]-cen[2])<0){nx=-nx;ny=-ny;nz=-nz}}
+ const lt=.5+.58*Math.max(0,nx*SUN.x+ny*SUN.y+nz*SUN.z),cb_=cb||ca,cc_=cc||ca;
+ if((this.n+3)*3>this.P.length)this.grow();
+ const P=this.P,C=this.C,U=this.U,U_=this.us,ax=Math.abs(nx),ay=Math.abs(ny),az=Math.abs(nz),k8=127.5*lt;let i=this.n*3,j=this.n*2;
+ const q8=v=>{v=Math.round(v*k8);return v<0?0:v>255?255:v};
+ for(let t=0;t<3;t++){const q=t===0?a:t===1?b:c,cl=t===0?ca:t===1?cb_:cc_;
+  P[i]=q[0];P[i+1]=q[1];P[i+2]=q[2];C[i]=q8(cl[0]);C[i+1]=q8(cl[1]);C[i+2]=q8(cl[2]);i+=3;
+  if(ay>=ax&&ay>=az){U[j]=q[0]/U_;U[j+1]=q[2]/U_}else if(ax>=az){U[j]=q[2]/U_;U[j+1]=q[1]/U_}else{U[j]=q[0]/U_;U[j+1]=q[1]/U_}j+=2}
+ this.n+=3;this.p.length=this.n*3};
+/* keep: leave the CPU copy in memory (for meshes whose colours are rewritten later, e.g. the grass for snow) */
+CBuilder.prototype.mesh=function(mat,keep){const n=this.n,P=this.P,g=new THREE.BufferGeometry();
+ let x0=1e9,y0=1e9,z0=1e9,x1=-1e9,y1=-1e9,z1=-1e9;for(let i=0;i<n*3;i+=3){const x=P[i],y=P[i+1],z=P[i+2];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z}
+ const cx=(x0+x1)/2,cy=(y0+y1)/2,cz=(z0+z1)/2,ext=Math.max(x1-x0,y1-y0,z1-z0)/2||1,sc=32760/ext,Q=new Int16Array(n*3);
+ for(let i=0;i<n*3;i+=3){Q[i]=Math.round((P[i]-cx)*sc);Q[i+1]=Math.round((P[i+1]-cy)*sc);Q[i+2]=Math.round((P[i+2]-cz)*sc)}
+ const free=keep?null:function(){this.array=null};
+ const add=(k,at)=>{if(free)at.onUpload(free);g.setAttribute(k,at)};
+ add('position',new THREE.Int16BufferAttribute(Q,3));
+ if(mat.vertexColors){const ca=new THREE.Uint8BufferAttribute(this.C.slice(0,n*3),3,true);if(keep)g.setAttribute('color',ca);else add('color',ca)}
+ if(mat.map)add('uv',new THREE.Float32BufferAttribute(this.U.slice(0,n*2),2));
+ g.computeBoundingSphere();g.computeBoundingBox();
+ const m=new THREE.Mesh(g,mat);m.position.set(cx,cy,cz);m.scale.setScalar(1/sc);m.updateMatrix();this.P=this.C=this.U=null;return m};
+/* chunk meshes carry colours at half scale, so they draw with a twin of the world material whose colour is doubled;
+   the twin copies the original every frame, so day/night tint, rain and night glow still apply */
+const CMAT=new Map();
+function cmat(m){if(!m.vertexColors)return m;let c=CMAT.get(m);if(!c){c=m.clone();c.userData={};CMAT.set(m,c);syncCMat()}return c}
+function syncCMat(){for(const[m,c]of CMAT){c.color.copy(m.color).multiplyScalar(2);c.opacity=m.opacity;c.transparent=m.transparent;c.visible=m.visible;if(c.map!==m.map){c.map=m.map;c.needsUpdate=true}}}
 function pcone(B,x,y,z,r,h,seg,col,rot){const ap=[x,y+h,z],cen=[x,y+h*.4,z],ring=[],dk=shd(col,.76);for(let i=0;i<seg;i++){const a=(rot||0)+i/seg*6.2832;ring.push([x+Math.cos(a)*r,y,z+Math.sin(a)*r])}for(let i=0;i<seg;i++)B.tri(ring[i],ring[(i+1)%seg],ap,dk,dk,col,false,cen)}
 function pcyl(B,x,y,z,r,h,seg,col){const cen=[x,y+h/2,z],lo=[],hi=[];for(let i=0;i<seg;i++){const a=i/seg*6.2832;lo.push([x+Math.cos(a)*r,y,z+Math.sin(a)*r]);hi.push([x+Math.cos(a)*r,y+h,z+Math.sin(a)*r])}for(let i=0;i<seg;i++){const j=(i+1)%seg;B.tri(lo[i],lo[j],hi[j],col,null,null,false,cen);B.tri(lo[i],hi[j],hi[i],col,null,null,false,cen)}}
 function pbox(B,x,y,z,sx,sy,sz,col,rot){const c=Math.cos(rot||0),s=Math.sin(rot||0),cen=[x,y+sy/2,z],P=[];for(const ly of [0,sy])for(const [lx,lz] of [[-1,-1],[1,-1],[1,1],[-1,1]]){const ax=lx*sx/2,az=lz*sz/2;P.push([x+ax*c+az*s,y+ly,z-ax*s+az*c])}const F=[[0,1,5,4],[1,2,6,5],[2,3,7,6],[3,0,4,7],[4,5,6,7]];for(const f of F){B.tri(P[f[0]],P[f[1]],P[f[2]],col,null,null,false,cen);B.tri(P[f[0]],P[f[2]],P[f[3]],col,null,null,false,cen)}}
