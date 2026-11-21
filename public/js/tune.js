@@ -374,7 +374,7 @@ function pay(n){if(cash<n){setMsg('NOT ENOUGH CASH');flash(0);return false}cash-
 
 /* ---- tab: cars ---- */
 function tabCars(){const B=$q('#tnBody');B.innerHTML='';
- for(let i=0;i<CARN.length;i++){if(i>5&&!OWN.car[i]&&i!==CARI)continue;const own=OWN.car[i],cur=i===S.commit.car,r=document.createElement('div');r.className='tnRow'+(CARI===i?' sel':'')+(cur?' cur':'');
+ for(let i=0;i<CARN.length;i++){if(window.TUNEHOME?!OWN.car[i]&&i!==0:i>5&&!OWN.car[i]&&i!==CARI)continue;const own=OWN.car[i],cur=i===S.commit.car,r=document.createElement('div');r.className='tnRow'+(CARI===i?' sel':'')+(cur?' cur':'');
   r.innerHTML=`<div class="n">${CARN[i]}<small>${CARSD[i]}</small></div><div class="pr ${cur?'ok':own?'ok':cash>=CPRs(i)?'':'no'}">${cur?'DRIVING':own?'OWNED':'£'+CPRs(i)}</div>`;
   r.onclick=()=>{setCar(i);neonPrev=null;neonNow();tabCars();head();carBtn()};B.appendChild(r)}
  carBtn()}
