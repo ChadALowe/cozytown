@@ -164,7 +164,7 @@ const ROADS=[
  /* ---- the new town ---- */
  {n:'NORTH STREET',p:[[-20,-232],[-20,-288]],lines:1,nw:1,mix:['terr'],dens:.9},
  {n:'MARKET PLACE',p:[[-62,-288],[22,-288],[22,-336],[-62,-336],[-62,-288]],ring:1,nw:1,mix:['terr'],dens:.9},
- {n:'STATION APPROACH',p:[[-20,-336],[-20,-618]],nw:1,mix:['terr','terr','semi'],dens:.75},
+ {n:'STATION APPROACH',p:[[22,-336],[22,-382],[-20,-404],[-20,-618]],nw:1,mix:['terr','terr','semi'],dens:.75},
  {n:'LONDON ROAD',p:[[232,0],[520,0],[860,-30]],lines:1,nw:1,mix:['semi','det','terr','semi'],dens:.7},
  {n:'WEST STREET',p:[[-232,0],[-1060,0]],lines:1,nw:1,mix:['terr','terr','semi'],dens:.85},
  {n:"KING'S WAY",p:[[-1060,190],[-1060,-900],[-600,-965],[200,-965],[860,-900],[860,190]],nw:1,rural:1,mix:['det','bung','cot'],dens:.1},

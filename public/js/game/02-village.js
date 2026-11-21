@@ -8,6 +8,7 @@ const PLACED=[],BLD=[],OBS=[];
 PLACED.push({x:LW(3.5,-2.5)[0],z:LW(3.5,-2.5)[1],rot:HM.th,hw:8,hd:7.5});
 var TOWNFILL=0;function footOK(cx,cz,rot,hw,hd){if(!TOWNFILL){if(Math.abs(cx)>VH-16||Math.abs(cz)>VH-16)return false}else if(!landOK(cx,cz,rot,hw,hd))return false;if(Math.hypot(cx-GRC[0],cz-GRC[1])<GRR+hw+3)return false;
  const c=Math.cos(rot),s=Math.sin(rot),pts=[[0,0],[-1,-1],[1,-1],[1,1],[-1,1],[0,-1],[0,1],[-1,0],[1,0]];for(const[a,b]of pts){const x=cx+a*hw*c+b*hd*s,z=cz-a*hw*s+b*hd*c;if(roadDist(x,z)<RW+PW+.4)return false}
+  if(TOWNFILL){const nx=Math.max(2,Math.ceil(hw/1.5)),nz=Math.max(2,Math.ceil(hd/1.5));for(let i=0;i<=nx;i++)for(let j=0;j<=nz;j++){const a=-1+2*i/nx,b=-1+2*j/nz,x=cx+a*hw*c+b*hd*s,z=cz-a*hw*s+b*hd*c;if(roadDist(x,z)<RW+PW+.4)return false}}
  for(const o of ROADS)if(o.head&&Math.hypot(cx-o.head[0],cz-o.head[1])<o.head[2]+PW+hw+2)return false;
  const me={x:cx,z:cz,rot,hw,hd};for(const p of PLACED)if(Math.hypot(p.x-cx,p.z-cz)<p.hw+p.hd+hw+hd+2&&obbHit(me,p))return false;return true}
 /* ---- roads ---- */
