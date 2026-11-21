@@ -8,7 +8,7 @@
 const T=window.TOWN;if(!T)return;const TAU=Math.PI*2;
 const pos=()=>GS.onFoot?P:GS;
 const LAST={x:0,z:0};
-const inTownP=(x,z)=>x>TB.x0-40&&x<TB.x1+40&&z>TB.z0-40&&z<320;
+const inTownP=(x,z)=>x>TB.x0-40&&x<TB.x1+40&&z>TB.z0-40&&z<470;
 const moonOn=()=>!!(window.MOON&&MOON.MN&&MOON.MN.on);
 const inTown=()=>{if(GS.inside||moonOn())return false;const p=pos();return inTownP(p.x,p.z)};
 const pk=a=>a[Math.floor(Math.random()*a.length)];

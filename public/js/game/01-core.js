@@ -142,12 +142,14 @@ const CAN=[[-300,-470],[-100,-472],[150,-480],[400,-472],[650,-480],[960,-474]];
 const RAILZ=-650,RAILX0=-1140,RAILX1=970;
 function plD(x,z,L){let b=1e9,bt=0;for(let i=0;i<L.length-1;i++){const a=L[i],c=L[i+1],dx=c[0]-a[0],dz=c[1]-a[1],l2=dx*dx+dz*dz;let t=((x-a[0])*dx+(z-a[1])*dz)/l2;t=t<0?0:t>1?1:t;const d=Math.hypot(x-a[0]-dx*t,z-a[1]-dz*t);if(d<b){b=d;bt=i+t}}return[b,bt]}
 function rivW(z){return z>150?7+(z-150)*.06:7}
-const PONDS=[[-640,110,26,16],[-20,-850,30,20]];/* park duck pond, mill pond */
+const PONDS=[[-640,110,26,16],[90,-850,30,20],[-850,-800,60,35]];/* park duck pond, mill pond, Coze Mere */
+const PIER={x:480,w:5.5,z0:200,z1:452,hx:[458,502],hz:[404,452]};
+function onPier(x,z){return(Math.abs(x-PIER.x)<PIER.w&&z>PIER.z0&&z<PIER.z1)||(x>PIER.hx[0]&&x<PIER.hx[1]&&z>PIER.hz[0]&&z<PIER.hz[1])}/* park duck pond, mill pond */
 function wetAt(x,z){if(x>-470&&x<-255&&z<260){if(plD(x,z,RIV)[0]<rivW(z))return 1}
  if(z>-492&&z<-458&&x>-300&&x<965){if(plD(x,z,CAN)[0]<4.2)return 2}
  for(const p of PONDS){const dx=(x-p[0])/p[2],dz=(z-p[1])/p[3];if(dx*dx+dz*dz<1)return 3}return 0}
 function landAt(x,z){if(x>-VH&&x<VH&&z>-VH&&z<VH)return 1;return!(x<TB.x0||x>TB.x1||z<TB.z0||z>coastZ(x))}
-function hAt(x,z){if(x>-VH&&x<VH&&z>-VH&&z<VH)return G0;if(x<TB.x0||x>TB.x1||z<TB.z0||z>coastZ(x))return -6;if(wetAt(x,z)&&roadDist(x,z)>RW+PW+.4)return -6;return G0}
+function hAt(x,z){if(x>-VH&&x<VH&&z>-VH&&z<VH)return G0;if(z>180&&onPier(x,z))return G0;if(x<TB.x0||x>TB.x1||z<TB.z0||z>coastZ(x))return -6;if(wetAt(x,z)&&roadDist(x,z)>RW+PW+.4)return -6;return G0}
 function gH(x,z){return hAt(x,z)}
 function ringPts(cx,cz,r,n,a0){const o=[];for(let i=0;i<=n;i++){const a=a0+i/n*6.2832;o.push([cx+Math.cos(a)*r,cz+Math.sin(a)*r])}return o}
 const GRC=[-105,72],GRR=30; // village green
@@ -192,7 +194,11 @@ const ROADS=[
  {n:'WINDMILL LANE',p:[[200,-965],[420,-1060],[590,-1110]],nw:1,rural:1,mix:['cot','det'],dens:.15},
  {n:'PLOUGH LANE',p:[[-600,-965],[-650,-1075],[-760,-1130]],nw:1,rural:1,mix:['cot','bung'],dens:.15},
  {n:'BRIDGE STREET',p:[[-520,-288],[-62,-288]],lines:1,nw:1,mix:['terr','terr','shop'],dens:.9},
- {n:'CHAPEL STREET',p:[[-290,-380],[360,-380]],nw:1,mix:['terr','terr','semi'],dens:.9}];
+ {n:'CHAPEL STREET',p:[[-290,-380],[360,-380]],nw:1,mix:['terr','terr','semi'],dens:.9},
+ {n:'FOUNDRY LANE',p:[[-20,-560],[680,-560],[680,-605]],nw:1,mix:[],dens:0},
+ {n:'MERE LANE',p:[[-850,-929],[-850,-845]],nw:1,rural:1,mix:[],dens:0},
+ {n:'SANDY LANE',p:[[-20,-1085],[-90,-1085]],nw:1,rural:1,mix:[],dens:0},
+ {n:'GOLF LANE',p:[[200,-965],[200,-770]],nw:1,rural:1,mix:[],dens:0}];
 const SEG=[];
 ROADS.forEach((r,ri)=>{for(let i=0;i<r.p.length-1;i++){const a=r.p[i],b=r.p[i+1],dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz);SEG.push({ri,a,b,l,dx:dx/l,dz:dz/l})}});
 function segDist(x,z,s){let t=((x-s.a[0])*s.dx+(z-s.a[1])*s.dz);t=t<0?0:t>s.l?s.l:t;const px=s.a[0]+s.dx*t,pz=s.a[1]+s.dz*t;return{d:Math.hypot(x-px,z-pz),px,pz,t}}
