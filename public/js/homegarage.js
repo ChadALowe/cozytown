@@ -5,10 +5,11 @@
 if(typeof HM==='undefined'||typeof openTune!=='function')return;
 const local=(x,z)=>{const dx=x-HM.x,dz=z-HM.z;return[dx*HM.c-dz*HM.s,dx*HM.s+dz*HM.c]};
 const inside=(x,z)=>{const q=local(x,z);return Math.abs(q[0])<1.9&&q[1]<-1.0&&q[1]>-6.0};
-let armed=0,cd=0;// armed once you have been outside the garage (the game can start with you parked in it)
+let armed=0,cd=0,opened=0;// armed once you have been outside the garage (the game can start with you parked in it)
 function check(dt){
  /* menu closed: leave home mode; if you walked in, step back out onto the driveway */
- if(window.TUNEHOME&&!(window.TNon&&TNon())&&!(typeof GAL!=='undefined'&&GAL.on)){window.TUNEHOME=0;if(GS.onFoot&&inside(P.x,P.z)){P.x=HM.x+3.2*HM.s;P.z=HM.z+3.2*HM.c;P.psi=Math.atan2(HM.s,HM.c)}}
+ if(window.TUNEHOME&&window.TNon&&TNon())opened=1;
+ if(window.TUNEHOME&&opened&&!TNon()&&!(typeof GAL!=='undefined'&&GAL.on)){window.TUNEHOME=0;opened=0;if(GS.onFoot&&inside(P.x,P.z)){P.x=HM.x+3.2*HM.s;P.z=HM.z+3.2*HM.c;P.psi=Math.atan2(HM.s,HM.c)}}
  if(cd>0){cd-=dt;return}
  if(GS.inside||busy||(window.TNon&&TNon())||(typeof GAL!=='undefined'&&GAL.on))return;
  const p=GS.onFoot?P:GS,inG=inside(p.x,p.z);
