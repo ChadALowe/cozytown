@@ -12,8 +12,8 @@ const STOCK=[.70,.72,.75];
 const pl=k=>z=>{if(z>=k[0][0])return k[0][1];for(let i=1;i<k.length;i++)if(z>=k[i][0]){const a=k[i-1],b=k[i],t=(z-b[0])/(a[0]-b[0]);return b[1]+(a[1]-b[1])*t}return k[k.length-1][1]};
 const wAt=pl([[2.47,.78],[2.46,.82],[2.445,.85],[2.42,.873],[2.38,.892],[2.2,.922],[1.9,.938],[1.5,W0],[-1.4,W0],[-1.9,.938],[-2.2,.922],[-2.36,.897],[-2.44,.865],[-2.47,.835]]);
 const ybAt=pl([[2.47,.25],[2.40,.19],[2.25,.165],[1.9,.16],[-1.9,.16],[-2.2,.19],[-2.40,.26],[-2.47,.32]]);
-const beltAt=pl([[2.47,.655],[2.462,.695],[2.448,.725],[2.425,.75],[2.39,.768],[2.33,.785],[2.2,.805],[1.8,.85],[1.2,.895],[.95,.925],[.3,.952],[-.5,.972],[-1.2,.988],[-1.7,1.0],[-2.1,1.01],[-2.33,1.012],[-2.43,.99],[-2.47,.955]]);
-const roofAt=pl([[1.0,.90],[.96,.935],[.80,1.06],[.55,1.22],[.30,1.345],[.10,1.415],[-.15,1.45],[-.40,1.457],[-.70,1.44],[-.92,1.405],[-1.12,1.33],[-1.38,1.19],[-1.58,1.07],[-1.71,.99]]);
+const beltAt=pl([[2.47,.575],[2.455,.625],[2.43,.665],[2.39,.70],[2.33,.733],[2.25,.762],[2.15,.79],[2.02,.815],[1.88,.837],[1.7,.86],[1.4,.897],[1.15,.912],[.95,.925],[.3,.952],[-.5,.972],[-1.2,.988],[-1.7,1.0],[-2.1,1.01],[-2.33,1.012],[-2.43,.99],[-2.47,.955]]);
+const roofAt=pl([[1.03,0],[1.0,.90],[.96,.935],[.80,1.06],[.55,1.22],[.30,1.345],[.10,1.415],[-.15,1.45],[-.40,1.457],[-.70,1.44],[-.92,1.405],[-1.12,1.33],[-1.38,1.19],[-1.58,1.07],[-1.71,.99],[-1.74,0]]);
 const ghAt=z=>Math.max(0,roofAt(z)-beltAt(z));
 const ss=t=>t<=0?0:t>=1?1:t*t*(3-2*t);
 
@@ -23,13 +23,13 @@ function prof(z,yb){const w=wAt(z),b=beltAt(z),gh=ghAt(z),t=ss(gh/.42);
     u switches from panel to cabin quickly once glass appears, so the windscreen keeps its full width */
  const u=ss(gh/.10),L=(a,c)=>a+(c-a)*u,cr=1-t;
  const c8=(w-.07)+(.655-(w-.07))*t;
- const x7=L(w-.075,w-.065),y7=b+L(.022,.012),x8=L(w-.17,c8),y8=L(b+.042,b+.012+.88*gh),x9=L(w*.52,c8-.07),y9=L(b+.060,b+.012+.97*gh+.03*cr),y10=b+gh+.066*cr;
+ const x7=L(w-.075,w-.065),y7=b+L(.022,.012),x8=L(w-.17,c8),y8=L(b+.042,b+.012+.88*gh),x9=L(w*.52,c8-.07),y9=L(b+.060,b+.012+.97*gh+.03*cr),y10=b+gh+.066*cr*(z>2.3?1-.45*Math.min(1,(z-2.3)/.17):1);
  const P=[[0,yb],[w-.10,yb],[w-.025,yb+.06],[w,Math.max(yb+.08,.43)],[w,b-.15],[w-.012,b-.11],[w-.032-.012*cr,b-.012*cr],[x7,y7],[x8,y8],[x9,y9],[0,y10]];
  for(let i=2;i<P.length;i++)if(P[i][1]<P[i-1][1]+.002)P[i][1]=P[i-1][1]+.002;
  return{P,gh}}
 
 /* stations: an even spread, extra at the rounded ends, and a semicircle cut out over each axle */
-const ST=[];{let o=0;const base=[];for(let i=0;i<=64;i++)base.push(NZ-i*2*NZ/64);for(const e of[2.457,2.445,2.43,2.41,2.39])base.push(e,-e);
+const ST=[];{let o=0;const base=[];for(let i=0;i<=64;i++)base.push(NZ-i*2*NZ/64);for(const e of[2.457,2.445,2.43,2.41,2.39])base.push(e,-e);for(const e of[2.36,2.32,2.28,2.24,2.2])base.push(e);
  for(const z of base)if(Math.abs(z-ZF)>RA+.01&&Math.abs(z-ZB)>RA+.01)ST.push([z,ybAt(z),0]);
  for(const za of[ZF,ZB]){ST.push([za+RA,ybAt(za+RA),++o]);for(let k=0;k<=12;k++){const a=k/12*Math.PI;ST.push([za+RA*Math.cos(a),R_+RA*Math.sin(a),++o])}ST.push([za-RA,ybAt(za-RA),++o])}
  ST.sort((a,b)=>b[0]-a[0]||a[2]-b[2])}
@@ -59,15 +59,19 @@ function cls(b,z0,z1,g0,g1){const zm=(z0+z1)/2,g=Math.min(g0,g1);
  if(b===9){if(g<.015)return null;if((zm<.97&&zm>.10)||(zm<-.92&&zm>-1.71))return WSC;return null}
  return null}
 
+/* nose shaping: corners pulled back (rounded in plan) and the upper front leaned back,
+   so the bonnet rolls down over the grille instead of ending in a straight box edge */
+const bend=(x,y,z)=>{if(z<1.85)return z;const k=Math.pow(Math.min(1,(z-1.85)/(NZ-1.85)),1.6),ax=Math.min(1,Math.abs(x)/.94);
+ return z-k*(.13*ax*ax+.05*Math.min(1,Math.max(0,(y-.38)/.3)))};
 /* hull: loft both halves */
 for(let i=0;i<RING.length-1;i++){const A=RING[i],Bq=RING[i+1];
  for(let b=0;b<10;b++){const hex=cls(b,A.z,Bq.z,A.gh,Bq.gh);
-  for(const s of[1,-1]){const v=(r,k)=>[s*r.P[k][0],r.P[k][1],r.z];
+  for(const s of[1,-1]){const v=(r,k)=>[s*r.P[k][0],r.P[k][1],bend(r.P[k][0],r.P[k][1],r.z)];
    const a=v(A,b),bb=v(A,b+1),c=v(Bq,b+1),d=v(Bq,b);
    if(s>0){tri(a,d,c,hex,null,1);tri(a,c,bb,hex,null,1)}else{tri(a,c,d,hex,null,1);tri(a,bb,c,hex,null,1)}}}}
 /* nose and tail caps */
-for(const[ri,dz]of[[0,1],[RING.length-1,-1]]){const r=RING[ri],L=[];for(const p of r.P)L.push([p[0],p[1],r.z]);for(let k=r.P.length-2;k>=1;k--)L.push([-r.P[k][0],r.P[k][1],r.z]);
- let cx=0,cy=0;for(const p of L){cx+=p[0];cy+=p[1]}const C=[cx/L.length,cy/L.length,r.z];
+for(const[ri,dz]of[[0,1],[RING.length-1,-1]]){const r=RING[ri],L=[];for(const p of r.P)L.push([p[0],p[1],bend(p[0],p[1],r.z)]);for(let k=r.P.length-2;k>=1;k--)L.push([-r.P[k][0],r.P[k][1],bend(r.P[k][0],r.P[k][1],r.z)]);
+ let cx=0,cy=0,cz=0;for(const p of L){cx+=p[0];cy+=p[1];cz+=p[2]}const C=[cx/L.length,cy/L.length,cz/L.length];
  for(let k=0;k<L.length;k++)tri(C,L[k],L[(k+1)%L.length],null,[0,0,dz],1)}
 
 /* ---------- projecting flat shapes onto the hull ---------- */
@@ -102,15 +106,15 @@ const plate=(ax,sg,y0,y1,bg)=>{decal(ax,sg,rect(-.26,y0,.26,y1),bg,4);decal(ax,s
 
 /* ---- front ---- */
 decal('z',1,rect(-.80,.19,.80,.255),0x1a1b1e,0);                                   // lower lip
-const SF=[[-.40,.665],[.40,.665],[.47,.60],[.45,.33],[.36,.235],[-.36,.235],[-.45,.33],[-.47,.62]];
+const SF=[[-.40,.605],[.40,.605],[.47,.56],[.45,.33],[.36,.235],[-.36,.235],[-.45,.33],[-.47,.62]];
 decal('z',1,SF,0x55585e,1);                                                          // Singleframe surround
 decal('z',1,SF.map(q=>[q[0]*.95,.235+(q[1]-.235)*.95+.012]),0x0f1012,2);            // grille
 for(let y=.30;y<.66;y+=.055)decal('z',1,rect(-.40,y,.40,y+.013),0x34373c,3);         // horizontal slats
 plate('z',1,.36,.47,0xeeeeea);
-both('z',1,[[.46,.64],[.52,.605],[.78,.615],[.85,.645],[.83,.69],[.48,.69]],0x262b31,1); // headlight housing
-both('z',1,[[.49,.65],[.54,.627],[.77,.635],[.82,.655],[.805,.68],[.50,.68]],0x8f9ba6,2);     // lens
-both('z',1,[[.525,.613],[.775,.623],[.78,.637],[.53,.627]],0xf6f9ff,3);                       // DRL strip
-for(let k=0;k<5;k++){const x=.57+k*.043;both('z',1,rect(x,.642,x+.019,.662),0xe8eef6,3)}       // DRL segments
+both('z',1,[[.46,.595],[.52,.562],[.78,.57],[.85,.592],[.83,.628],[.48,.632]],0x262b31,1); // headlight housing
+both('z',1,[[.49,.602],[.54,.582],[.77,.588],[.82,.603],[.805,.622],[.50,.624]],0x8f9ba6,2);     // lens
+both('z',1,[[.525,.57],[.775,.578],[.78,.59],[.53,.582]],0xf6f9ff,3);                       // DRL strip
+for(let k=0;k<5;k++){const x=.57+k*.043;both('z',1,rect(x,.594,x+.019,.61),0xe8eef6,3)}       // DRL segments
 both('z',1,[[.52,.265],[.74,.265],[.80,.325],[.78,.455],[.56,.44],[.49,.36]],0x131416,1);   // side intakes
 both('z',1,rect(.53,.352,.78,.366),0x5c6066,2);                                               // intake blade
 /* ---- rear ---- */
@@ -128,7 +132,7 @@ sides(rect(-1.0,.165,1.115,.26),0x26272b,1);                                    
 for(const z of[.95,-.075])sides(rect(z-.0035,.27,z+.0035,beltAt(z)-.005),0x1b1c1f,1);        // door shut lines
 sides([[-1.135,.66],[-1.128,.66],[-1.128,.98],[-1.135,.98]],0x1b1c1f,1);
 sides(rect(.05,.862,.22,.884),0x55595f,1);sides(rect(-.98,.875,-.81,.897),0x55595f,1);        // door handles
-sides(rect(2.29,.625,2.43,.685),0x262b31,1);sides(rect(2.30,.612,2.425,.624),0xf2f6ff,2);     // headlight wrap
+sides(rect(2.24,.58,2.36,.635),0x262b31,1);sides(rect(2.25,.568,2.355,.58),0xf2f6ff,2);     // headlight wrap
 sides(rect(-2.445,.89,-2.25,.975),0x6d0a10,1);sides(rect(-2.43,.905,-2.27,.96),0xc31a26,2);  // tail light wrap
 sides(rect(2.0,.47,2.07,.49),0xd88a20,1);                                                     // side marker
 
@@ -178,5 +182,5 @@ S.upd=function(still){const l=U.uLight.value,c=S.pc;pM.color.setRGB(c[0]*l.x,c[1
 S.inst=function(){const m=makeCar(mat(new THREE.Color(...STOCK)),mat(),new THREE.MeshBasicMaterial({color:0x151518}),new THREE.MeshBasicMaterial({color:0x2a2c30}),mat());return m.g};
 S.stats={tris:(PB.p.length+FB.p.length)/9};
 NC.cars[ID]=S;
-LPOS[ID]={f:[.66,.665,2.47],b:[.66,.935,-2.475]};
+LPOS[ID]={f:[.66,.60,2.40],b:[.66,.935,-2.475]};
 })();
