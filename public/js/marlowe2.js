@@ -28,7 +28,7 @@ let IM=null;
 function buildIM(){IM=MODELS.map((m,i)=>{const mb=wmat(null,{side:THREE.DoubleSide}),md=wmat(null,{side:THREE.DoubleSide}),gb=m.b.mesh(mb).geometry,gd=m.d.mesh(md).geometry,n=MAXN[i];
  const ib=new THREE.InstancedMesh(gb,mb,n),id=new THREE.InstancedMesh(gd,md,n);ib.instanceMatrix.setUsage(THREE.DynamicDrawUsage);id.instanceMatrix.setUsage(THREE.DynamicDrawUsage);ib.count=id.count=0;ib.frustumCulled=id.frustumCulled=false;
  for(let k=0;k<n;k++)ib.setColorAt(k,new THREE.Color(1,1,1));TG.add(ib,id);return{ib,id,n}});
- if(window.TRI)for(let j=0;j<TRI.city.length;j++){const g=TRI.geoK(TRI.city[j]),n=j===TRI.cityCab?6:4,ib=TRI.lit(new THREE.InstancedMesh(g.P,TRI.mat(),n)),id=TRI.lit(new THREE.InstancedMesh(g.SF,TRI.mat(),n));
+ if(window.TRI)for(let j=0;j<TRI.city.length;j++){const g=TRI.geoK(TRI.city[j]),n=j===TRI.cityCab?6:4,ib=TRI.lit(new THREE.InstancedMesh(g.P,TRI.mat(),n)),id=TRI.lit(new THREE.InstancedMesh(g.TF||g.SF,TRI.mat(),n));
   ib.instanceMatrix.setUsage(THREE.DynamicDrawUsage);id.instanceMatrix.setUsage(THREE.DynamicDrawUsage);ib.count=id.count=0;ib.frustumCulled=id.frustumCulled=false;for(let j=0;j<n;j++)ib.setColorAt(j,new THREE.Color(1,1,1));TG.add(ib,id);IM.push({ib,id,n})}}
 const TG=new THREE.Group();scene.add(TG);TG.visible=false;
 const CARC=[[.72,.08,.08],[.12,.22,.52],[.88,.88,.9],[.1,.1,.12],[.52,.54,.58],[.2,.42,.28],[.86,.72,.2],[.38,.2,.12],[.92,.92,.92],[.62,.64,.68],[.08,.3,.5]];

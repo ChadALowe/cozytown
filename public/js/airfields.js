@@ -157,7 +157,8 @@ function open(tab){if(OV||busy||CIN.on)return;busy=1;inp.gas=inp.brk=inp.hand=in
  const pn_=document.createElement('div');pn_.style.cssText='width:min(94vw,580px);max-height:92vh;overflow:auto;background:#0b1422;border:3px solid #6aa8ff;box-shadow:4px 4px 0 #000;padding:10px;box-sizing:border-box';ov.appendChild(pn_);pn_.onpointerdown=e=>e.stopPropagation();
  OV={ov,pn:pn_,tab:tab||0,msg:''};OV.kd=e=>{if(e.key==='Escape')close()};addEventListener('keydown',OV.kd);render()}
 function close(){if(!OV)return;removeEventListener('keydown',OV.kd);OV.ov.remove();OV=null;busy=0}
-function here(){const p=GS.onFoot?P:GS,m=mapAt(p.x,p.z);return m?m.id:'home'}
+/* inside a building your position is in interior space, so use the building's door outside */
+function here(){const o=GS.inside&&typeof SHOPCUR!=='undefined'&&SHOPCUR&&SHOPCUR.o,p=o&&o.x!=null?o:(GS.onFoot?P:GS),m=mapAt(p.x,p.z);return m?m.id:(AP.at||'home')}
 function render(){const pn_=OV.pn;pn_.textContent='';const el=(t,css,txt,par)=>{const e=document.createElement(t);if(css)e.style.cssText=css;if(txt!=null)e.textContent=txt;(par||pn_).appendChild(e);return e};
  const bt=(par,txt,on,fn,dis)=>{const b=el('button','font:bold 12px monospace;border:2px solid '+(on?'#6aa8ff':'#556')+';border-radius:6px;color:#fff;background:'+(on?'#1c3a6a':'#242838')+';padding:6px 9px;margin:2px;touch-action:manipulation;'+(dis?'opacity:.4;':''),txt,par);b.onclick=e=>{e.stopPropagation();fn()};return b};
  const loc=here(),M=MAPS[loc];const hd=el('div','display:flex;justify-content:space-between;align-items:center;margin-bottom:6px');el('div','font-size:16px;color:#8cf','COZY AIRWAYS  ·  '+M.airfield,hd);bt(hd,'CLOSE',0,close);

@@ -653,9 +653,9 @@ for(const row of CAT){const[key,name,brand,type,L,W,H,WB,price,pf,pal,ex]=row,T=
 /* ================================================================ motorbikes
    Built from lofted octagon sections (fairing, tank, seat, tail), beams (frame, fork, swingarm)
    and a seated rider. Same output as the cars: paint buffer + trim buffer, wheels separate. */
-function buildBike(S){const PB={p:[],c:[]},FB={p:[],c:[]};
+function buildBike(S){const PB={p:[],c:[]},FB={p:[],c:[]},RB={p:[],c:[]};let OUT=null;
  const tri=(a,b,c,hex,ref)=>{let n=nrm(crs(sub(b,a),sub(c,a)));if(!n)return;if(ref&&n[0]*ref[0]+n[1]*ref[1]+n[2]*ref[2]<0){const t=b;b=c;c=t;n=[-n[0],-n[1],-n[2]]}
-  const s=shade(n),k=hex==null?[1,1,1]:hx(hex),B=hex==null?PB:FB;B.p.push(...a,...b,...c);for(let i=0;i<3;i++)B.c.push(k[0]*s,k[1]*s,k[2]*s)};
+  const s=shade(n),k=hex==null?[1,1,1]:hx(hex),B=OUT||(hex==null?PB:FB);B.p.push(...a,...b,...c);for(let i=0;i<3;i++)B.c.push(k[0]*s,k[1]*s,k[2]*s)};
  const oct=(z,cx,cy,w,h)=>{const o=[];for(let i=0;i<8;i++){const a=(i+.5)/8*6.2832;o.push([cx+Math.cos(a)*w/2/Math.cos(Math.PI/8),cy+Math.sin(a)*h/2/Math.cos(Math.PI/8),z])}return o};
  /* loft through sections [z,cy,w,h] (or [z,cy,w,h,cx]) */
  const loft=(secs,hex)=>{const R=secs.map(q=>oct(q[0],q[4]||0,q[1],q[2],q[3]));let cx=0,cy=0,cz=0,n=0;for(const r of R)for(const p of r){cx+=p[0];cy+=p[1];cz+=p[2];n++}const C=[cx/n,cy/n,cz/n];
@@ -707,7 +707,8 @@ function buildBike(S){const PB={p:[],c:[]},FB={p:[],c:[]};
  const bar=[0,head[1]+(cr?.18:adv?.10:sp?-.06:.08),head[2]-.06],bw=cr?.42:adv?.40:sc?.30:sp?.30:.36;beam([-bw,bar[1],bar[2]-.04],[bw,bar[1],bar[2]-.04],.03,BLK);
  for(const s of[1,-1])beam([s*bw*.8,bar[1],bar[2]],[s*(bw*.8+.06),bar[1]+.14,bar[2]+.02],.02,BLK),box([s*(bw*.8+.08),bar[1]+.16,bar[2]+.02],[.08,.05,.02],BLK);
  if(adv)for(const s of[1,-1])box([s*.30,R+.40,zr+.30],[.14,.34,.44],0x3a3c40);
- /* rider: helmet, torso, arms, legs, boots */
+ /* rider: helmet, torso, arms, legs, boots (own mesh: only shown while you're riding) */
+ OUT=RB;
  const J=S.jacket||0x1c1d22,PN=0x22242a,HL=S.helmet||0xe8e8ea,lean=sp?.95:adv?.25:cr?-.1:sc?.05:.35,seat=[0,R+(adv?.74:cr?.50:sp?.68:sc?.70:.62),sc?-.30:cr?-.36:-.30];
  const hip=[0,seat[1]+.10,seat[2]],sh=[0,hip[1]+.50*Math.cos(lean*.6),hip[2]+.50*Math.sin(lean*.6)+(sp?.08:0)],hd=[0,sh[1]+.20-(sp?.06:0),sh[2]+.06];
  beam(hip,sh,.30,J);box([0,sh[1]-.02,sh[2]],[.40,.12,.20],J);loft([[hd[2]+.13,hd[1],.12,.12],[hd[2]+.08,hd[1],.25,.26],[hd[2]-.06,hd[1],.27,.28],[hd[2]-.15,hd[1],.14,.16]],HL);box([0,hd[1]+.01,hd[2]+.12],[.18,.07,.04],0x111418);
@@ -715,7 +716,8 @@ function buildBike(S){const PB={p:[],c:[]},FB={p:[],c:[]};
   beam(S0,E_,.09,J);beam(E_,H_,.08,J);box(H_,[.07,.07,.08],0x111214);
   const K=sc?[s*.16,R+.62,.05]:cr?[s*.20,R+.52,.12]:[s*.16,R+(adv?.68:.56),-.02+(sp?.08:0)],F_=sc?[s*.14,R+.10,.06]:cr?[s*.24,R+.12,.42]:[s*.16,R+(adv?.20:.18),-.18+(sp?-.08:0)];
   beam([s*.12,hip[1]-.02,hip[2]],K,.13,PN);beam(K,F_,.11,PN);box([F_[0],F_[1]-.02,F_[2]+.06],[.10,.08,.22],0x101012)}
- return{PB,FB,tris:(PB.p.length+FB.p.length)/9}}
+ OUT=null;
+ return{PB,FB,RB,tris:(PB.p.length+FB.p.length+RB.p.length)/9}}
 
 const BIKES=[ // key,name,type,wheelbase,R,tyre half-width,price,perf,colours,frame,jacket,helmet
  ['cbr600','HONDA CBR600RR','sport',1.375,.30,.06,120,9,[[.8,.06,.06],[.06,.06,.07],[.94,.94,.95]],0x2a2c30,0x1c1d22,0xc81818],
@@ -748,12 +750,13 @@ const TRI={specs:SPECS,ids:[],build,gen,byKey:{}};
 SPECS.forEach((C,k)=>{const id=FIRST+k,S=C.S;C.id=id;C.k=k;TRI.ids.push(id);TRI.byKey[C.key]=id;
  let G=null;const ensure=()=>{if(G)return G;const t0=performance.now(),o=C.bike?buildBike(S):build(S);
   const st={p:o.FB.p.slice(),c:o.FB.c.slice()};for(const sx of[1,-1])for(const z of[S.ZF,S.ZB])wheelArr(S,sx,C.bike?0:sx*(S.W0-S.inset),z,st);
-  G={P:geo(o.PB),F:geo(o.FB),SF:geo(st),RG:{1:geo(rimArr(1,S,{p:[],c:[]})),'-1':geo(rimArr(-1,S,{p:[],c:[]}))},tris:o.tris,ms:performance.now()-t0};return G};
+  const tf=o.RB?{p:st.p.concat(o.RB.p),c:st.c.concat(o.RB.c)}:null;
+  G={P:geo(o.PB),F:geo(o.FB),SF:geo(st),TF:tf?geo(tf):null,RD:o.RB?geo(o.RB):null,RG:{1:geo(rimArr(1,S,{p:[],c:[]})),'-1':geo(rimArr(-1,S,{p:[],c:[]}))},tris:o.tris,ms:performance.now()-t0};return G};
  /* the drivable car: lazily built the first time it is shown */
  const pM=MAT(),fM=MAT(),rM=MAT(),tyreM=new THREE.MeshBasicMaterial({color:0x151518}),dM=new THREE.MeshBasicMaterial({color:0x2a2c30});
  const grp=new THREE.Group();grp.visible=false;car.add(grp);const wl=[];
  const N={id,grp,ready:1,pc:C.stock,spec:C,built:0,
-  load(){if(N.built||CARI!==id)return;N.built=1;const g=ensure();grp.add(new THREE.Mesh(g.P,pM),new THREE.Mesh(g.F,fM));
+  load(){if(N.built||CARI!==id)return;N.built=1;const g=ensure();grp.add(new THREE.Mesh(g.P,pM),new THREE.Mesh(g.F,fM));if(g.RD){N.rider=new THREE.Mesh(g.RD,fM);N.rider.visible=false;grp.add(N.rider)}
    const tyreG=new THREE.CylinderGeometry(S.R*.985,S.R*.985,S.TW*2,24).rotateZ(Math.PI/2);
    const dG=sx=>{const dg=new THREE.CircleGeometry(S.rimR*.992,24);dg.rotateY(sx>0?Math.PI/2:-Math.PI/2);dg.translate(sx*(S.TW+.001),0,0);return dg};
    for(const sx of C.bike?[1]:[1,-1])for(const[f,z]of[[1,S.ZF],[0,S.ZB]]){const piv=new THREE.Group(),spin=new THREE.Group();piv.position.set(C.bike?0:sx*(S.W0-S.inset),S.R,z);
@@ -763,7 +766,8 @@ SPECS.forEach((C,k)=>{const id=FIRST+k,S=C.S;C.id=id;C.k=k;TRI.ids.push(id);TRI.
   upd(still){const l=U.uLight.value,c=N.pc;pM.color.setRGB(c[0]*l.x,c[1]*l.y,c[2]*l.z);fM.color.setRGB(l.x,l.y,l.z);rM.color.setRGB(l.x,l.y,l.z);
    tyreM.color.setRGB(.085*l.x,.085*l.y,.09*l.z);dM.color.setRGB(.17*l.x,.17*l.y,.19*l.z);if(still)return;
    for(const w of wl){w.spin.rotation.x=GS_SPIN*.275/S.R;if(w.front)w.piv.rotation.y=GS.steer*.5}
-   if(C.bike){const v=Math.min(1,Math.abs(GS.speed||0)/10),tl=-(GS.steer||0)*v*.55;grp.rotation.z+=(tl-grp.rotation.z)*.2}},
+   if(N.rider)N.rider.visible=!GS.onFoot&&CARI===id;
+   if(C.bike){const v=Math.min(1,Math.abs(GS.speed||0)/10),tl=GS.onFoot?0:-(GS.steer||0)*v*.55;grp.rotation.z+=(tl-grp.rotation.z)*.2}},
   /* a static copy: showroom pods (stock paint) and traffic (any colour) */
   inst(col){const g=ensure(),o=new THREE.Group();o.add(lit(new THREE.Mesh(g.P,MAT()),col||C.stock),lit(new THREE.Mesh(g.SF,MAT())));return o},
   geo:ensure};
