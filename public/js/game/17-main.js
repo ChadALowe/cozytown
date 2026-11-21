@@ -72,16 +72,16 @@ for(const b of document.querySelectorAll('[data-res]'))b.onclick=()=>{for(const 
 const PCOL=[['#ffffff',[1,1,1]],['#c8102e',[.85,.07,.12]],['#1c4fa0',[.12,.28,.8]],['#e8c11a',[1,.76,.06]],['#2a9d58',[.1,.58,.27]],['#f08a24',[1,.42,.06]],['#8b8f96',[.5,.52,.56]],['#1a1a1d',[.1,.1,.11]]];
 PCOL.forEach((c,i)=>{const b=document.createElement('button');b.className='sw'+(i===0?' on':'');b.style.background=c[0];b.onclick=()=>{for(const o of $('sw').children)o.classList.remove('on');b.classList.add('on');paintC=c[1];applyPaint()};$('sw').appendChild(b)});
 // minimap
-const MMS=128,mm=$('mm'),mc=mm.getContext('2d'),mb=document.createElement('canvas');mm.width=mm.height=MMS;mb.width=mb.height=MMS;
-const mx=x=>(x+HALF)/SIZE*MMS,mz=z=>(HALF-z)/SIZE*MMS;
-{const x=mb.getContext('2d');x.fillStyle='#3f7a35';x.fillRect(0,0,MMS,MMS);x.fillStyle='#5aa648';x.beginPath();x.arc(mx(GRC[0]),mz(GRC[1]),GRR/SIZE*MMS,0,6.3);x.fill();x.fillStyle='#4a82b4';x.beginPath();x.arc(mx(GRC[0]+9),mz(GRC[1]-6),2.4,0,6.3);x.fill();
- x.strokeStyle='#d8d8d0';x.lineCap='round';x.lineJoin='round';x.lineWidth=2.6;for(const r of ROADS){x.beginPath();r.p.forEach((q,i)=>i?x.lineTo(mx(q[0]),mz(q[1])):x.moveTo(mx(q[0]),mz(q[1])));x.stroke();if(r.head){x.fillStyle='#d8d8d0';x.beginPath();x.arc(mx(r.head[0]),mz(r.head[1]),3,0,6.3);x.fill()}}
- x.fillStyle='#8a6a5c';for(const b of BLD){x.save();x.translate(mx(b.x),mz(b.z));x.rotate(b.rot);x.fillRect(-b.w/2*MMS/SIZE,-b.d/2*MMS/SIZE,b.w*MMS/SIZE,b.d*MMS/SIZE);x.restore()}}
-function drawMap(){mc.drawImage(mb,0,0);
+const MMS=128,MBS=1600,mm=$('mm'),mc=mm.getContext('2d'),mb=document.createElement('canvas');mm.width=mm.height=MMS;mb.width=mb.height=MBS;
+const mx=x=>(x+HALF)/SIZE*MBS,mz=z=>(HALF-z)/SIZE*MBS;
+{const x=mb.getContext('2d'),k=MBS/SIZE;x.fillStyle='#2a6a8a';x.fillRect(0,0,MBS,MBS);townMap(x,mx,mz,k);x.fillStyle='#5aa648';x.beginPath();x.arc(mx(GRC[0]),mz(GRC[1]),GRR*k,0,6.3);x.fill();x.fillStyle='#4a82b4';x.beginPath();x.arc(mx(GRC[0]+9),mz(GRC[1]-6),4*k,0,6.3);x.fill();
+ x.strokeStyle='#d8d8d0';x.lineCap='round';x.lineJoin='round';x.lineWidth=9*k;for(const r of ROADS){x.strokeStyle=r.rural?'#c8bc98':'#d8d8d0';x.beginPath();r.p.forEach((q,i)=>i?x.lineTo(mx(q[0]),mz(q[1])):x.moveTo(mx(q[0]),mz(q[1])));x.stroke();if(r.head){x.fillStyle='#d8d8d0';x.beginPath();x.arc(mx(r.head[0]),mz(r.head[1]),r.head[2]*k,0,6.3);x.fill()}}
+ x.fillStyle='#8a6a5c';for(const b of BLD){x.save();x.translate(mx(b.x),mz(b.z));x.rotate(b.rot);x.fillRect(-b.w/2*k,-b.d/2*k,b.w*k,b.d*k);x.restore()}}
+function drawMap(){const T0=GS.inside?{x:HM.x,z:HM.z}:GS.onFoot?P:GS,VW=MMS*1.9,sc=MMS/VW;mc.setTransform(1,0,0,1,0,0);mc.fillStyle='#2a6a8a';mc.fillRect(0,0,MMS,MMS);mc.setTransform(sc,0,0,sc,MMS/2-mx(T0.x)*sc,MMS/2-mz(T0.z)*sc);mc.drawImage(mb,0,0);
  for(const d of DEPOTS){mc.fillStyle=d.type==='food'?'#ffd23a':'#4aa8ff';mc.fillRect(mx(d.x)-2.5,mz(d.z)-2.5,5,5)}
  if(JOB.on)for(const s of JOB.stops){if(s.done)continue;mc.fillStyle='#ff4a2a';mc.beginPath();mc.arc(mx(s.dx),mz(s.dz),3,0,6.3);mc.fill()}
  const T=GS.inside?{x:HM.x,z:HM.z,psi:P.psi}:GS.onFoot?P:GS;if(GS.onFoot){mc.fillStyle='#4af';mc.fillRect(mx(GS.x)-2,mz(GS.z)-2,5,5)}
- mc.save();mc.translate(mx(T.x),mz(T.z));mc.rotate(Math.atan2(-Math.cos(T.psi),Math.sin(T.psi)));mc.fillStyle='#fff';mc.strokeStyle='#d00';mc.lineWidth=1.5;mc.beginPath();mc.moveTo(6,0);mc.lineTo(-4,-3.5);mc.lineTo(-4,3.5);mc.closePath();mc.fill();mc.stroke();mc.restore()}
+ mc.save();mc.translate(mx(T.x),mz(T.z));mc.rotate(Math.atan2(-Math.cos(T.psi),Math.sin(T.psi)));mc.fillStyle='#fff';mc.strokeStyle='#d00';mc.lineWidth=1.5;mc.beginPath();mc.moveTo(6/sc,0);mc.lineTo(-4/sc,-3.5/sc);mc.lineTo(-4/sc,3.5/sc);mc.closePath();mc.fill();mc.stroke();mc.restore();mc.setTransform(1,0,0,1,0,0)}
 
 /* ---------- main loop ---------- */
 let last=performance.now(),hudT=0;

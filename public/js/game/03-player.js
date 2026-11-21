@@ -144,7 +144,7 @@ function step(dt){
  if(hAt(nx,nz)<.25){GS.vx*=-.3;GS.vz*=-.3;nx=GS.x;nz=GS.z;impact=Math.max(impact,6)}
  const cf=[Math.sin(GS.psi),Math.cos(GS.psi)];
  for(const off of[1.1,-1,0]){const px=nx+cf[0]*off,pz=nz+cf[1]*off;
-  for(let i=0;i<COL.length;i++){const c=COL[i];if(c.d&&dOpen>.7)continue;const dx=px-c[0],dz=pz-c[1];if(dx>c[2]+2||dx<-c[2]-2||dz>c[2]+2||dz<-c[2]-2)continue;const dd=Math.hypot(dx,dz),rr=c[2]+(CARI===5?1.12:CARI===4?.92:CARI===2?1.05:CARI===3?1.0:CARI?.95:.85);if(dd<rr&&dd>1e-3){const ux=dx/dd,uz=dz/dd;nx+=ux*(rr-dd);nz+=uz*(rr-dd);const vn=GS.vx*ux+GS.vz*uz;if(vn<0){GS.vx-=vn*ux*1.35;GS.vz-=vn*uz*1.35;GS.vx*=.94;GS.vz*=.94;impact=Math.max(impact,-vn)}}}}
+  {const CL_=colQ(px,pz);for(let i=0;i<CL_.length;i++){const c=CL_[i];if(c.d&&dOpen>.7)continue;const dx=px-c[0],dz=pz-c[1];if(dx>c[2]+2||dx<-c[2]-2||dz>c[2]+2||dz<-c[2]-2)continue;const dd=Math.hypot(dx,dz),rr=c[2]+(CARI===5?1.12:CARI===4?.92:CARI===2?1.05:CARI===3?1.0:CARI?.95:.85);if(dd<rr&&dd>1e-3){const ux=dx/dd,uz=dz/dd;nx+=ux*(rr-dd);nz+=uz*(rr-dd);const vn=GS.vx*ux+GS.vz*uz;if(vn<0){GS.vx-=vn*ux*1.35;GS.vz-=vn*uz*1.35;GS.vx*=.94;GS.vz*=.94;impact=Math.max(impact,-vn)}}}}}
  GS.x=nx;GS.z=nz;
  const F=1.17,Sd=.72,hf=gH(nx+cf[0]*F,nz+cf[1]*F),hb=gH(nx-cf[0]*F,nz-cf[1]*F),hl=gH(nx+lx*Sd,nz+lz*Sd),hr=gH(nx-lx*Sd,nz-lz*Sd);
  const hc=gH(nx,nz),gy=Math.max((hf+hb+hl+hr)/4,hc)+.08+Math.abs(Math.sin(GS.roll))*.35+Math.abs(Math.sin(GS.pitch))*.5;GS.gy=gy;const gvy=(gy-GS.prevGY)/dt;GS.prevGY=gy;
@@ -167,7 +167,7 @@ function stepFoot(dt){
  const sp=fwd>0?(run?7.4:3.4):fwd<0?2:0;P.speed+=(sp-P.speed)*Math.min(1,dt*(run?5:10));
  let nx=P.x+Math.sin(P.psi)*P.speed*P.dir*dt,nz=P.z+Math.cos(P.psi)*P.speed*P.dir*dt;
  if(hAt(nx,nz)<.35){nx=P.x;nz=P.z;P.speed=0}
- for(let i=0;i<COL.length;i++){const c=COL[i];if(c.d&&dOpen>.7)continue;const dx=nx-c[0],dz=nz-c[1];if(dx>c[2]+1||dx<-c[2]-1||dz>c[2]+1||dz<-c[2]-1)continue;const dd=Math.hypot(dx,dz),rr=c[2]+.4;if(dd<rr&&dd>1e-3){nx+=dx/dd*(rr-dd);nz+=dz/dd*(rr-dd)}}
+ {const CL_=colQ(nx,nz);for(let i=0;i<CL_.length;i++){const c=CL_[i];if(c.d&&dOpen>.7)continue;const dx=nx-c[0],dz=nz-c[1];if(dx>c[2]+1||dx<-c[2]-1||dz>c[2]+1||dz<-c[2]-1)continue;const dd=Math.hypot(dx,dz),rr=c[2]+.4;if(dd<rr&&dd>1e-3){nx+=dx/dd*(rr-dd);nz+=dz/dd*(rr-dd)}}}
  for(const off of[1.3,0,-1.3]){const cx=GS.x+Math.sin(GS.psi)*off,cz=GS.z+Math.cos(GS.psi)*off,dx=nx-cx,dz=nz-cz,dd=Math.hypot(dx,dz),rr=.95+.4;if(dd<rr&&dd>1e-3){nx+=dx/dd*(rr-dd);nz+=dz/dd*(rr-dd)}}
  P.x=nx;P.z=nz;{const sx_=Math.sin(P.psi),sz_=Math.cos(P.psi),gt=Math.max(gH(nx,nz),gH(nx+sx_*.24,nz+sz_*.24),gH(nx-sx_*.14,nz-sz_*.14))+.02;P.y+=(gt-P.y)*Math.min(1,dt*15)}P.phase+=P.speed*dt*(run?1.25:2.3);collectGems(P.x,P.z,P.y)}
 man.rotation.order='YXZ';

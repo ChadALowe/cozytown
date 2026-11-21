@@ -128,10 +128,26 @@ const roadTex=mkTex((i,j)=>{const r=hash2(i*5+1,j*11+7);let v=.86+(r-.5)*.13;if(
 const objTex=mkTex((i,j)=>{const r=hash2(i*3+9,j*5+2),b=hash2((i>>2)+7,(j>>2)+31);return .9+(r-.5)*.09+(b-.5)*.1});
 const rockTex=mkTex((i,j)=>{const r=hash2(i*9+4,j*3+8),b=hash2((i>>2)+55,(j>>3)+12);return .82+(r-.5)*.2+(b-.5)*.2});
 /* ---------- world data (village) ---------- */
-const SIZE=480,HALF=SIZE/2,G0=4.6,RW=3.5,PW=1.8,CH=60,NCH=SIZE/CH;
+const SIZE=2400,HALF=SIZE/2,G0=4.6,RW=3.5,PW=1.8,CH=60,NCH=SIZE/CH,VSZ=480,VH=240;
 const SUN=new THREE.Vector3(.5,.85,.3).normalize();
-const COL=[]; // colliders [x,z,r]
-function hAt(x,z){return(x<-HALF||x>HALF||z<-HALF||z>HALF)?-6:G0}
+const COL=[]; // colliders [x,z,r] (dynamic + late); static ones are moved into a grid once the town is built
+const CGRID=new Map(),CGS=12,QB=[];
+function colGrid(L){for(const c of L){const m=c[2]+2.6;for(let a=Math.floor((c[0]-m)/CGS);a<=Math.floor((c[0]+m)/CGS);a++)for(let b=Math.floor((c[1]-m)/CGS);b<=Math.floor((c[1]+m)/CGS);b++){const k=a*8192+b;let q=CGRID.get(k);if(!q)CGRID.set(k,q=[]);q.push(c)}}}
+function colQ(x,z){QB.length=0;const q=CGRID.get(Math.floor(x/CGS)*8192+Math.floor(z/CGS));if(q)for(let i=0;i<q.length;i++)QB.push(q[i]);for(let i=0;i<COL.length;i++)QB.push(COL[i]);return QB}
+/* ---- COZYTOWN: land, sea, the River Coze, the canal and the railway ---- */
+const TB={x0:-1150,x1:980,z0:-1180};
+function coastZ(x){const ax=Math.abs(x),t=ax<262?0:Math.min(1,(ax-262)/90);return 241*(1-t)+(240+Math.sin(x*.011)*6+Math.sin(x*.029+1)*3)*t}
+const RIV=[[-430,-1180],[-385,-1000],[-430,-820],[-372,-660],[-300,-470],[-330,-300],[-300,-120],[-312,60],[-336,252]];
+const CAN=[[-300,-470],[-100,-472],[150,-480],[400,-472],[650,-480],[960,-474]];
+const RAILZ=-650,RAILX0=-1140,RAILX1=970;
+function plD(x,z,L){let b=1e9,bt=0;for(let i=0;i<L.length-1;i++){const a=L[i],c=L[i+1],dx=c[0]-a[0],dz=c[1]-a[1],l2=dx*dx+dz*dz;let t=((x-a[0])*dx+(z-a[1])*dz)/l2;t=t<0?0:t>1?1:t;const d=Math.hypot(x-a[0]-dx*t,z-a[1]-dz*t);if(d<b){b=d;bt=i+t}}return[b,bt]}
+function rivW(z){return z>150?7+(z-150)*.06:7}
+const PONDS=[[-640,110,26,16],[-20,-850,30,20]];/* park duck pond, mill pond */
+function wetAt(x,z){if(x>-470&&x<-255&&z<260){if(plD(x,z,RIV)[0]<rivW(z))return 1}
+ if(z>-492&&z<-458&&x>-300&&x<965){if(plD(x,z,CAN)[0]<4.2)return 2}
+ for(const p of PONDS){const dx=(x-p[0])/p[2],dz=(z-p[1])/p[3];if(dx*dx+dz*dz<1)return 3}return 0}
+function landAt(x,z){if(x>-VH&&x<VH&&z>-VH&&z<VH)return 1;return!(x<TB.x0||x>TB.x1||z<TB.z0||z>coastZ(x))}
+function hAt(x,z){if(x>-VH&&x<VH&&z>-VH&&z<VH)return G0;if(x<TB.x0||x>TB.x1||z<TB.z0||z>coastZ(x))return -6;if(wetAt(x,z)&&roadDist(x,z)>RW+PW+.4)return -6;return G0}
 function gH(x,z){return hAt(x,z)}
 function ringPts(cx,cz,r,n,a0){const o=[];for(let i=0;i<=n;i++){const a=a0+i/n*6.2832;o.push([cx+Math.cos(a)*r,cz+Math.sin(a)*r])}return o}
 const GRC=[-105,72],GRR=30; // village green
@@ -144,12 +160,48 @@ const ROADS=[
  {n:'STATION ROAD',p:[[-20,-110],[205,-110]]},
  {n:'ORCHARD CLOSE',p:[[60,0],[60,78]],head:[60,78,8]},
  {n:'SCHOOL LANE',p:[[-20,125],[30,125],[30,195]]},
- {n:'BACK LANE',p:[[170,0],[170,115]]}];
+ {n:'BACK LANE',p:[[170,0],[170,115]]},
+ /* ---- the new town ---- */
+ {n:'NORTH STREET',p:[[-20,-232],[-20,-288]],lines:1,nw:1,mix:['terr'],dens:.9},
+ {n:'MARKET PLACE',p:[[-62,-288],[22,-288],[22,-336],[-62,-336],[-62,-288]],ring:1,nw:1,mix:['terr'],dens:.9},
+ {n:'STATION APPROACH',p:[[-20,-336],[-20,-618]],nw:1,mix:['terr','terr','semi'],dens:.75},
+ {n:'LONDON ROAD',p:[[232,0],[520,0],[860,-30]],lines:1,nw:1,mix:['semi','det','terr','semi'],dens:.7},
+ {n:'WEST STREET',p:[[-232,0],[-1060,0]],lines:1,nw:1,mix:['terr','terr','semi'],dens:.85},
+ {n:"KING'S WAY",p:[[-1060,190],[-1060,-900],[-600,-965],[200,-965],[860,-900],[860,190]],nw:1,rural:1,mix:['det','bung','cot'],dens:.1},
+ {n:'MARINE PARADE',p:[[262,200],[860,200]],nw:1,mix:['det','semi','bung'],dens:.6},
+ {n:'THE PROMENADE',p:[[-372,205],[-1060,205]],nw:1,mix:['det','semi'],dens:.5},
+ {n:'BEACH ROAD',p:[[400,0],[400,200]],nw:1,mix:['semi','det'],dens:.7},
+ {n:'PARK ROAD',p:[[-400,0],[-400,205]],nw:1,mix:['semi','terr'],dens:.6},
+ {n:'GLADSTONE STREET',p:[[-520,0],[-520,-560]],nw:1,mix:['terr'],dens:.97},
+ {n:'DICKENS STREET',p:[[-680,0],[-680,-560]],nw:1,mix:['terr'],dens:.97},
+ {n:'BRUNEL STREET',p:[[-840,0],[-840,-560]],nw:1,mix:['terr'],dens:.97},
+ {n:'VICTORIA ROAD',p:[[-1060,-200],[-470,-200]],nw:1,mix:['terr'],dens:.97},
+ {n:'ALBERT ROAD',p:[[-1060,-380],[-470,-380]],nw:1,mix:['terr'],dens:.97},
+ {n:'QUEEN STREET',p:[[-1060,-560],[-470,-560]],nw:1,mix:['terr','terr','semi'],dens:.9},
+ {n:'WESTBROOK LANE',p:[[-760,-560],[-760,-624]],nw:1,mix:[],dens:0},
+ {n:'MEADOW WAY',p:[[205,-110],[300,-200],[860,-200]],nw:1,mix:['semi','semi','det'],dens:.85},
+ {n:'OAK AVENUE',p:[[500,0],[500,-430]],nw:1,mix:['semi','det'],dens:.85},
+ {n:'BLUEBELL CLOSE',p:[[380,-200],[380,-305]],head:[380,-305,8],nw:1,mix:['semi','det','bung'],dens:.95},
+ {n:'HAZEL CLOSE',p:[[380,-200],[380,-105]],head:[380,-105,8],nw:1,mix:['semi','det','bung'],dens:.95},
+ {n:'FOXGLOVE CLOSE',p:[[660,-200],[660,-315]],head:[660,-315,8],nw:1,mix:['det','semi','bung'],dens:.95},
+ {n:'PRIMROSE CLOSE',p:[[660,-200],[660,-95]],head:[660,-95,8],nw:1,mix:['det','semi','bung'],dens:.95},
+ {n:'CANAL ROAD',p:[[-20,-430],[500,-430]],nw:1,mix:['terr','cot'],dens:.55},
+ {n:'LEISURE WAY',p:[[600,0],[600,140],[845,140]],nw:1,mix:[],dens:0},
+ {n:'EASTFIELD ROAD',p:[[860,-605],[680,-605]],nw:1,mix:[],dens:0},
+ {n:'MOOR LANE',p:[[-20,-618],[-20,-965],[-20,-1150]],nw:1,rural:1,mix:['cot','det','bung'],dens:.14},
+ {n:'WINDMILL LANE',p:[[200,-965],[420,-1060],[590,-1110]],nw:1,rural:1,mix:['cot','det'],dens:.15},
+ {n:'PLOUGH LANE',p:[[-600,-965],[-650,-1075],[-760,-1130]],nw:1,rural:1,mix:['cot','bung'],dens:.15},
+ {n:'BRIDGE STREET',p:[[-520,-288],[-62,-288]],lines:1,nw:1,mix:['terr','terr','shop'],dens:.9},
+ {n:'CHAPEL STREET',p:[[-290,-380],[360,-380]],nw:1,mix:['terr','terr','semi'],dens:.9}];
 const SEG=[];
 ROADS.forEach((r,ri)=>{for(let i=0;i<r.p.length-1;i++){const a=r.p[i],b=r.p[i+1],dx=b[0]-a[0],dz=b[1]-a[1],l=Math.hypot(dx,dz);SEG.push({ri,a,b,l,dx:dx/l,dz:dz/l})}});
 function segDist(x,z,s){let t=((x-s.a[0])*s.dx+(z-s.a[1])*s.dz);t=t<0?0:t>s.l?s.l:t;const px=s.a[0]+s.dx*t,pz=s.a[1]+s.dz*t;return{d:Math.hypot(x-px,z-pz),px,pz,t}}
-function roadDist(x,z){let b=1e9;for(const s of SEG){const q=segDist(x,z,s);if(q.d<b)b=q.d}for(const r of ROADS)if(r.head){const d=Math.hypot(x-r.head[0],z-r.head[1])-(r.head[2]-RW);if(d<b)b=d}return b}
-function roadNear(x,z){let b=1e9,bs=null,bq=null;for(const s of SEG){const q=segDist(x,z,s);if(q.d<b){b=q.d;bs=s;bq=q}}return{d:b,s:bs,q:bq}}
+const SGR=new Map(),SGC=40;let SGN=0;
+function sgIdx(){for(;SGN<SEG.length;SGN++){const s=SEG[SGN],m=RW+PW+SGC,x0=Math.min(s.a[0],s.b[0])-m,x1=Math.max(s.a[0],s.b[0])+m,z0=Math.min(s.a[1],s.b[1])-m,z1=Math.max(s.a[1],s.b[1])+m;for(let a=Math.floor(x0/SGC);a<=Math.floor(x1/SGC);a++)for(let b=Math.floor(z0/SGC);b<=Math.floor(z1/SGC);b++){const k=a*4096+b;let L=SGR.get(k);if(!L)SGR.set(k,L=[]);if(segDist((a+.5)*SGC,(b+.5)*SGC,s).d<SGC*.75+m)L.push(s)}}}
+function roadDist(x,z){if(SGN<SEG.length)sgIdx();const L=SGR.get(Math.floor(x/SGC)*4096+Math.floor(z/SGC));if(L){let b=1e9;for(const s of L){const q=segDist(x,z,s);if(q.d<b)b=q.d}if(b<SGC*.5){for(const r of ROADS)if(r.head){const d=Math.hypot(x-r.head[0],z-r.head[1])-(r.head[2]-RW);if(d<b)b=d}return b}}return roadDist0(x,z)}
+function roadNear(x,z){if(SGN<SEG.length)sgIdx();const L=SGR.get(Math.floor(x/SGC)*4096+Math.floor(z/SGC));if(L){let b=1e9,bs=null,bq=null;for(const s of L){const q=segDist(x,z,s);if(q.d<b){b=q.d;bs=s;bq=q}}if(b<SGC*.5)return{d:b,s:bs,q:bq}}return roadNear0(x,z)}
+function roadDist0(x,z){let b=1e9;for(const s of SEG){const q=segDist(x,z,s);if(q.d<b)b=q.d}for(const r of ROADS)if(r.head){const d=Math.hypot(x-r.head[0],z-r.head[1])-(r.head[2]-RW);if(d<b)b=d}return b}
+function roadNear0(x,z){let b=1e9,bs=null,bq=null;for(const s of SEG){const q=segDist(x,z,s);if(q.d<b){b=q.d;bs=s;bq=q}}return{d:b,s:bs,q:bq}}
 function dAt(x,z){return roadDist(x,z)-(RW+PW-4.6)}
 /* ---------- home site ---------- */
 var dOpen=0;
@@ -174,11 +226,11 @@ function pbox(B,x,y,z,sx,sy,sz,col,rot){const c=Math.cos(rot||0),s=Math.sin(rot|
 function poct(B,x,y,z,rx,ry,rz,col,jit){const j=()=>1+(rnd()-.5)*jit,V=[[x+rx*j(),y,z],[x-rx*j(),y,z],[x,y+ry*j(),z],[x,y-ry*.6*j(),z],[x,y,z+rz*j()],[x,y,z-rz*j()]],cen=[x,y,z],F=[[0,2,4],[4,2,1],[1,2,5],[5,2,0],[0,3,4],[4,3,1],[1,3,5],[5,3,0]];for(const f of F)B.tri(V[f[0]],V[f[1]],V[f[2]],shd(col,.8),null,col,false,cen)}
 
 /* ---------- terrain (flat) ---------- */
-const NG=60,CG=SIZE/NG;
+const NG=60,CG=VSZ/NG;
 const terrB=new Builder(8),terrW=new Builder(8);
 function gcol(x,z,w){const t=fbm(x*.03+9,z*.03+4),u=fbm(x*.11+3,z*.11+8);let c=mix3([.2,.42,.15],[.28,.5,.2],t);c=mix3(c,[.24,.46,.17],u*.5);const gd=Math.hypot(x-GRC[0],z-GRC[1]);if(gd<GRR+2)c=mix3(c,[.32,.56,.22],.55);if(w){const q=.88+.1*u;return[.86*q,.89*q,.94*q]}return c}
 for(let j=0;j<NG;j++)for(let i=0;i<NG;i++){
- const x0=i*CG-HALF,x1=x0+CG,z0=j*CG-HALF,z1=z0+CG,y=G0,chk=((i+j)&1)?1.04:.96;
+ const x0=i*CG-VH,x1=x0+CG,z0=j*CG-VH,z1=z0+CG,y=G0,chk=((i+j)&1)?1.04:.96;
  const a=[x0,y,z0],b=[x1,y,z0],c=[x0,y,z1],d=[x1,y,z1];
  const ca=shd(gcol(x0,z0),chk),cb=shd(gcol(x1,z0),chk),cc=shd(gcol(x0,z1),chk),cd=shd(gcol(x1,z1),chk);
  const wa=shd(gcol(x0,z0,1),chk),wb=shd(gcol(x1,z0,1),chk),wc=shd(gcol(x0,z1,1),chk),wd=shd(gcol(x1,z1,1),chk);

@@ -6,7 +6,7 @@ function ck(x,z){const i=clamp(Math.floor((x+HALF)/CH),0,NCH-1),j=clamp(Math.flo
 function obbHit(a,b){const dx=b.x-a.x,dz=b.z-a.z;for(const o of[a,b])for(const ang of[o.rot,o.rot+Math.PI/2]){const ax=Math.sin(ang),az=Math.cos(ang);const ra=a.hw*Math.abs(Math.cos(a.rot)*ax-Math.sin(a.rot)*az)+a.hd*Math.abs(Math.sin(a.rot)*ax+Math.cos(a.rot)*az),rb=b.hw*Math.abs(Math.cos(b.rot)*ax-Math.sin(b.rot)*az)+b.hd*Math.abs(Math.sin(b.rot)*ax+Math.cos(b.rot)*az);if(Math.abs(dx*ax+dz*az)>=ra+rb)return false}return true}
 const PLACED=[],BLD=[],OBS=[];
 PLACED.push({x:LW(3.5,-2.5)[0],z:LW(3.5,-2.5)[1],rot:HM.th,hw:8,hd:7.5});
-function footOK(cx,cz,rot,hw,hd){if(Math.abs(cx)>HALF-16||Math.abs(cz)>HALF-16)return false;if(Math.hypot(cx-GRC[0],cz-GRC[1])<GRR+hw+3)return false;
+var TOWNFILL=0;function footOK(cx,cz,rot,hw,hd){if(!TOWNFILL){if(Math.abs(cx)>VH-16||Math.abs(cz)>VH-16)return false}else if(!landOK(cx,cz,rot,hw,hd))return false;if(Math.hypot(cx-GRC[0],cz-GRC[1])<GRR+hw+3)return false;
  const c=Math.cos(rot),s=Math.sin(rot),pts=[[0,0],[-1,-1],[1,-1],[1,1],[-1,1],[0,-1],[0,1],[-1,0],[1,0]];for(const[a,b]of pts){const x=cx+a*hw*c+b*hd*s,z=cz-a*hw*s+b*hd*c;if(roadDist(x,z)<RW+PW+.4)return false}
  for(const o of ROADS)if(o.head&&Math.hypot(cx-o.head[0],cz-o.head[1])<o.head[2]+PW+hw+2)return false;
  const me={x:cx,z:cz,rot,hw,hd};for(const p of PLACED)if(Math.hypot(p.x-cx,p.z-cz)<p.hw+p.hd+hw+hd+2&&obbHit(me,p))return false;return true}
@@ -17,11 +17,11 @@ function disc(B,x,z,r,col,y,n){n=n||12;for(let i=0;i<n;i++){const a=i/n*6.2832,b
 function distOther(x,z,ri){let b=1e9;for(const s of SEG)if(s.ri!==ri){const q=segDist(x,z,s);if(q.d<b)b=q.d}return b}
 const Y0=G0,CPAV=[.6,.6,.58],CKERB=[.78,.78,.74],CASP=[.27,.27,.3],CWHT=[.9,.9,.84],CYEL=[.92,.76,.14];
 for(const s of SEG){const r=ROADS[s.ri];for(let t=0;t<s.l;t+=15){const t1=Math.min(s.l,t+15),x0=s.a[0]+s.dx*t,z0=s.a[1]+s.dz*t,x1=s.a[0]+s.dx*t1,z1=s.a[1]+s.dz*t1,K=ck((x0+x1)/2,(z0+z1)/2),B=K.rd,mx=(x0+x1)/2,mz=(z0+z1)/2;
- band(B,x0,z0,x1,z1,-RW-PW,RW+PW,CPAV,Y0+.03);band(B,x0,z0,x1,z1,-RW-.15,-RW,CKERB,Y0+.045);band(B,x0,z0,x1,z1,RW,RW+.15,CKERB,Y0+.045);
+ if(r.rural)band(B,x0,z0,x1,z1,-RW-PW,RW+PW,[.34,.46,.24],Y0+.03);else{band(B,x0,z0,x1,z1,-RW-PW,RW+PW,CPAV,Y0+.03);band(B,x0,z0,x1,z1,-RW-.15,-RW,CKERB,Y0+.045);band(B,x0,z0,x1,z1,RW,RW+.15,CKERB,Y0+.045)}
  band(B,x0,z0,x1,z1,-RW,RW,CASP,Y0+.06);
  if(distOther(mx,mz,s.ri)>RW+3){if(r.lines){for(const o of[-1,1]){band(B,x0,z0,x1,z1,o*(RW-.28),o*(RW-.18),CYEL,Y0+.09);band(B,x0,z0,x1,z1,o*(RW-.5),o*(RW-.4),CYEL,Y0+.09)}}
   for(let u=t;u<t1;u+=4){const u1=Math.min(t1,u+1.8);band(B,s.a[0]+s.dx*u,s.a[1]+s.dz*u,s.a[0]+s.dx*u1,s.a[1]+s.dz*u1,-.07,.07,CWHT,Y0+.09)}}}}
-for(const r of ROADS){const pts=r.p;for(let i=0;i<pts.length;i++){const q=pts[i],K=ck(q[0],q[1]);disc(K.rd,q[0],q[1],RW+PW,CPAV,Y0+.03,14);disc(K.rd,q[0],q[1],RW,CASP,Y0+.06,14)}
+for(const r of ROADS){const pts=r.p;for(let i=0;i<pts.length;i++){const q=pts[i],K=ck(q[0],q[1]);disc(K.rd,q[0],q[1],RW+PW,r.rural?[.34,.46,.24]:CPAV,Y0+.03,14);disc(K.rd,q[0],q[1],RW,CASP,Y0+.06,14)}
  if(r.head){const K=ck(r.head[0],r.head[1]);disc(K.rd,r.head[0],r.head[1],r.head[2]+PW,CPAV,Y0+.03,24);disc(K.rd,r.head[0],r.head[1],r.head[2],CASP,Y0+.06,24)}}
 /* village green: pond + path */
 {const K=ck(GRC[0],GRC[1]);disc(K.rd,GRC[0]+9,GRC[1]-6,5.5,[.25,.42,.55],Y0+.05,16);for(let a=0;a<4;a++){const ang=a*1.5708+.6,x1=GRC[0]+Math.cos(ang)*GRR,z1=GRC[1]+Math.sin(ang)*GRR;band(K.rd,GRC[0],GRC[1],x1,z1,-.9,.9,[.7,.65,.55],Y0+.035)}}
@@ -202,10 +202,10 @@ function bld(cx,cz,rot,o){
   for(let i=1;i<n;i+=2)chim(-w/2+uw*i);
  }else if(k==='pub'){
   for(const bx of[-6,-3,3,6]){frame(w/15*bx,.95,d/2,1,1.4,1.3,rnd()<.5);frame(w/15*bx,3.3,d/2,1,1.2,1.3,rnd()<.5)}
-  {const a=W(0,0,d/2+1.4),b2=W(0,0,d/2-.5);SHOPD.push({x:a[0],z:a[2],psi:Math.atan2(a[0]-b2[0],a[2]-b2[2]),t:'THE ROYAL OAK',bg:'#1c3a24',fg:'#f0d070',pub:1})}
+  {const a=W(0,0,d/2+1.4),b2=W(0,0,d/2-.5);SHOPD.push({x:a[0],z:a[2],psi:Math.atan2(a[0]-b2[0],a[2]-b2[2]),t:o.pname||'THE ROYAL OAK',bg:o.pbg||'#1c3a24',fg:'#f0d070',pub:1})}
   door(0,DOORC[0],1.8);for(const yy of[2.6,5.2])pbox(K.o,...W(0,yy,d/2+.05),w+.1,.2,.1,[.18,.13,.09],rot);for(let i=0;i<=5;i++)pbox(K.o,...W(-w/2+i*w/5,0,d/2+.05),.22,H,.1,[.18,.13,.09],rot);
-  chim(-w*.3);chim(w*.3);{const f=W(0,4.1,d/2+.12);signPlane(K,'THE ROYAL OAK','#1c3a24','#f0d070',2.8,.9,f[0],f[1],f[2],rot,256,64)}
-  {const f=W(w/2+.3,3.8,d/2+1.2);signPlane(K,'THE ROYAL OAK','#6a1a1a','#f0d070',1.5,1.2,f[0],f[1],f[2],rot+Math.PI/2,128,100);signPlane(K,'THE ROYAL OAK','#6a1a1a','#f0d070',1.5,1.2,f[0],f[1],f[2],rot-Math.PI/2,128,100);pbox(K.o,...W(w/2+.3,5.1,d/2+.7),.1,.1,1.2,[.2,.15,.1],rot)}
+  chim(-w*.3);chim(w*.3);{const f=W(0,4.1,d/2+.12);signPlane(K,o.pname||'THE ROYAL OAK',o.pbg||'#1c3a24','#f0d070',2.8,.9,f[0],f[1],f[2],rot,256,64)}
+  {const f=W(w/2+.3,3.8,d/2+1.2);signPlane(K,o.pname||'THE ROYAL OAK','#6a1a1a','#f0d070',1.5,1.2,f[0],f[1],f[2],rot+Math.PI/2,128,100);signPlane(K,o.pname||'THE ROYAL OAK','#6a1a1a','#f0d070',1.5,1.2,f[0],f[1],f[2],rot-Math.PI/2,128,100);pbox(K.o,...W(w/2+.3,5.1,d/2+.7),.1,.1,1.2,[.2,.15,.1],rot)}
   for(let t=0;t<3;t++){const f=W(-4+t*3.5,0,d/2+3.2);pbox(K.o,f[0],f[1]+.7,f[2],1.8,.08,.9,[.45,.3,.15],rot);pbox(K.o,f[0],f[1],f[2],.15,.7,.7,[.3,.2,.1],rot);COL.push([f[0],f[2],.9])}
  }else if(k==='church'){
   const sw=[.66,.64,.58];for(const cx2 of[-7,-3.5,0,3.5])frame(cx2,1.2,d/2,1,1,2.6,0);door(w/2-3.5,[.25,.15,.08],1.8);
@@ -213,7 +213,7 @@ function bld(cx,cz,rot,o){
   {const p=W(-w/2-2,15,0);pcone(K.r,p[0],p[1],p[2],3.5,8,4,[.7,.76,.88],rot+.7854)}for(const yy of[8.5])for(const sg of[1,-1]){frame(-w/2-2,yy,2.5*sg,sg,.9,2.2,0)}
   const gx=W(0,0,-d/2-11);const gy=ck(gx[0],gx[2]);for(let i=0;i<5;i++)for(let j=0;j<5;j++){if((i*7+j*3)%5===0)continue;const q=W(-w/2+3+i*3.2,0,-d/2-3-j*3);pbox(K.o,q[0],q[1],q[2],.6,1.1,.16,[.5,.5,.52],rot+(((i+j)%3)-1)*.06)}
  }else if(k==='school'){
-  for(const sx of[-10.5,-7,-3.5,3.5,7,10.5])frame(sx,1.0,d/2,1,1.8,1.5,rnd()<.2);door(0,[.12,.2,.45],2.0);{const f=W(0,3.3,d/2+.12);signPlane(K,'VILLAGE SCHOOL','#1d4a8a','#ffffff',5.6,.9,f[0],f[1],f[2],rot,256,48)}
+  for(const sx of[-10.5,-7,-3.5,3.5,7,10.5])frame(sx,1.0,d/2,1,1.8,1.5,rnd()<.2);door(0,[.12,.2,.45],2.0);{const f=W(0,3.3,d/2+.12);signPlane(K,o.sname||'VILLAGE SCHOOL','#1d4a8a','#ffffff',5.6,.9,f[0],f[1],f[2],rot,256,48)}
   const pg=W(0,0,-d/2-9),gk=ck(pg[0],pg[2]);const cc=[pg[0],pg[2]];quadXZ(gk.rd,[cc[0]-w/2,cc[1]-7],[cc[0]+w/2,cc[1]-7],[cc[0]+w/2,cc[1]+7],[cc[0]-w/2,cc[1]+7],[.34,.34,.38],Y0+.05);
  }
  // colliders + footprint
@@ -262,7 +262,7 @@ for(const dp of DEPOTS)console.log('depot',dp.name,dp.x.toFixed(0),dp.z.toFixed(
 // procedural fill
 for(const r of ROADS){if(r.n==='HIGH STREET'&&false)continue}
 const cnt={};
-for(const s of SEG){const r=ROADS[s.ri],mix=MIX[r.n];for(const sd of[1,-1]){let t=5+rnd()*4;while(t<s.l-5){const o=KIND[mix[Math.floor(rnd()*mix.length)]](),px=s.a[0]+s.dx*(t+o.w/2),pz=s.a[1]+s.dz*(t+o.w/2),f=frontage(px,pz,s.dx,s.dz,sd,o.fg,o.d),cd=Math.hypot(f.cx,f.cz);
+for(const s of SEG){const r=ROADS[s.ri],mix=MIX[r.n];if(r.nw)continue;for(const sd of[1,-1]){let t=5+rnd()*4;while(t<s.l-5){const o=KIND[mix[Math.floor(rnd()*mix.length)]](),px=s.a[0]+s.dx*(t+o.w/2),pz=s.a[1]+s.dz*(t+o.w/2),f=frontage(px,pz,s.dx,s.dz,sd,o.fg,o.d),cd=Math.hypot(f.cx,f.cz);
   if(rnd()<clamp(1.45-cd/170,.2,1)&&footOK(f.cx,f.cz,f.rot,o.w/2+.8,o.d/2+.8)){o.road=r.n;o.side=sd;bld(f.cx,f.cz,f.rot,o);cnt[r.n]=(cnt[r.n]||0)+1;t+=o.w+1+rnd()*4}else t+=4}}}
 /* home driveway */
 {const K=ck(HM.x,HM.z),a=LW(-2.2,.3),b=LW(2.2,.3),c2=LW(2.2,5.2),d2=LW(-2.2,5.2);quadXZ(K.rd,a,b,c2,d2,CPAV,Y0+.04)}
@@ -281,9 +281,9 @@ function carParts(E,si,col){const T=CST[si%5],L=T.L,W=T.W,y0=T.tall?.32:.22,bh=T
  for(const sx of[-1,1]){E('l',sx*(W/2-.27),y0+.22,L/2+.02,.36,.15,.06,[1,1,.85]);E('l',sx*(W/2-.24),y0+.3,-L/2-.02,.34,.15,.06,[.92,.08,.08]);E('l',sx*(W/2-.06),y0+.22,L/2+.02,.12,.1,.06,[1,.6,.1]);
   for(const z of[L/2-.85,-L/2+.85]){E('o',sx*(W/2-.04),0,z,.26,ty,ty,[.06,.06,.07]);E('o',sx*(W/2+.1),ty/2-.14,z,.04,.28,.28,ch)}}}
 function pcar(x,z,rot,col,si){si=si==null?Math.floor(rnd()*5):si;const K=ck(x,z),c=Math.cos(rot),s=Math.sin(rot),W=(lx,ly,lz)=>[x+lx*c+lz*s,Y0+ly,z-lx*s+lz*c];carParts((k,lx,ly,lz,sx,sy,sz,cc)=>pbox(K[k],...W(lx,ly,lz),sx,sy,sz,cc,rot),si,col);const h=CST[si].L/2-.9;for(const zz of[-h,0,h])COL.push([x+zz*s,z+zz*c,.85])}
-{const cols=[[.7,.1,.1],[.1,.2,.5],[.85,.85,.88],[.1,.1,.12],[.3,.5,.3],[.9,.75,.1],[.5,.5,.55]];let n=0;for(let q=0;q<400&&n<30;q++){const s=SEG[Math.floor(rnd()*SEG.length)],t=6+rnd()*(s.l-12),sd=rnd()<.5?1:-1,px=s.a[0]+s.dx*t,pz=s.a[1]+s.dz*t;if(distOther(px,pz,s.ri)<RW+PW+9)continue;const lat=sd*(RW-.75),x=px-s.dz*lat,z=pz+s.dx*lat;if(Math.hypot(x-HM.x,z-HM.z)<14)continue;if(DEPOTS.some(d=>Math.hypot(d.x-x,d.z-z)<9))continue;if(COL.some(c=>Math.hypot(c[0]-x,c[1]-z)<1.8))continue;
+{const cols=[[.7,.1,.1],[.1,.2,.5],[.85,.85,.88],[.1,.1,.12],[.3,.5,.3],[.9,.75,.1],[.5,.5,.55]];let n=0;for(let q=0;q<1600&&n<110;q++){const s=SEG[Math.floor(rnd()*SEG.length)],t=6+rnd()*(s.l-12),sd=rnd()<.5?1:-1,px=s.a[0]+s.dx*t,pz=s.a[1]+s.dz*t;if(distOther(px,pz,s.ri)<RW+PW+9)continue;const lat=sd*(RW-.75),x=px-s.dz*lat,z=pz+s.dx*lat;if(Math.hypot(x-HM.x,z-HM.z)<14)continue;if(DEPOTS.some(d=>Math.hypot(d.x-x,d.z-z)<9))continue;if(COL.some(c=>Math.hypot(c[0]-x,c[1]-z)<1.8))continue;
  {const mi=(()=>{const r=rnd();return r<.36?0:r<.72?1:r<.86?2:3})(),rot=Math.atan2(s.dx,s.dz)+(sd>0?0:Math.PI),lp=[3.46,3.95,4.4,3.9][mi]/2-.85,cs=Math.sin(rot),cc=Math.cos(rot);civAdd({m:mi,col:cols[Math.floor(rnd()*cols.length)],x,z,rot,parked:1});for(const zz of[-lp,0,lp])COL.push([x+zz*cs,z+zz*cc,.85])}n++}}
-{for(const s of SEG){for(let t=14,k=0;t<s.l-6;t+=38,k++){const sd=k%2?1:-1,px=s.a[0]+s.dx*t,pz=s.a[1]+s.dz*t;if(distOther(px,pz,s.ri)<RW+PW+3)continue;const o=RW+.9,x=px-s.dz*sd*o,z=pz+s.dx*sd*o,K=ck(x,z),rt=Math.atan2(s.dx,s.dz),ax=x+s.dz*sd*.45,az=z-s.dx*sd*.45;pbox(K.o,x,Y0,z,.14,5.4,.14,[.25,.27,.3]);pbox(K.o,(x+ax)/2,Y0+5.3,(z+az)/2,.5,.08,.1,[.25,.27,.3],rt);pbox(K.l,ax,Y0+5.2,az,.5,.18,.4,[1,1,1],rt);COL.push([x,z,.22])}}}
+{for(const s of SEG){if(ROADS[s.ri].rural)continue;for(let t=14,k=0;t<s.l-6;t+=38,k++){const sd=k%2?1:-1,px=s.a[0]+s.dx*t,pz=s.a[1]+s.dz*t;if(distOther(px,pz,s.ri)<RW+PW+3)continue;const o=RW+.9,x=px-s.dz*sd*o,z=pz+s.dx*sd*o,K=ck(x,z),rt=Math.atan2(s.dx,s.dz),ax=x+s.dz*sd*.45,az=z-s.dx*sd*.45;pbox(K.o,x,Y0,z,.14,5.4,.14,[.25,.27,.3]);pbox(K.o,(x+ax)/2,Y0+5.3,(z+az)/2,.5,.08,.1,[.25,.27,.3],rt);pbox(K.l,ax,Y0+5.2,az,.5,.18,.4,[1,1,1],rt);COL.push([x,z,.22])}}}
 // junction name plates
 {const seen=[];for(let i=0;i<SEG.length;i++)for(let j=i+1;j<SEG.length;j++){const a=SEG[i],b=SEG[j];if(a.ri===b.ri)continue;const den=a.dx*b.dz-a.dz*b.dx;if(Math.abs(den)<1e-3)continue;const ex=b.a[0]-a.a[0],ez=b.a[1]-a.a[1],t=(ex*b.dz-ez*b.dx)/den,u=(ex*a.dz-ez*a.dx)/den;if(t<-1.5||t>a.l+1.5||u<-1.5||u>b.l+1.5)continue;const X=a.a[0]+a.dx*t,Z=a.a[1]+a.dz*t;if(seen.some(q=>Math.hypot(q[0]-X,q[1]-Z)<6))continue;seen.push([X,Z]);
  const px=X+(a.dx+b.dx)*4.8,pz=Z+(a.dz+b.dz)*4.8,K=ck(px,pz);pbox(K.o,px,Y0,pz,.12,2.8,.12,[.3,.3,.32]);COL.push([px,pz,.2]);const ry=Math.atan2(X-px,Z-pz);
@@ -304,13 +304,10 @@ var KZN=0;function kartZone(x,z){return(x>-150&&x<-40&&z>-96&&z<-6)||(x>96&&x<23
 {const ck0=ck,KDUM=new Proxy({},{get:(t,k)=>t[k]||(t[k]=new Builder(3))});ck=function(x,z){return KZN?KDUM:ck0(x,z)}}
 function inAnyBld(x,z,m){const me={x,z,rot:0,hw:m,hd:m};for(const p of PLACED)if(Math.hypot(p.x-x,p.z-z)<p.hw+p.hd+m*2&&obbHit(me,p))return true;return false}
 for(let a=0;a<7;a++){const ang=a*.9+.3,rr=8+(a%3)*7;tree(GRC[0]+Math.cos(ang)*rr,GRC[1]+Math.sin(ang)*rr,1.15);COL.push([GRC[0]+Math.cos(ang)*rr,GRC[1]+Math.sin(ang)*rr,.7])}
-for(let q=0,n=0;q<2500&&n<230;q++){const x=(rnd()-.5)*(SIZE-30),z=(rnd()-.5)*(SIZE-30);if(roadDist(x,z)<RW+PW+2.2||inAnyBld(x,z,3)||Math.hypot(x-GRC[0],z-GRC[1])<GRR+2&&Math.hypot(x-GRC[0],z-GRC[1])>GRR-1)continue;if(Math.hypot(x-GRC[0],z-GRC[1])<GRR-1)continue;if(Math.hypot(x-HM.cx,z-HM.cz)<13)continue;if(Math.hypot(x-GRC[0]-9,z-GRC[1]+6)<6)continue;
+for(let q=0,n=0;q<2500&&n<230;q++){const x=(rnd()-.5)*(VSZ-30),z=(rnd()-.5)*(VSZ-30);if(roadDist(x,z)<RW+PW+2.2||inAnyBld(x,z,3)||Math.hypot(x-GRC[0],z-GRC[1])<GRR+2&&Math.hypot(x-GRC[0],z-GRC[1])>GRR-1)continue;if(Math.hypot(x-GRC[0],z-GRC[1])<GRR-1)continue;if(Math.hypot(x-HM.cx,z-HM.cz)<13)continue;if(Math.hypot(x-GRC[0]-9,z-GRC[1]+6)<6)continue;
  const cd=Math.hypot(x,z),p=clamp(.35+cd/260,.2,1);if(rnd()>p)continue;KZN=kartZone(x,z);if(rnd()<.2)conifer(x,z,1+rnd()*.6);else tree(x,z,.9+rnd()*.7);KZN=0;if(!kartZone(x,z))COL.push([x,z,.6]);n++}
-for(let q=0;q<4;q++)for(let u=-HALF+8;u<HALF-6;u+=5+rnd()*2){const e=[[u,-HALF+5+rnd()*3],[u,HALF-5-rnd()*3],[-HALF+5+rnd()*3,u],[HALF-5-rnd()*3,u]][q];if(roadDist(e[0],e[1])<10)continue;if(rnd()<.6)conifer(e[0],e[1],1.2+rnd()*.8);else tree(e[0],e[1],1.2+rnd()*.6)}
-/* ---- finalise chunks ---- */
-for(const c of CHL){const g=new THREE.Group();c.grp=g;for(const[k,m]of[['o',mObj],['b',mBrick],['s',mStone],['r',mRoof],['g',mGlass],['l',gLit],['rd',mRoad]]){if(c[k].p.length)g.add(c[k].mesh(m));c[k].p=c[k].c=c[k].u=null}for(const e of c.x)g.add(e);scene.add(g)}
-function cullChunks(){const R=scene.fog.far+50,R2=R*R,cx=cam.position.x,cz=cam.position.z;for(const c of CHL){const dx=c.cx-cx,dz=c.cz-cz;c.grp.visible=dx*dx+dz*dz<R2}homeG.visible=Math.hypot(HM.x-cx,HM.z-cz)<R+20}
-window.VINFO={bld:BLD.length,tg:TG.length,col:COL.length,chunks:CHL.length,cnt};
+/* (the old edge-of-the-world hedge ring is gone: the town carries on) */
+/* chunks are finalised at the end of 02t-town.js */
 
 const mountMat=new THREE.MeshBasicMaterial({visible:false});
 

@@ -6,7 +6,7 @@ const crp=(a,b,c,d,t)=>{const t2=t*t,t3=t2*t;return[0,1].map(k=>.5*(2*b[k]+(-a[k
 const spline=(P,n)=>{const o=[];for(let i=0;i<P.length-1;i++)for(let k=0;k<n;k++)o.push(crp(P[Math.max(0,i-1)],P[i],P[i+1],P[Math.min(P.length-1,i+2)],k/n));o.push(P[P.length-1]);return o};
 let rs=77;const rnd=()=>(rs=(rs*16807)%2147483647)/2147483647;
 /* ---------------------------------------------------------------- maps */
-const HOME=registerMap({id:'home',city:'COZY VILLAGE',airfield:'COZY AIRFIELD',ox:-1500,oz:1500,reg:[-430,340,-640,640],style:'country',welcome:'WELCOME BACK TO THE VILLAGE'});
+const HOME=registerMap({id:'home',city:'COZYTOWN',airfield:'COZY AIRFIELD',ox:-1500,oz:1500,reg:[-430,340,-640,640],style:'country',welcome:'WELCOME BACK TO COZYTOWN'});
 const MARL=registerMap({id:'marlowe',city:'MARLOWE',airfield:'MARLOWE INTERNATIONAL',ox:2400,oz:-1500,reg:[-740,260,-560,1000],style:'city',welcome:'WELCOME TO MARLOWE'});
 const ROUTES={home:['marlowe'],marlowe:['home']},FARE=150,CAPN=20;
 /* ---------------------------------------------------------------- shared builders */
@@ -227,7 +227,7 @@ OFFICE.door=W2(0,OFFICE.d/2+1.4);OFFICE.psi=OFFICE.rot;
   put(mk('S'),AX-1.75,-26,0,3,12);put(mk('S'),AX-1.75,-80,0,3,12);
   put(mk('L'),AX-22,-1.75,-Math.PI/2,3,12);put(mk('R'),AX+22,1.75,Math.PI/2,3,12)}
  /* show it on the minimap too */
- try{const x=mb.getContext('2d');x.strokeStyle='#d8d8d0';x.lineCap='round';x.lineWidth=2.6;x.beginPath();x.moveTo(mx(AX),mz(Z0));x.lineTo(mx(AX),mz(Z1));x.stroke();x.fillStyle='#3a8a9a';x.fillRect(mx(OFFICE.cx)-OFFICE.w/2*MMS/SIZE,mz(OFFICE.cz)-OFFICE.d/2*MMS/SIZE,OFFICE.w*MMS/SIZE,OFFICE.d*MMS/SIZE)}catch(e){}}
+ try{const x=mb.getContext('2d');x.strokeStyle='#d8d8d0';x.lineCap='round';x.lineWidth=9*MBS/SIZE;x.beginPath();x.moveTo(mx(AX),mz(Z0));x.lineTo(mx(AX),mz(Z1));x.stroke();x.fillStyle='#3a8a9a';x.fillRect(mx(OFFICE.cx)-OFFICE.w/2*MBS/SIZE,mz(OFFICE.cz)-OFFICE.d/2*MBS/SIZE,OFFICE.w*MBS/SIZE,OFFICE.d*MBS/SIZE)}catch(e){}}
 {const cone=new THREE.ConeGeometry(.34,.7,4);cone.rotateX(Math.PI);cone.translate(0,-.35,0);const stem=new THREE.BoxGeometry(.16,.5,.16);stem.translate(0,.25,0);const am=new THREE.MeshBasicMaterial({color:0x6aa8ff,fog:false}),ag=new THREE.Group();ag.add(new THREE.Mesh(cone,am),new THREE.Mesh(stem,am));ag.visible=false;scene.add(ag);
  const u0=updCozy;updCozy=function(dt){u0(dt);const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z,dist=Math.hypot(MTERM.x-px,MTERM.z-pz),t=performance.now()/1000;ag.visible=!CIN.on&&!GS.inside&&dist<45&&!menuOpen&&MARL.built&&MARL.active;if(ag.visible){ag.position.set(MTERM.x,gH(MTERM.x,MTERM.z)+2.6+Math.sin(t*3.2)*.18,MTERM.z);ag.rotation.y=t*1.2;ag.scale.setScalar(Math.max(.7,Math.min(1.3,dist/14)))}}}
 SHOPD.push(MTERM);
@@ -240,7 +240,7 @@ Object.assign(HRS,{'MARLOWE AIRPORT':[0,24]});
  splane(2*RX,Hh,0,Hh/2,-RZ,0,wm(sWl));splane(2*RX,Hh,0,Hh/2,RZ,Math.PI,wm(sWl));splane(2*RZ,Hh,RX,Hh/2,0,-Math.PI/2,wm(sWl2));splane(2*RZ,Hh,-RX,Hh/2,0,Math.PI/2,wm(sWl2));
  const vd=new THREE.Mesh(new THREE.BoxGeometry(90,70,90),new THREE.MeshBasicMaterial({color:0x0c1420,side:THREE.BackSide,fog:false}));vd.position.y=Hh/2;SG.add(vd);splane(1.1,2.2,0,1.1,RZ-.02,Math.PI,imat(T_FDOOR));
  /* departures / arrivals board + world map */
- const dest=o.dest||(M2?'COZY VILLAGE':'MARLOWE'),hd=M2?'ARRIVALS  ·  DEPARTURES':'DEPARTURES';
+ const dest=o.dest||(M2?'COZYTOWN':'MARLOWE'),hd=M2?'ARRIVALS  ·  DEPARTURES':'DEPARTURES';
  splane(5.4,1.9,0,2.0,-RZ+.03,0,MB_(cvx(768,270,(g,W,H)=>{g.fillStyle='#050a14';g.fillRect(0,0,W,H);g.strokeStyle='#6aa8ff';g.lineWidth=5;g.strokeRect(4,4,W-8,H-8);g.fillStyle='#ffd24a';g.font='bold 30px monospace';g.fillText(hd,24,48);g.font='bold 24px monospace';g.fillStyle='#fff';g.fillText('CA101   '+dest+'   GATE 1   ON TIME',24,110);g.fillStyle='#9fe';g.fillText('CA102   '+dest+'   GATE 1   BOARDING',24,160);g.fillStyle='#667';g.fillText('CA201   ...      GATE 2   COMING SOON',24,210)})));
  splane(3.2,1.8,-RX+.03,1.9,-1.5,Math.PI/2,MB_(cvx(300,170,(g,W,H)=>{g.fillStyle='#17304e';g.fillRect(0,0,W,H);g.fillStyle='#3e7a4a';for(const[x,y,r]of[[70,60,30],[140,100,24],[210,60,34],[250,120,14]]){g.beginPath();g.arc(x,y,r,0,6.3);g.fill()}g.strokeStyle='#ffd24a';g.setLineDash([6,5]);g.lineWidth=3;g.beginPath();g.moveTo(80,70);g.quadraticCurveTo(150,10,215,62);g.stroke();g.fillStyle='#fff';g.font='bold 14px monospace';g.fillText('COZY AIRWAYS NETWORK',40,155)})));
  /* check-in desk + clerk */
