@@ -11,7 +11,7 @@ const STOCK=()=>({p:PCOL[0][1].slice(),eng:0,tyr:0,trb:0,brk:0,nos:0,tank:0,cu:0
 const tuning=()=>!!(window.TNon&&TNon()),galOn=()=>typeof GAL!=='undefined'&&GAL.on;
 const perf=()=>({eng:ENG|0,tyr:TYR|0,trb:T.trb|0,brk:T.brk|0,nos:T.nos|0,tank:T.tank|0});
 const rec=i=>T.car[i]||(T.car[i]=STOCK());
-const persist=()=>{try{localStorage.setItem('tune1',JSON.stringify(T))}catch(e){}};
+const persist=()=>{try{localStorage.setItem('tune1',JSON.stringify(T))}catch(e){czErr(e,"percar.js")}};
 let ready=0,quiet=0,was=0;
 /* a gallery session lasts from openGallery until our check after it closes (closeGallery restores the car after it switches GAL.on off) */
 {const og=openGallery;openGallery=function(){was=1;return og.apply(this,arguments)}}

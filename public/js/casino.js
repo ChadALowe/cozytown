@@ -263,6 +263,6 @@ function buildInterior(){const G=new THREE.Group(),H=IHT,RX_=IRX,RZ_=IRZ;
 /* minimap: the base map was painted when app.js loaded, so add the casino + its drive to it */
 try{const x=mb.getContext('2d');x.strokeStyle='#d8d8d0';x.lineCap='round';x.lineWidth=2.6;x.beginPath();x.moveTo(mx(CX),mz(115));x.lineTo(mx(CX),mz(152));x.stroke();
  x.fillStyle='#d9c9a8';x.fillRect(mx(CX-36),mz(186),72*MBS/SIZE,36*MBS/SIZE);x.fillStyle='#4a82b4';x.beginPath();x.arc(mx(FX),mz(FZ),2.2,0,6.3);x.fill();
- x.fillStyle='#e8bf4a';for(const b of BLD)if(b.k==='casino'){x.save();x.translate(mx(b.x),mz(b.z));x.fillRect(-b.w/2*MBS/SIZE,-b.d/2*MBS/SIZE,b.w*MBS/SIZE,b.d*MBS/SIZE);x.restore()}}catch(e){}
+ x.fillStyle='#e8bf4a';for(const b of BLD)if(b.k==='casino'){x.save();x.translate(mx(b.x),mz(b.z));x.fillRect(-b.w/2*MBS/SIZE,-b.d/2*MBS/SIZE,b.w*MBS/SIZE,b.d*MBS/SIZE);x.restore()}}catch(e){czErr(e,"casino.js")}
 window.CASINO={cx:CX,door:DOOR};
 })();

@@ -51,7 +51,7 @@ function fbOpen(){if(FG||!FB)return;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;do
  ov.append(lv,kick,ch);document.body.append(ov);
  const G=FG={ov,chips:ch,stake,sc:[0,0],ph:'serve',t:2.2,bx:0,bz:0,vx:0,vz:0,sel:5,drag:null,idle:9,keys:{},still:0,mt:0,last:performance.now(),over:0};
  FBBALL.visible=FBSH.visible=true;fbBallPos();if(window.FDAVE)FDAVE.visible=false;
- ov.onpointerdown=e=>{if(G.over)return;const r=fbPick(e.clientY);G.sel=r.i;const p=fbPx(r);G.drag={x0:e.clientX,y0:e.clientY,t0:performance.now(),s0:r.st,ppm:p,id:e.pointerId};G.idle=0;try{ov.setPointerCapture(e.pointerId)}catch(_){}};
+ ov.onpointerdown=e=>{if(G.over)return;const r=fbPick(e.clientY);G.sel=r.i;const p=fbPx(r);G.drag={x0:e.clientX,y0:e.clientY,t0:performance.now(),s0:r.st,ppm:p,id:e.pointerId};G.idle=0;try{ov.setPointerCapture(e.pointerId)}catch(_){czErr(_,"12-table-football.js")}};
  ov.onpointermove=e=>{const d=G.drag;if(!d)return;const r=FBT[G.sel];r.st=clamp(d.s0+(e.clientX-d.x0)/d.ppm,-r.T,r.T);G.idle=0};
  ov.onpointerup=e=>{const d=G.drag;if(!d)return;G.drag=null;const dy=e.clientY-d.y0,dx=e.clientX-d.x0,dt=performance.now()-d.t0;if(dy<-55&&dt<320&&Math.abs(dy)>Math.abs(dx)*.8)fbKick(G.sel,clamp(.55+Math.abs(dy)/300,.55,1))};ov.onpointercancel=()=>{G.drag=null};
  G.kd=e=>{G.keys[e.key]=1;if(e.key===' ')fbKick(G.sel,.9);if(e.key>='1'&&e.key<='4')G.sel=[0,1,3,5][+e.key-1]};G.ku=e=>{G.keys[e.key]=0};addEventListener('keydown',G.kd);addEventListener('keyup',G.ku);

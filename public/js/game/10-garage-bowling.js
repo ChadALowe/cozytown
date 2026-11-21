@@ -125,14 +125,14 @@ function bowlOpen(L){if(BW)return;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;docu
  const bs='position:absolute;font:bold 16px monospace;border:3px solid #f5e6a0;border-radius:10px;color:#fff;touch-action:manipulation;pointer-events:auto;';
  const mk=(t,css,fn)=>{const b=document.createElement('button');b.textContent=t;b.style.cssText=bs+css;b.onclick=fn;return b};
  const lv=mk('LEAVE','right:8px;bottom:12px;font-size:12px;padding:8px 10px;background:#333',()=>bowlClose(1));
- const mv=d=>{const b=mk(d<0?'◀':'▶',(d<0?'left:10px':'left:68px')+';bottom:12px;padding:12px 16px;font-size:20px;background:#335',()=>{});b.onpointerdown=e=>{e.stopPropagation();BW.mvd=d;try{b.setPointerCapture(e.pointerId)}catch(_){}};b.onpointerup=b.onpointercancel=()=>{BW.mvd=0};return b};
+ const mv=d=>{const b=mk(d<0?'◀':'▶',(d<0?'left:10px':'left:68px')+';bottom:12px;padding:12px 16px;font-size:20px;background:#335',()=>{});b.onpointerdown=e=>{e.stopPropagation();BW.mvd=d;try{b.setPointerCapture(e.pointerId)}catch(_){czErr(_,"10-garage-bowling.js")}};b.onpointerup=b.onpointercancel=()=>{BW.mvd=0};return b};
  ov.append(sc,msg,hint,lv,mv(-1),mv(1));document.body.append(ov);
  const B=BW={ov,sc,L,zc:BZC[L],f:0,b:0,rolls:[],i10:0,stand:10,ph:'zoom',t:0,stake,v:0,mvd:0,last:performance.now(),cp:[0,0,0],cl:[0,0,0],pins:[],ball:{on:0,u:0,v:0,vu:0,vv:0,hook:0,gut:0}};
  BW.pins=BPS.map((s,k)=>({k,x:s[0],y:s[1],vx:0,vy:0,up:1,gone:0,fa:0,m:BPINS[L][k],ax:[1,0]}));
  for(let l=0;l<3;l++)if(l!==L)BPINS[l].forEach(m=>m.visible=true);
  const bm=new THREE.Mesh(new THREE.SphereGeometry(BBR,14,10),new THREE.ShaderMaterial({uniforms:{map:{value:bowlBallTex()}},vertexShader:BALLVS,fragmentShader:BALLFS}));bm.visible=false;SG.add(bm);B.ball.m=bm;
  const cur={a:0,t:0,pts:[]};B.sw=cur;
- ov.onpointerdown=e=>{if(B.ph!=='aim'||e.target.tagName==='BUTTON')return;cur.on=1;cur.pts=[[e.clientX,e.clientY,performance.now()]];try{ov.setPointerCapture(e.pointerId)}catch(_){}};
+ ov.onpointerdown=e=>{if(B.ph!=='aim'||e.target.tagName==='BUTTON')return;cur.on=1;cur.pts=[[e.clientX,e.clientY,performance.now()]];try{ov.setPointerCapture(e.pointerId)}catch(_){czErr(_,"10-garage-bowling.js")}};
  ov.onpointermove=e=>{if(cur.on)cur.pts.push([e.clientX,e.clientY,performance.now()])};
  ov.onpointerup=e=>{if(!cur.on)return;cur.on=0;cur.pts.push([e.clientX,e.clientY,performance.now()]);bowlSwipe(cur.pts)};
  B.kd=e=>{if(e.key===' '&&B.ph==='aim')bowlThrow(0,0,8,0);if(e.key==='ArrowLeft')B.mvd=-1;if(e.key==='ArrowRight')B.mvd=1};B.ku=e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight')B.mvd=0};addEventListener('keydown',B.kd);addEventListener('keyup',B.ku);
@@ -186,4 +186,4 @@ function bowlClose(q){const B=BW;if(!B)return;cancelAnimationFrame(B.raf);remove
 {const b0=buildShop;buildShop=function(o){b0(o);try{const zd=RZ-.06,dx=1.6,B=(x,y,z,w,h,d,hex)=>sbox(x,y,z,w,h,d,fmc(hex));
  for(const sg of[-1,1])B(dx+sg*.62,0,zd,.14,2.3,.1,0xf4f4ee);B(dx,2.2,zd,1.4,.14,.12,0xf4f4ee);B(dx,2.34,zd,1.55,.06,.16,0xf4f4ee);
  B(dx-.38,.95,zd-.04,.1,.1,.08,0xe6b83c);B(dx-.38,.88,zd-.02,.1,.24,.03,0xe6b83c);B(dx,0,zd-.35,1.0,.025,.65,0x5a1a1a);B(dx,0,zd-.35,.9,.03,.55,0x7a2a22);
- B(dx,2.48,zd-.02,.7,.16,.04,0x1a6a2a)}catch(e){}}}
+ B(dx,2.48,zd-.02,.7,.16,.04,0x1a6a2a)}catch(e){czErr(e,"10-garage-bowling.js")}}}

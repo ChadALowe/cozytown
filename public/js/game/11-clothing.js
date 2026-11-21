@@ -8,8 +8,8 @@ function chDefault(){return{f:false,bd:1,ht:1,sk:PSK[1].slice(),hr:PHR[1].slice(
 function chSpec(){return chSpecOf(CHR)}
 function chSpecOf(c){return{f:c.f,w:(c.f?.92:1)*CH_BD[c.bd],h:CH_HT[c.ht],sk:c.sk,hr:c.hr,hs:c.hs,beard:!c.f&&c.beard,ts:c.ts,tc:c.tc,bc:c.bc,sc:c.sc,scarf:c.scarf,gl:c.gl,bag:c.bag,bp:c.bp,st:0,sh:c.sh,old:false,ss:c.ss|0,bs:c.bs|0,hc:c.hc,nk:c.nk,bn:!!c.bn}}
 function chBuild(){if(!CHR)return;if(CHM){man.remove(CHM);CHM.traverse(o=>{if(o.geometry)o.geometry.dispose()})}CHM=mkPerson(chSpec(),mObj,man)}
-function chSave(){try{localStorage.setItem('c1look',JSON.stringify(CHR))}catch(e){}}
-function chLoad(){CHR=chDefault();try{const d=JSON.parse(localStorage.getItem('c1look')||'null');if(d&&typeof d==='object')for(const k in CHR)if(k in d&&d[k]!==undefined)CHR[k]=d[k]}catch(e){}}
+function chSave(){try{localStorage.setItem('c1look',JSON.stringify(CHR))}catch(e){czErr(e,"11-clothing.js")}}
+function chLoad(){CHR=chDefault();try{const d=JSON.parse(localStorage.getItem('c1look')||'null');if(d&&typeof d==='object')for(const k in CHR)if(k in d&&d[k]!==undefined)CHR[k]=d[k]}catch(e){czErr(e,"11-clothing.js")}}
 chLoad();
 for(const c of man.children){if(c.geometry&&c.geometry.type==='PlaneGeometry'||c===carryBox)continue;c.visible=false}
 chBuild();
@@ -31,7 +31,7 @@ function chOpen(){if(CHS||busy&&!menuOpen)return;if(GS.inside){toast('GO OUTSIDE
  const st=document.createElement('style');st.textContent='#chp{position:absolute;background:rgba(10,14,32,.93);border:3px solid #fff;box-shadow:4px 4px 0 #000;display:flex;flex-direction:column;box-sizing:border-box;padding:6px}#chp.pt{left:0;right:0;bottom:0;height:46%;border-width:3px 0 0 0}#chp.ls{right:0;top:0;bottom:0;width:46%;border-width:0 0 0 3px}#chtabs{display:flex;gap:4px;margin-bottom:6px}#chtabs button{flex:1;padding:7px 2px;font:800 12px ui-monospace,monospace;background:#223;color:#9ab;border:2px solid #556;border-radius:6px}#chtabs button.on{background:#1c4fa0;color:#fff;border-color:#fff}#chbody{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}#chbody .r{margin:0 0 8px}#chbody .l{color:#ffe14a;font-size:11px;letter-spacing:.08em;margin:0 0 3px}#chbody .c{display:flex;flex-wrap:wrap;gap:4px}#chbody .c button{padding:7px 9px;font:800 12px ui-monospace,monospace;background:#223;color:#cde;border:2px solid #556;border-radius:6px}#chbody .c button.on{background:#d9a21a;color:#111;border-color:#fff}#chbody .c i{display:inline-block;width:32px;height:32px;border-radius:16px;border:3px solid #556;box-sizing:border-box}#chbody .c i.on{border-color:#fff;box-shadow:0 0 0 2px #1c4fa0}#chact{display:flex;gap:6px;margin-top:6px}#chact button{flex:1;padding:10px;font:800 14px ui-monospace,monospace;border:3px solid #fff;border-radius:8px;box-shadow:3px 3px 0 #000;color:#fff;background:#1c4fa0}#chact button.g{background:#1f8a3a}#chhint{position:absolute;left:0;right:0;top:12px;text-align:center;font-size:12px;color:#fff;text-shadow:2px 2px 0 #000;pointer-events:none}';ov.appendChild(st);
  const hint=document.createElement('div');hint.id='chhint';hint.textContent='DRAG TO TURN YOUR CHARACTER';ov.appendChild(hint);
  const pn=document.createElement('div');pn.id='chp';ov.appendChild(pn);document.body.appendChild(ov);CHS.ov=ov;CHS.pn=pn;
- const dn=e=>{if(pn.contains(e.target))return;CHS.drag=1;CHS.lx=e.clientX;CHS.dt=0;try{ov.setPointerCapture(e.pointerId)}catch(_){}};
+ const dn=e=>{if(pn.contains(e.target))return;CHS.drag=1;CHS.lx=e.clientX;CHS.dt=0;try{ov.setPointerCapture(e.pointerId)}catch(_){czErr(_,"11-clothing.js")}};
  ov.addEventListener('pointerdown',dn);ov.addEventListener('pointermove',e=>{if(!CHS||!CHS.drag)return;CHS.rot+=(e.clientX-CHS.lx)*.012;CHS.lx=e.clientX;CHS.idle=0});ov.addEventListener('pointerup',()=>{if(CHS)CHS.drag=0});ov.addEventListener('pointercancel',()=>{if(CHS)CHS.drag=0});
  CHS.kd=e=>{if(e.key==='Escape')chClose()};addEventListener('keydown',CHS.kd);
  chLayout();chTabs();
@@ -63,8 +63,8 @@ TH["RANI'S SILK HOUSE"]={wall:0xf6d6a8,fl:'carpet',cnt:0x8a1a4a,top:0xd4af37,sh:
 TH["PENNY'S BARGAINS"]={wall:0xf4e8b0,fl:'tile',cnt:0xc01818,top:0xf8d010,sh:0xc01818};
 TH['HARRINGTON & CO']={wall:0x3a5646,fl:'wood',cnt:0x2a1a10,top:0x4a3020,sh:0x0f3324};
 TH["MAISON D'OR"]={wall:0x1e1c24,fl:'tile2',cnt:0x101014,top:0xd4af37,sh:0x0a0a10};
-var CLOWN={};try{CLOWN=JSON.parse(localStorage.getItem('c1clo')||'{}')||{}}catch(e){}
-function cloSave(){try{localStorage.setItem('c1clo',JSON.stringify(CLOWN))}catch(e){}}
+var CLOWN={};try{CLOWN=JSON.parse(localStorage.getItem('c1clo')||'{}')||{}}catch(e){czErr(e,"11-clothing.js")}
+function cloSave(){try{localStorage.setItem('c1clo',JSON.stringify(CLOWN))}catch(e){czErr(e,"11-clothing.js")}}
 const CLOCAT=['TOPS','BOTTOMS','SHOES','ACCESSORIES'];
 var CLOIT=null;
 function cloItems(){if(CLOIT)return CLOIT;const cn=['RED','BLUE','YELLOW','GREEN','WHITE','PURPLE','ORANGE','TEAL','SLATE','PINK','TAN','BLACK'],TSN=['T-SHIRT','LONG SLEEVE TEE','HOODIE','COAT','SUMMER DRESS'],TSP=[12,18,30,60,45];
@@ -173,7 +173,7 @@ function thBrowse(si,tier){if(BRW||!SHOPCUR)return;busy=1;inp.gas=inp.brk=inp.ha
  ov.innerHTML='<style>#brov button{font:800 14px ui-monospace,monospace;border:3px solid #fff;border-radius:8px;box-shadow:3px 3px 0 #000;color:#fff;background:#1c4fa0;padding:10px 14px}#brov .ar{position:absolute;top:38%;width:54px;height:72px;font-size:26px;padding:0;background:rgba(20,26,60,.8)}#brp{position:absolute;left:0;right:0;bottom:0;background:rgba(10,14,32,.92);border-top:3px solid #fff;padding:8px 10px;text-align:center;padding-bottom:max(8px,env(safe-area-inset-bottom))}#brtr{display:flex;gap:6px;justify-content:center;margin-bottom:6px}#brtr button{padding:5px 9px;font-size:11px;box-shadow:2px 2px 0 #000;background:#223}#brn{font-size:17px;color:#ffe14a;letter-spacing:.06em}#brs{font-size:13px;margin:3px 0 8px;color:#cde}#brr{display:flex;gap:8px;justify-content:center}#brr button{flex:1;max-width:220px}#brt{position:absolute;left:0;right:0;top:10px;text-align:center;font-size:13px;text-shadow:2px 2px 0 #000;pointer-events:none}</style><div id="brt"></div><button class="ar" id="brL" style="left:8px">◀</button><button class="ar" id="brR" style="right:8px">▶</button><div id="brp"><div id="brtr"></div><div id="brn"></div><div id="brs"></div><div id="brr"><button id="brA" style="background:#1f8a3a">BUY</button><button id="brB" style="background:#7a2a2a">BACK</button></div></div>';
  document.body.appendChild(ov);BRW.ov=ov;
  {const tr=ov.querySelector('#brtr');['BUDGET','HIGH END','ULTRA'].forEach(t=>{const b=document.createElement('button');b.textContent=t;b.dataset.t=t;b.onclick=()=>{const IT=thIT(BRW),k=IT.findIndex(it=>it.t===t);if(k>=0){BRW.i=k;thShow();beep(620,.05,'square',.04)}};tr.appendChild(b)})}
- ov.addEventListener('pointerdown',e=>{if(e.target.closest('#brp')||e.target.closest('.ar'))return;BRW.drag=1;BRW.lx=e.clientX;BRW.sx=e.clientX;try{ov.setPointerCapture(e.pointerId)}catch(_){}});
+ ov.addEventListener('pointerdown',e=>{if(e.target.closest('#brp')||e.target.closest('.ar'))return;BRW.drag=1;BRW.lx=e.clientX;BRW.sx=e.clientX;try{ov.setPointerCapture(e.pointerId)}catch(_){czErr(_,"11-clothing.js")}});
  ov.addEventListener('pointermove',e=>{if(!BRW||!BRW.drag)return;BRW.rot+=(e.clientX-BRW.lx)*.012;BRW.lx=e.clientX;BRW.idle=0});
  const up=e=>{if(!BRW||!BRW.drag)return;BRW.drag=0;const dx=e.clientX-BRW.sx;if(Math.abs(dx)>110){thFlick(dx<0?1:-1)}};ov.addEventListener('pointerup',up);ov.addEventListener('pointercancel',()=>{if(BRW)BRW.drag=0});
  document.getElementById('brL').onclick=()=>thFlick(-1);document.getElementById('brR').onclick=()=>thFlick(1);document.getElementById('brB').onclick=thEnd;document.getElementById('brA').onclick=thAct;

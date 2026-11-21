@@ -57,8 +57,8 @@ Object.assign(HRS,{'BULLSEYE RANGE':[10,21]});
 TH['BULLSEYE RANGE']={wall:0x6a7a6a,fl:'stone',cnt:0x303038,top:0x888890,sh:0x2a2a30};
 const RGW=[{n:'AIR PISTOL',k:'pistol',cd:.28,sway:.011,fov:55,d:'FAST · SHORT BARREL'},{n:'AIR RIFLE',k:'rifle',cd:.95,sway:.0065,fov:24,d:'SCOPED · SLOW · PRECISE'},{n:'BOW & ARROW',k:'bow',cd:.6,sway:.009,fov:48,d:'HOLD TO DRAW · ARROWS DROP'}];
 const RGM=['PAPER TARGETS','MOVING TARGETS','CLAY PIGEONS'];
-var RGP={w:-1,aim:'drag',mode:0,best:{}};try{const d=JSON.parse(localStorage.getItem('c1range')||'null');if(d)RGP=Object.assign(RGP,d)}catch(e){}
-function rgSave(){try{localStorage.setItem('c1range',JSON.stringify(RGP))}catch(e){}}
+var RGP={w:-1,aim:'drag',mode:0,best:{}};try{const d=JSON.parse(localStorage.getItem('c1range')||'null');if(d)RGP=Object.assign(RGP,d)}catch(e){czErr(e,"14-services-range.js")}
+function rgSave(){try{localStorage.setItem('c1range',JSON.stringify(RGP))}catch(e){czErr(e,"14-services-range.js")}}
 const RGL=[-4.2,0,4.2],RGZ=5.3,RGEY=1.55;
 function buildRange(o){while(SG.children.length)SG.remove(SG.children[0]);o.rx=7;o.rz=14;o.sz=12.3;RX=7;RZ=14;IA.splice(0,IA.length);IROOM.splice(0,IROOM.length);
  const W=(x,y,z,w,h,d,hex)=>gbox(SG,x,y,z,w,h,d,hex),CONC=0x4a4a52,GRN=0x3a5a44,CR=0xd8d0b8;
@@ -105,7 +105,7 @@ function buildRange(o){while(SG.children.length)SG.remove(SG.children[0]);o.rx=7
 CUSTB['BULLSEYE RANGE']={rx:7,fn:o=>buildRange(o)};
 /* ---------- game ---------- */
 var RG=null;
-function rgAC(){try{initAudio()}catch(e){}return AC}
+function rgAC(){try{initAudio()}catch(e){czErr(e,"14-services-range.js")}return AC}
 function rgNoise(d,vol,f0,f1,type){const a=rgAC();if(!a||!snd)return;const n=Math.floor(a.sampleRate*d),b=a.createBuffer(1,n,a.sampleRate),c=b.getChannelData(0);for(let i=0;i<n;i++)c[i]=(Math.random()*2-1)*(1-i/n);const s=a.createBufferSource();s.buffer=b;const f=a.createBiquadFilter(),g=a.createGain();f.type=type||'bandpass';f.frequency.setValueAtTime(f0,a.currentTime);f.frequency.exponentialRampToValueAtTime(Math.max(40,f1),a.currentTime+d);g.gain.value=vol;s.connect(f);f.connect(g);g.connect(a.destination);s.start()}
 function rgSnd(k){if(k==='pistol'){rgNoise(.12,.35,2400,500);beep(180,.08,'square',.05)}else if(k==='rifle'){rgNoise(.25,.5,3000,300);beep(110,.15,'sawtooth',.06)}else if(k==='bow'){beep(420,.18,'triangle',.08);setTimeout(()=>beep(220,.12,'triangle',.05),60)}else if(k==='hit'){beep(1200,.08,'square',.05)}else if(k==='bull'){beep(1200,.08,'square',.06);setTimeout(()=>beep(1800,.14,'square',.06),80)}else if(k==='miss'){beep(150,.1,'sawtooth',.04)}else if(k==='draw'){beep(260,.05,'triangle',.03)}}
 var RGT=null,RGD={};function rgTex(){if(RGT)return RGT;const f=cvT(256,256),g=f.cv.getContext('2d');g.fillStyle='#f4f0e0';g.fillRect(0,0,256,256);const cs=['#f4f0e0','#f4f0e0','#f4f0e0','#222','#222','#2a5ab0','#2a5ab0','#c02828','#c02828','#e8d020'];for(let i=0;i<10;i++){const r=125*(1-i/10);g.fillStyle=cs[i]==='#f4f0e0'?(i%2?'#ddd8c4':'#f4f0e0'):cs[i];g.beginPath();g.arc(128,128,r,0,7);g.fill();g.strokeStyle='#555';g.lineWidth=1;g.stroke()}f.tx.magFilter=THREE.NearestFilter;RGT=f.tx;return f.tx}
@@ -133,7 +133,7 @@ function rgStart(){const R=RG;if(!R||R.ph!=='setup')return;if(cash<3){toast('NOT
  const stb=document.createElement('div');stb.className='rgb';stb.textContent='STEADY';stb.style.cssText='left:12px;bottom:26px;width:78px;height:78px;border-radius:50%;background:#1c4fa0;display:flex;align-items:center;justify-content:center;font-size:12px';stb.onpointerdown=e=>{e.stopPropagation();e.preventDefault();R.steady=1};stb.onpointerup=stb.onpointercancel=e=>{e.stopPropagation();R.steady=0};ov.appendChild(stb);
  const lv=document.createElement('div');lv.className='rgb';lv.textContent='LEAVE';lv.style.cssText='right:8px;top:36px;font-size:11px;padding:6px 9px;background:#333';lv.onpointerdown=e=>{e.stopPropagation();rgClose(1)};ov.appendChild(lv);
  if(R.aimM){const rc=document.createElement('div');rc.className='rgb';rc.textContent='RECENTRE';rc.style.cssText='left:8px;top:36px;font-size:11px;padding:6px 9px;background:#333';rc.onpointerdown=e=>{e.stopPropagation();R.y0=null;R.p0=null};ov.appendChild(rc);R.od=e=>rgOri(e);addEventListener('deviceorientation',R.od);R.t0=performance.now()}
- let dr=null;ov.onpointerdown=e=>{if(R.aimM)return;dr={x:e.clientX,y:e.clientY,ay:R.ay,ap:R.ap};try{ov.setPointerCapture(e.pointerId)}catch(_){}};ov.onpointermove=e=>{if(!dr||R.aimM)return;const s=.0042*(rgFov()/55);R.ay=Math.max(-.75,Math.min(.75,dr.ay+(e.clientX-dr.x)*s));R.ap=Math.max(-.4,Math.min(.45,dr.ap-(e.clientY-dr.y)*s))};ov.onpointerup=ov.onpointercancel=()=>{dr=null};
+ let dr=null;ov.onpointerdown=e=>{if(R.aimM)return;dr={x:e.clientX,y:e.clientY,ay:R.ay,ap:R.ap};try{ov.setPointerCapture(e.pointerId)}catch(_){czErr(_,"14-services-range.js")}};ov.onpointermove=e=>{if(!dr||R.aimM)return;const s=.0042*(rgFov()/55);R.ay=Math.max(-.75,Math.min(.75,dr.ay+(e.clientX-dr.x)*s));R.ap=Math.max(-.4,Math.min(.45,dr.ap-(e.clientY-dr.y)*s))};ov.onpointerup=ov.onpointercancel=()=>{dr=null};
  R.kd2=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();if(!R.kdown){R.kdown=1;rgFireDown()}}else if(e.key==='Shift')R.steady=1;else if(e.key==='ArrowLeft')R.ay=Math.max(-.75,R.ay-.03);else if(e.key==='ArrowRight')R.ay=Math.min(.75,R.ay+.03);else if(e.key==='ArrowUp')R.ap=Math.min(.45,R.ap+.02);else if(e.key==='ArrowDown')R.ap=Math.max(-.4,R.ap-.02)};R.ku2=e=>{if(e.key===' '||e.key==='Enter'){R.kdown=0;rgFireUp()}else if(e.key==='Shift')R.steady=0};addEventListener('keydown',R.kd2);addEventListener('keyup',R.ku2);
  DZ.fn=rgCam;DZ.fov=55;DZ.tp=rgCam();DZ.look=new THREE.Vector3();DZ.on=1;rgCam();R.last=performance.now();R.raf=requestAnimationFrame(rgLoop);rgHud()}
 

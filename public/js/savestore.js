@@ -1,3 +1,6 @@
+/* errors that used to be swallowed silently are now kept (last 50) and logged once each, so a failure shows up in
+   the console instead of just doing nothing. czErrs() lists them. */
+(function(){const R=[],seen=new Set();window.czErr=function(e,where){try{const m=(where||'?')+': '+(e&&e.message||String(e));R.push({t:Date.now(),m});if(R.length>50)R.shift();if(!seen.has(m)){seen.add(m);console.warn('[cozytown] '+m)}}catch(_){}};window.czErrs=()=>R.slice()})();
 /* ---- ONE SAVE ----
    Everything the game keeps now lives in the single 'c1save' record (version 2). Modules that used to keep their own
    localStorage keys (car tuning, outfits, records, bets...) still call localStorage as before, but those keys are

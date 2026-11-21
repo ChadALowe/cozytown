@@ -276,7 +276,7 @@ function bcOpen(){if(BG)return;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;
  BG={ov,cv,g:cv.getContext('2d'),W,H,r,tx,ty,caps:[],turn:0,n:[0,0],ph:'aim',drag:null,t:0,msg:'',last:performance.now(),raf:0,done:0,wt:0};
  lv.onclick=()=>bcClose();
  const pt=e=>{const b=cv.getBoundingClientRect();return[(e.clientX-b.left)*W/b.width,(e.clientY-b.top)*H/b.height]};
- cv.onpointerdown=e=>{e.preventDefault();if(BG.ph!=='aim'||BG.turn!==0)return;const[x,y]=pt(e),s=bcStart();if(Math.hypot(x-s[0],y-s[1])<r*3.2){BG.drag={x,y};try{cv.setPointerCapture(e.pointerId)}catch(_){}}};
+ cv.onpointerdown=e=>{e.preventDefault();if(BG.ph!=='aim'||BG.turn!==0)return;const[x,y]=pt(e),s=bcStart();if(Math.hypot(x-s[0],y-s[1])<r*3.2){BG.drag={x,y};try{cv.setPointerCapture(e.pointerId)}catch(_){czErr(_,"08-farm-pub.js")}}};
  cv.onpointermove=e=>{if(BG.drag){const[x,y]=pt(e);BG.drag.x=x;BG.drag.y=y}};
  cv.onpointerup=e=>{if(!BG.drag)return;const s=bcStart(),dx=s[0]-BG.drag.x,dy=s[1]-BG.drag.y;BG.drag=null;let L=Math.hypot(dx,dy);if(L<r*.8){return}const m=Math.min(L,W*.3),k=m/L;bcFlick(0,dx*k*6.2,dy*k*6.2)};
  bcMsg('DRAG BACK FROM YOUR CAP AND LET GO TO FLICK. LAND CLOSE TO THE CENTRE, KNOCK THEIRS OFF!',4500);BG.raf=requestAnimationFrame(bcLoop)}
@@ -336,7 +336,7 @@ function herdOpen(){if(HG)return;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;
  const sh=[];for(let i=0;i<6;i++)sh.push({x:W*(.18+Math.random()*.4),y:H*(.14+Math.random()*.72),vx:0,vy:0,in:0,blk:i===5,ph:Math.random()*6});
  HG={ov,cv,g:cv.getContext('2d'),W,H,sh,dog:{x:W*.08,y:H*.5,tx:W*.08,ty:H*.5,a:0},t:70,ph:'play',barkT:0,barkC:0,last:performance.now(),raf:0,msg:'',mt:0,pen:[W*.8,H*.3,W,H*.7],pond:[W*.36,H*.5,W*.075]};
  const pt=e=>{const b=cv.getBoundingClientRect();return[(e.clientX-b.left)*W/b.width,(e.clientY-b.top)*H/b.height]};
- cv.onpointerdown=e=>{e.preventDefault();const[x,y]=pt(e);HG.dog.tx=x;HG.dog.ty=y;HG.hold=1;try{cv.setPointerCapture(e.pointerId)}catch(_){}};cv.onpointermove=e=>{if(HG.hold){const[x,y]=pt(e);HG.dog.tx=x;HG.dog.ty=y}};cv.onpointerup=()=>{HG.hold=0};
+ cv.onpointerdown=e=>{e.preventDefault();const[x,y]=pt(e);HG.dog.tx=x;HG.dog.ty=y;HG.hold=1;try{cv.setPointerCapture(e.pointerId)}catch(_){czErr(_,"08-farm-pub.js")}};cv.onpointermove=e=>{if(HG.hold){const[x,y]=pt(e);HG.dog.tx=x;HG.dog.ty=y}};cv.onpointerup=()=>{HG.hold=0};
  bark.onpointerdown=e=>{e.preventDefault();herdBark()};lv.onclick=()=>herdClose();
  HG.kd=e=>{if(e.code==='Space'){e.preventDefault();herdBark()}else if(e.code==='Escape')herdClose()};addEventListener('keydown',HG.kd);
  herdMsg('DRAG TO SEND THE COLLIE. SHEEP RUN FROM HIM. GET ALL 6 IN THE PEN! WOOF SCARES THEM FURTHER.',5000);HG.raf=requestAnimationFrame(herdLoop)}

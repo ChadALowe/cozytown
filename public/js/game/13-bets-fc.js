@@ -29,8 +29,8 @@ function bkSt(c,t){const C=BK.CH[c],n=Math.floor(t/C.cyc),r=t-n*C.cyc;let ph,tl,
 function bkProg(x,t){if(t>=x.T)return 1;const u=t/x.T;return u+x.amp*Math.sin(6.2832*(x.b*u+x.ph))*Math.sin(Math.PI*u)}
 function bkClock(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 /* bets */
-var BKB={bets:[],st:0,wn:0};try{const d=JSON.parse(localStorage.getItem('c1bets')||'null');if(d&&d.bets)BKB=d}catch(e){}
-function bkSave(){try{localStorage.setItem('c1bets',JSON.stringify(BKB))}catch(e){}}
+var BKB={bets:[],st:0,wn:0};try{const d=JSON.parse(localStorage.getItem('c1bets')||'null');if(d&&d.bets)BKB=d}catch(e){czErr(e,"13-bets-fc.js")}
+function bkSave(){try{localStorage.setItem('c1bets',JSON.stringify(BKB))}catch(e){czErr(e,"13-bets-fc.js")}}
 function bkDone(b){const C=BK.CH[b.c];return bkNow()>=b.n*C.cyc+C.open+C.live}
 function bkWon(b){const ev=bkEv(b.c,b.n);return ev.sels[b.sel].win(b.c<2?ev:ev)}
 function bkDue(){let s=0;for(const b of BKB.bets)if(!b.paid&&bkDone(b)&&bkWon(b))s+=b.stake*b.dec;return Math.round(s*100)/100}
@@ -145,8 +145,8 @@ const FCF={};
 function fcSt(t){const n=Math.floor(t/FCG.T),r=t-n*FCG.T;let ph,tl,rem;if(r<FCG.PRE){ph=0;tl=r;rem=FCG.PRE-r}else if(r<FCG.PRE+FCG.LIVE){ph=1;tl=r-FCG.PRE;rem=FCG.PRE+FCG.LIVE-r}else{ph=2;tl=r-FCG.PRE-FCG.LIVE;rem=FCG.T-r}return{n,ph,tl,rem,fx:fcFix(n)}}
 function fcScore(fx,tl){let h=0,a=0;for(const e of fx.ev)if(e.kind==='goal'&&e.te+.8<=tl){if(e.team===0)h++;else a++}return[h,a]}
 /* fan progress */
-var FAN={xp:0,tk:-1,lv:0};try{const d=JSON.parse(localStorage.getItem('c1fan')||'null');if(d)FAN=Object.assign(FAN,d)}catch(e){}
-function fanSave(){try{localStorage.setItem('c1fan',JSON.stringify(FAN))}catch(e){}}
+var FAN={xp:0,tk:-1,lv:0};try{const d=JSON.parse(localStorage.getItem('c1fan')||'null');if(d)FAN=Object.assign(FAN,d)}catch(e){czErr(e,"13-bets-fc.js")}
+function fanSave(){try{localStorage.setItem('c1fan',JSON.stringify(FAN))}catch(e){czErr(e,"13-bets-fc.js")}}
 function fanLevel(){return Math.floor(FAN.xp/100)}
 /* clock text */
 
@@ -208,7 +208,7 @@ function fcBoardDraw(){const B=FBOARD;if(!B)return;const st=fcSt(fcNow()),fx=st.
  let l1,l2,col='#ffd840';
  if(st.ph===0){l1='KICK-OFF IN '+bkClock(st.rem);l2='TICKETS FROM £3 · GATES OPEN'}else if(st.ph===1){const s=fcScore(fx,st.tl);l1='LIVE  '+s[0]+' - '+s[1]+'   '+fcMin(st)+"'";l2='COME ON YOU ROVERS!';col='#ff7070'}else{l1='FULL TIME  '+fx.hg+' - '+fx.ag;l2='NEXT MATCH IN '+bkClock(st.rem);col='#9fe'}
  g.fillStyle=col;g.font='bold 40px monospace';g.fillText(l1,w/2,196);g.fillStyle='#cde';g.font='bold 18px monospace';g.fillText(l2,w/2,238);B.tx.needsUpdate=true}
-{const u0=updCozy;updCozy=function(dt){u0(dt);if(!FBOARD&&typeof SHOPD!=='undefined')try{fcBoardInit()}catch(e){}if(FBOARD&&!GS.inside){FBOARD.t-=dt;if(FBOARD.t<=0){FBOARD.t=.5;if(Math.hypot(P.x-FBOARD.grp.position.x,P.z-FBOARD.grp.position.z)<90&&GS.onFoot||Math.hypot(GS.x-FBOARD.grp.position.x,GS.z-FBOARD.grp.position.z)<90)fcBoardDraw()}}}}
+{const u0=updCozy;updCozy=function(dt){u0(dt);if(!FBOARD&&typeof SHOPD!=='undefined')try{fcBoardInit()}catch(e){czErr(e,"13-bets-fc.js")}if(FBOARD&&!GS.inside){FBOARD.t-=dt;if(FBOARD.t<=0){FBOARD.t=.5;if(Math.hypot(P.x-FBOARD.grp.position.x,P.z-FBOARD.grp.position.z)<90&&GS.onFoot||Math.hypot(GS.x-FBOARD.grp.position.x,GS.z-FBOARD.grp.position.z)<90)fcBoardDraw()}}}}
 CUSTB['VILLAGE ROVERS FC']={rx:26,fn:o=>buildGround(o)};
 /* ---- stadium geometry, crowd, match visuals ---- */
 const FL=56,FW=34,FCZ=-35,FHL=28,FHW=17;
@@ -342,10 +342,10 @@ function fcCrestTex(){const f=cvT(128,160),g=f.cv.getContext('2d');g.fillStyle='
 var GW=null;
 {const c0=cloItems;cloItems=function(){const fresh=!CLOIT,r=c0();if(fresh){r[0].push({id:'top:rov',n:'ROVERS REPLICA SHIRT',p:35,ap:c=>{c.ts=0;c.tc=[.8,.1,.12]},has:c=>c.ts===0&&chEq(c.tc,[.8,.1,.12])});r[3].push({id:'acc:rov',n:'ROVERS SCARF',p:14,ap:c=>{c.scarf=[.8,.1,.12]},rm:c=>{c.scarf=null},has:c=>chEq(c.scarf,[.8,.1,.12])})}return r}}
 const FANRW={2:['acc:rov','ROVERS SCARF'],4:['top:rov','ROVERS REPLICA SHIRT']};
-function fanAdd(n,why){const l0=fanLevel();FAN.xp+=n;const l1=fanLevel();fanSave();if(l1>l0){for(let l=l0+1;l<=l1;l++){if(FANRW[l]){CLOWN[FANRW[l][0]]=1;try{cloSave()}catch(e){}toast('FAN LEVEL '+l+'! FREE '+FANRW[l][1]);}else toast('FAN LEVEL '+l+'!')}}else if(why)fcPop(why)}
+function fanAdd(n,why){const l0=fanLevel();FAN.xp+=n;const l1=fanLevel();fanSave();if(l1>l0){for(let l=l0+1;l<=l1;l++){if(FANRW[l]){CLOWN[FANRW[l][0]]=1;try{cloSave()}catch(e){czErr(e,"13-bets-fc.js")}toast('FAN LEVEL '+l+'! FREE '+FANRW[l][1]);}else toast('FAN LEVEL '+l+'!')}}else if(why)fcPop(why)}
 function fcPop(t){const e=document.getElementById('fcP');if(!e)return;e.textContent=t;e.style.opacity=1;clearTimeout(GW&&GW.pt);if(GW)GW.pt=setTimeout(()=>{e.style.opacity=0},1100)}
 /* audio */
-function fcA(){try{initAudio()}catch(e){}return AC}
+function fcA(){try{initAudio()}catch(e){czErr(e,"13-bets-fc.js")}return AC}
 function fcNoise(){if(!AC)return null;if(!GW.nb){const n=AC.sampleRate*2,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;GW.nb=b}return GW.nb}
 function fcBurst(f0,f1,dur,vol,q,atk){const a=fcA();if(!a||!snd)return;const s=a.createBufferSource();s.buffer=fcNoise();s.loop=true;const f=a.createBiquadFilter(),g=a.createGain(),t=a.currentTime;f.type='bandpass';f.Q.value=q||.7;f.frequency.setValueAtTime(f0,t);f.frequency.linearRampToValueAtTime(f1,t+dur);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+(atk||.25));g.gain.linearRampToValueAtTime(0,t+dur);s.connect(f);f.connect(g);g.connect(a.destination);s.start(t);s.stop(t+dur+.05)}
 function fcClap(t0,vol){const a=AC;if(!a||!snd)return;const s=a.createBufferSource();s.buffer=fcNoise();const f=a.createBiquadFilter(),g=a.createGain();f.type='bandpass';f.frequency.value=1800+Math.random()*1200;f.Q.value=.9;g.gain.setValueAtTime(vol,t0);g.gain.exponentialRampToValueAtTime(.001,t0+.07);s.connect(f);f.connect(g);g.connect(a.destination);s.start(t0,Math.random());s.stop(t0+.1)}
@@ -360,7 +360,7 @@ function fcSnd(k,big){if(!fcA()||!snd)return;const t=AC.currentTime,v=big||1;
  else if(k==='groan'){fcBurst(420,220,1.3,.1,1.3,.15)}
  else if(k==='whistle'){fcTone(3100,t,.18,.1,'sine');fcTone(3100,t+.22,.5,.1,'sine',3300)}
  else if(k==='post'){fcTone(220,t,.25,.2,'square',140);fcClap(t,.2)}}
-function fcBed(on){if(!AC||!snd)return;const G=GW;if(on&&!G.bed){const s=AC.createBufferSource();s.buffer=fcNoise();s.loop=true;const f=AC.createBiquadFilter(),g=AC.createGain();f.type='bandpass';f.frequency.value=650;f.Q.value=.5;g.gain.value=.02;s.connect(f);f.connect(g);g.connect(AC.destination);s.start();G.bed={s,g,f}}else if(!on&&G.bed){try{G.bed.s.stop()}catch(e){}G.bed=null}}
+function fcBed(on){if(!AC||!snd)return;const G=GW;if(on&&!G.bed){const s=AC.createBufferSource();s.buffer=fcNoise();s.loop=true;const f=AC.createBiquadFilter(),g=AC.createGain();f.type='bandpass';f.frequency.value=650;f.Q.value=.5;g.gain.value=.02;s.connect(f);f.connect(g);g.connect(AC.destination);s.start();G.bed={s,g,f}}else if(!on&&G.bed){try{G.bed.s.stop()}catch(e){czErr(e,"13-bets-fc.js")}G.bed=null}}
 /* camera */
 const FSEAT=[{n:'MAIN STAND',pr:5,e:[15,4.5,-10.6],base:[0,1.2,-35],fov:58},{n:'THE TERRACE',pr:3,e:[-36.2,3.8,-34],base:[0,1.6,-35],fov:62},{n:'PITCHSIDE',pr:8,e:[5.5,1.5,-19.3],base:[0,.9,-35],fov:64}];
 
@@ -376,7 +376,7 @@ function fcWatch(k){busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;document.body.clas
  [['📣 CHEER','cheer','#a01820'],['😠 BOO','boo','#403048'],['👏 CLAP','clap','#2a5a8a'],['🎶 CHANT','chant','#a06a10'],['🌊 WAVE','wave','#1a7a5a'],['😮 OOH','ooh','#6a3a8a']].forEach(([t,a,c])=>{const b=document.createElement('button');b.textContent=t;b.style.cssText=bs+'background:'+c;b.onpointerdown=e=>{e.stopPropagation();fcReact(a)};bar.append(b)});
  const lv=document.createElement('button');lv.textContent='LEAVE';lv.style.cssText='position:absolute;right:6px;top:70px;font:bold 12px monospace;border:3px solid #f5e6a0;border-radius:8px;color:#fff;padding:6px 9px;background:#333;pointer-events:auto';lv.onpointerdown=e=>{e.stopPropagation();fcLeave()};
  ov.append(bar,lv);document.body.append(ov);
- let dr=null;ov.onpointerdown=e=>{dr={x:e.clientX,y:e.clientY,oy:G.oy,op:G.op};try{ov.setPointerCapture(e.pointerId)}catch(_){}};ov.onpointermove=e=>{if(!dr)return;G.oy=Math.max(-1.1,Math.min(1.1,dr.oy-(e.clientX-dr.x)/260));G.op=Math.max(-3,Math.min(5,dr.op-(e.clientY-dr.y)/60))};ov.onpointerup=ov.onpointercancel=()=>{dr=null};
+ let dr=null;ov.onpointerdown=e=>{dr={x:e.clientX,y:e.clientY,oy:G.oy,op:G.op};try{ov.setPointerCapture(e.pointerId)}catch(_){czErr(_,"13-bets-fc.js")}};ov.onpointermove=e=>{if(!dr)return;G.oy=Math.max(-1.1,Math.min(1.1,dr.oy-(e.clientX-dr.x)/260));G.op=Math.max(-3,Math.min(5,dr.op-(e.clientY-dr.y)/60))};ov.onpointerup=ov.onpointercancel=()=>{dr=null};
  G.kd=e=>{const m={'1':'cheer','2':'boo','3':'clap','4':'chant','5':'wave','6':'ooh'}[e.key];if(m)fcReact(m);if(e.key==='Escape')fcLeave()};addEventListener('keydown',G.kd);
  DZ.fn=fcCam;DZ.tp=fcCam();DZ.look=new THREE.Vector3();DZ.on=1;fcCam();fcBed(true);fcNow2(G);fcSnd('cheer',.3);
  fcSay(FSEAT[k].n+' · '+(G.st.ph===0?'KICK-OFF IN '+bkClock(G.st.rem):G.st.ph===1?'MATCH IS LIVE':'FULL TIME'));

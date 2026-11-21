@@ -61,7 +61,7 @@ function boardDraw(){const draw=(c,W,H,rows)=>{const g=c.getContext('2d');g.fill
  IROOM.splice(0,IROOM.length,[-RX-1,RX+1,-RZ-1,-RZ+.9],[-2.6,2.6,-RZ+1.9,-RZ+2.9],[-RX,-RX+1.2,-2.2,2.2],[RX-1.2,RX,-2.2,2.2],[-3.9,-2.1,1.0,2.0],[2.1,3.9,1.0,2.0]);
  SHOPCUR={o:o,k:['BROKER',"Welcome to the Exchange. Buy low, sell high — and mind the news."]};
  IA.splice(0,IA.length,{r:[-2.4,2.4,-RZ+2.9,-RZ+3.8],label:'TRADE SHARES',fn:()=>open(0)},{r:[-1.0,1.0,RZ-.3,RZ],label:'LEAVE',fn:()=>leaveShop()});
- try{addVisitors(o)}catch(e){}}}
+ try{addVisitors(o)}catch(e){czErr(e,"stocks.js")}}}
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(GS.inside&&SHOPCUR&&SHOPCUR.o&&SHOPCUR.o.stk)boardDraw()}}
 /* ---------- overlay */
 let OV=null;

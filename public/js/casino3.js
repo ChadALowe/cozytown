@@ -94,7 +94,7 @@ function dressHall(){
    if(CC.pass){toast('"ENJOY THE MUSIC, OLD SPORT."');return}
    if(cash<PASS){toast('"A PASS IS £'+PASS+', SIR. COME BACK WHEN YOU ARE FLUSH."');return}
    cash-=PASS;cashUI();CC.pass=1;beep(880,.12,'square',.06);setTimeout(()=>beep(1175,.16,'square',.06),130);
-   toast('MEMBERS\' PASS BOUGHT! SHOW IT TO THE BOUNCER');try{phText('THE TOP-HAT GENTLEMAN',"Welcome to the club. The door's on the east wall; the bouncer will let you through.")}catch(e){}}});
+   toast('MEMBERS\' PASS BOUGHT! SHOW IT TO THE BOUNCER');try{phText('THE TOP-HAT GENTLEMAN',"Welcome to the club. The door's on the east wall; the bouncer will let you through.")}catch(e){czErr(e,"casino3.js")}}});
  SG.userData.cc=hall}
 {const b0=buildShop;buildShop=function(o){b0(o);if(!o||!o.casino)return;if(SG.userData.cc){SG.remove(SG.userData.cc)}inLng=0;G3.visible=false;dressHall()}}
 

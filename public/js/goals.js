@@ -21,8 +21,8 @@ const L=[
 const next=()=>L.find(g=>!GL.done[g.id]);
 {const s0=cozySave,l0=cozyLoad;cozySave=function(){const o=s0();o.goals=GL.done;return o};cozyLoad=function(z){l0(z);if(z&&z.goals)GL.done=Object.assign({},z.goals)}}
 let t=0,quiet=4;
-function check(){for(const g of L){if(GL.done[g.id])continue;let ok=false;try{ok=g.ok()}catch(e){}if(!ok)continue;GL.done[g.id]=DAY||1;
-  cash+=g.r;toast('🏆 GOAL REACHED: '+g.n+'  ·  BONUS £'+g.r.toLocaleString('en-GB'));try{beep(784,.1,'square',.05);setTimeout(()=>beep(1047,.16,'square',.05),110);setTimeout(()=>beep(1319,.22,'square',.05),240)}catch(e){}
+function check(){for(const g of L){if(GL.done[g.id])continue;let ok=false;try{ok=g.ok()}catch(e){czErr(e,"goals.js")}if(!ok)continue;GL.done[g.id]=DAY||1;
+  cash+=g.r;toast('🏆 GOAL REACHED: '+g.n+'  ·  BONUS £'+g.r.toLocaleString('en-GB'));try{beep(784,.1,'square',.05);setTimeout(()=>beep(1047,.16,'square',.05),110);setTimeout(()=>beep(1319,.22,'square',.05),240)}catch(e){czErr(e,"goals.js")}
   const nx=next();if(nx)setTimeout(()=>toast('🎯 NEXT GOAL: '+nx.n+' · '+nx.d.toUpperCase()),3200);return}}
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(!GS.started)return;if(quiet>0){quiet-=dt;return}t-=dt;if(t>0)return;t=1.5;check()}}
 {const n0=newDay;newDay=function(){n0();const nx=next();if(nx)setTimeout(()=>toast('🎯 TODAY\'S GOAL: '+nx.n+' · '+nx.d.toUpperCase()),2500)}}

@@ -125,7 +125,7 @@ function copsUpd(dt){const p=pos(),now=performance.now();const town=inTown();
  /* siren */W.sirenT-=dt;if(W.st>0&&nearest<150&&W.sirenT<0){W.sirenT=.42;W.hi=!W.hi;beep(W.hi?960:720,.38,'triangle',Math.max(.012,.055*(1-nearest/150)))}
  /* HUD */const ev=W.st>0&&!W.seen&&(now/300|0)%2;stEl.style.display=W.st>0?'block':'none';stEl.innerHTML='<span style="color:'+(ev?'#fff8':'#ffd24a')+'">'+'★'.repeat(W.st)+'</span><span style="color:#fff3">'+'★'.repeat(5-W.st)+'</span>'+(W.bustT>0?' <span style="color:#ff4040">STOP! '+Math.max(0,2.2-W.bustT).toFixed(1)+'</span>':'')}
 const BUSTH=[];
-function busted(){W.bustT=0;const fine=Math.min(Math.floor(cash),50+W.st*40+Math.floor(cash*.05));const lost=[];for(const f of BUSTH){try{const r=f();if(r)lost.push(r)}catch(e){}}W.st=0;for(const c of[...W.cops])if(!c.patrol)dropCop(c);
+function busted(){W.bustT=0;const fine=Math.min(Math.floor(cash),50+W.st*40+Math.floor(cash*.05));const lost=[];for(const f of BUSTH){try{const r=f();if(r)lost.push(r)}catch(e){czErr(e,"crime_core.js")}}W.st=0;for(const c of[...W.cops])if(!c.patrol)dropCop(c);
  big('BUSTED','FINE £'+fine+(lost.length?' · CONFISCATED: '+lost.join(', '):''),3000);beep(150,.6,'sawtooth',.1);
  setTimeout(()=>fade(()=>{cash-=fine;const st=SHOPD.find(s=>s.t==='COZYTOWN POLICE');if(st){if(!GS.onFoot){GS.onFoot=1;man.visible=true}GS.x=st.x+7;GS.z=st.z+4;GS.vx=GS.vz=0;GS.speed=0;GS.psi=0;P.x=st.x;P.z=st.z+1.5;P.psi=0;setLabels()}GT+=2;if(GT>=24){GT-=24;newDay()}toast('A NIGHT IN THE CELLS. YOUR CAR IS IN THE POLICE CAR PARK.');obj('')}),1400)}
 /* police station front desk */

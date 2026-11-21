@@ -2,12 +2,12 @@
 (function(){
 /* FPS counter: off unless turned on in OPTIONS (it used to show for everyone and printed over game titles) */
 const fpsEl=[...document.body.children].find(e=>/FPS$/.test(e.textContent||'')&&e.style.position==='fixed');
-let on=false;try{on=localStorage.getItem('cz_fps')==='1'}catch(e){}
+let on=false;try{on=localStorage.getItem('cz_fps')==='1'}catch(e){czErr(e,"uifix.js")}
 const apply=()=>{if(fpsEl)fpsEl.style.display=on?'':'none';for(const b of row.querySelectorAll('button'))b.classList.toggle('on',(b.dataset.fps==='1')===on)};
 const card=document.getElementById('optCard'),q=card&&card.querySelector('[data-res]'),row=document.createElement('div');
 row.className='row';row.innerHTML='<b>FPS COUNTER</b><button data-fps="0">OFF</button><button data-fps="1">ON</button>';
 if(q)q.parentElement.after(row);
-row.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();on=b.dataset.fps==='1';try{localStorage.setItem('cz_fps',on?'1':'0')}catch(_){}apply()});
+row.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;e.stopPropagation();on=b.dataset.fps==='1';try{localStorage.setItem('cz_fps',on?'1':'0')}catch(_){czErr(_,"uifix.js")}apply()});
 apply();
 /* Escape: if a game or panel is open, press its own close button (once), instead of opening the pause menu over it */
 const RX=/^\s*(LEAVE|QUIT|EXIT|CLOSE|DONE|BACK|✕|×|LEAVE TABLE|STAND UP)\s*$/i,SKIP='#hud,#menu,#mbtns';
@@ -19,7 +19,7 @@ addEventListener('keydown',e=>{if(e.key!=='Escape'||e.repeat)return;if(typeof me
  e.preventDefault();e.stopImmediatePropagation();if(b.onpointerdown&&!b.onclick)b.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}));else if(b.ontouchstart&&!b.onclick)b.dispatchEvent(new Event('touchstart',{bubbles:true}));else b.click()},true);
 })();
 /* the district name banner shouldn't sit on top of the pause menu */
-(function(){if(typeof setMenu!=='function')return;const s0=setMenu;setMenu=function(v){const r=s0.apply(this,arguments);try{const d=document.getElementById('crDis');if(v&&d)d.style.opacity=0}catch(e){}return r}})();
+(function(){if(typeof setMenu!=='function')return;const s0=setMenu;setMenu=function(v){const r=s0.apply(this,arguments);try{const d=document.getElementById('crDis');if(v&&d)d.style.opacity=0}catch(e){czErr(e,"uifix.js")}return r}})();
 /* one save: every full save carries the side data; a NEW GAME reload starts straight away */
 (function(){if(!window.CZSAVE)return;if(typeof cozySave==='function'){const s0=cozySave;cozySave=function(){return CZSAVE.attach(s0.apply(this,arguments)||{})}}
  if(CZSAVE.fresh){const t=setInterval(()=>{if(window.__bootDone===1){clearInterval(t);const g=document.getElementById('go');if(g&&!g.disabled)g.click()}},200)}})();

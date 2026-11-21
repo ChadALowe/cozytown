@@ -276,8 +276,8 @@ function rgFov(){const R=RG;return R.w.k==='rifle'?(R.scope?24:50):R.w.k==='bow'
 /* ===== vD8: NEON ARCADE - interior, 5 mini-games, tickets & prize counter ===== */
 Object.assign(HRS,{'NEON ARCADE':[10,24]});
 TH['NEON ARCADE']={wall:0x2a2040,fl:'stone',cnt:0x303038,top:0x888890,sh:0x2a2a30};
-var ARP={tix:0,best:{},won:{}};try{Object.assign(ARP,JSON.parse(localStorage.getItem('c1arc')||'{}'))}catch(e){}
-function arSave(){try{localStorage.setItem('c1arc',JSON.stringify(ARP))}catch(e){}}
+var ARP={tix:0,best:{},won:{}};try{Object.assign(ARP,JSON.parse(localStorage.getItem('c1arc')||'{}'))}catch(e){czErr(e,"15-football-engine.js")}
+function arSave(){try{localStorage.setItem('c1arc',JSON.stringify(ARP))}catch(e){czErr(e,"15-football-engine.js")}}
 const ARN=['ROVER INVADERS','BRICK BASH','C1 RUSH','WHACK-A-MOLE','CLAW GRABBER','AIR HOCKEY','STREET BRAWLER','SNAKE BITE','ROVER RUNNER','ROVER RACER','PINBALL'];
 const ARC=[0x20e0ff,0xff4090,0xffa020,0x60ff60,0xc060ff,0x4090ff,0xff3030,0x80ff40,0xffd040,0xff6020,0xff40ff];
 {const c0=cloItems;cloItems=function(){const fresh=!CLOIT,r=c0();if(fresh){r[3].push({id:'acc:arp',n:'NEON PINK SCARF',p:30,ap:c=>{c.scarf=[1,.2,.7]},rm:c=>{c.scarf=null},has:c=>chEq(c.scarf,[1,.2,.7])},{id:'acc:arc',n:'ARCADE CYAN SCARF',p:30,ap:c=>{c.scarf=[.1,.85,.95]},rm:c=>{c.scarf=null},has:c=>chEq(c.scarf,[.1,.85,.95])});r[0].push({id:'top:arg',n:'GOLDEN WINNER SHIRT',p:60,ap:c=>{c.ts=0;c.tc=[.95,.75,.1]},has:c=>c.ts===0&&chEq(c.tc,[.95,.75,.1])})}return r}}

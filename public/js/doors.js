@@ -4,7 +4,7 @@
 (function(){
 const doors=[];
 for(const s of SHOPD){doors.push({x:s.x,z:s.z,o:s})}
-try{const hd=LW(4.2,.6);doors.push({x:hd[0],z:hd[1],home:1})}catch(e){}
+try{const hd=LW(4.2,.6);doors.push({x:hd[0],z:hd[1],home:1})}catch(e){czErr(e,"doors.js")}
 const geo=new THREE.ConeGeometry(.34,.7,4);geo.rotateX(Math.PI);geo.translate(0,-.35,0);
 const stem=new THREE.BoxGeometry(.16,.5,.16);stem.translate(0,.25,0);
 const mOpen=new THREE.MeshBasicMaterial({color:0xffd23a,fog:false}),mShut=new THREE.MeshBasicMaterial({color:0xd04a3a,fog:false}),mHome=new THREE.MeshBasicMaterial({color:0x5ad0ff,fog:false});

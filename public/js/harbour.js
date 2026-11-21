@@ -264,7 +264,7 @@ const DOORP=W2(0,ST_.d/2+1.4);
  IROOM.splice(0,IROOM.length,[-RX-1,RX+1,-RZ-1,-RZ+.9],[-2.8,2.8,-RZ+1.9,-RZ+2.8],[-RX,-RX+1.2,-1.4,1.4],[RX-1.2,RX,-1.4,1.4]);
  SHOPCUR={o:o,k:['HARBOUR MASTER',"Fish don't catch themselves. Mind the fuel gauge, and mind the weather."]};
  IA.splice(0,IA.length,{r:[-2.6,2.6,-RZ+2.8,-RZ+3.8],label:'FERRY TO COZY HARBOUR (FREE)',fn:()=>{leaveShopQ()}},{r:[RX-2.3,RX-1,-1.6,1.6],label:"ANGLER'S LOG",fn:()=>open(3)},{r:[-1.0,1.0,RZ-.3,RZ],label:'LEAVE',fn:()=>leaveShop()});
- try{addVisitors(o)}catch(e){}}}
+ try{addVisitors(o)}catch(e){czErr(e,"harbour.js")}}}
 function leaveShopQ(){if(busy)return;ferry(1)}
 window.HARBOUR={HB,SP,BT,ISL,open,close,ferry,boardBoat,moor,newShoals,newCrates,get shoals(){return shoals},get crates(){return crates},W,BERTH,ARR,inHb,DOORP,ST:ST_};
 })();

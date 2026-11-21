@@ -299,7 +299,7 @@ addEventListener('keydown',e=>{if((e.key==='m'||e.key==='M')&&inRes()&&!e.repeat
 Object.assign(RS,{openMap,where,inRes,mmBuild,onRoad,STERM,BOXES});
 /* your car: parked in the Sunhaven Airport car park when you land, sent back home when you fly home */
 function parkHere(){const p=W(-205,-310.5);GS.x=p[0];GS.z=p[1];GS.psi=-Math.PI/2;GS.vx=GS.vz=0;GS.y=Y+.1;GS.vy=0;GS.prevGY=GS.y;GS.pitch=GS.roll=0;GS.speed=0}
-{const a0=RM.arrive;RM.arrive=function(sv){a0(sv);const V=window.MARLOWE2&&MARLOWE2.VAL,MW=window.MARLOWE;if(V&&!inReg(GS.x,GS.z)&&!(MW&&MW.inReg(GS.x,GS.z))){V.has=1;V.x=GS.x;V.z=GS.z;V.psi=GS.psi}parkHere();setTimeout(()=>{try{phText('COZY VALET',"Your car is waiting in the Sunhaven Airport car park, just south of the terminal. Enjoy the seaside!")}catch(e){}},2500)}}
+{const a0=RM.arrive;RM.arrive=function(sv){a0(sv);const V=window.MARLOWE2&&MARLOWE2.VAL,MW=window.MARLOWE;if(V&&!inReg(GS.x,GS.z)&&!(MW&&MW.inReg(GS.x,GS.z))){V.has=1;V.x=GS.x;V.z=GS.z;V.psi=GS.psi}parkHere();setTimeout(()=>{try{phText('COZY VALET',"Your car is waiting in the Sunhaven Airport car park, just south of the terminal. Enjoy the seaside!")}catch(e){czErr(e,"resort.js")}},2500)}}
 {const H=window.AIRFIELDS.HOME,a0=H.arrive;H.arrive=function(sv){a0(sv);if(inReg(GS.x,GS.z)){const V=window.MARLOWE2&&MARLOWE2.VAL;if(V&&V.has){GS.x=V.x;GS.z=V.z;GS.psi=V.psi;V.has=0}else respawn(false);GS.vx=GS.vz=0;GS.y=gH(GS.x,GS.z)+.1;GS.prevGY=GS.y}}}
 RS.parkHere=parkHere;
 })();

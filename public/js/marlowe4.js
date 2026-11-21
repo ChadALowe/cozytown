@@ -174,7 +174,7 @@ function buildMotors(o){const H=shell(o,0xe8eaee,'tile');B(0,0,-RZ+1.4,4,1.0,.8,
  SHOPCUR={o,k:['DEALER','Every model on the forecourt. Buy one or swap to a car you already own.']};ia(-2,2,-RZ+1.9,-RZ+2.9,'BUY OR SWAP CARS',()=>{MS.gar='dealer';openShop('mgar')});leave()}
 {const b0=buildShop;buildShop=function(o){if(!o||!o.mc)return b0(o);
  if(o.mc==='hotel')(MS.room?buildHotelRoom:buildHotelLobby)(o);else if(o.mc==='home')buildHome(o);else if(o.mc==='food')buildFood(o);else if(o.mc==='estate')buildEstate(o);else if(o.mc==='motors')buildMotors(o);
- try{if(o.mc==='food'||o.mc==='hotel'&&!MS.room)addVisitors(o)}catch(e){}}}
+ try{if(o.mc==='food'||o.mc==='hotel'&&!MS.room)addVisitors(o)}catch(e){czErr(e,"marlowe4.js")}}}
 function goRoom(o){fade(()=>{MS.room=1;buildShop(o);P.x=IX;P.z=IZ+RZ-1.1;P.y=IY+.02;P.psi=Math.PI;P.speed=0;camAng=P.psi;setLabels()})}
 function goLobby(o){fade(()=>{MS.room=0;buildShop(o);P.x=IX-RX+2;P.z=IZ;P.y=IY+.02;P.psi=Math.PI/2;P.speed=0;camAng=P.psi;setLabels()})}
 /* ------------------------------------------------------------------ menus */
@@ -195,7 +195,7 @@ CUSTOM_SHOP.mfood=function(msg){const o=SHOPCUR.o,f=o.def;H$('shT').textContent=
  const rd=window.REP?REP.disc():1;for(const[n,p0,h,e]of f.items){const p=Math.max(1,Math.round(p0*rd));dRow(n+(h?'  FOOD +'+h:'')+(e?'  ENERGY +'+e:''),[['£'+p,()=>{if(cash<p)return renderShop('NOT ENOUGH CASH');cash-=p;fed(h,e,n+'! (-£'+p+')');renderShop('ENJOY!')}]])}dRow('',[['BACK',()=>closeShop()]])};
 CUSTOM_SHOP.mest=function(msg){H$('shT').textContent='MARLOWE ESTATES';H$('shMsg').textContent=msg||'HOMES FOR SALE IN MARLOWE  ·  CASH £'+Math.round(cash).toLocaleString('en-GB');
  for(const h of HOMES){const own=MS.own[h.id],o=ALL.find(x=>x.def===h);dRow(h.sn+' · '+h.area+' · '+h.desc,own?[['OWNED ✓',()=>{},1],['SHOW ME',()=>{closeShop();crWay(o.x,o.z,h.sn)}],['SELL £'+Math.round(h.price*.8).toLocaleString('en-GB'),()=>{delete MS.own[h.id];cash+=Math.round(h.price*.8);renderShop('SOLD. £'+Math.round(h.price*.8).toLocaleString('en-GB')+' PAID TO YOU.')}]]:
-  [['BUY £'+h.price.toLocaleString('en-GB'),()=>{if(cash<h.price)return renderShop('YOU NEED £'+h.price.toLocaleString('en-GB')+' FOR THE '+h.sn);cash-=h.price;MS.own[h.id]=1;for(let i=0;i<4;i++)setTimeout(()=>beep(600+i*160,.1,'square',.05),i*110);renderShop('CONGRATULATIONS! THE KEYS TO YOUR '+h.sn+' ARE YOURS.');try{phText('MARLOWE ESTATES','Your new '+h.sn.toLowerCase()+' is ready. I\'ve put it on your map.')}catch(e){}buildShop(SHOPCUR.o)}],['SHOW ME',()=>{closeShop();crWay(o.x,o.z,h.sn)}]])}
+  [['BUY £'+h.price.toLocaleString('en-GB'),()=>{if(cash<h.price)return renderShop('YOU NEED £'+h.price.toLocaleString('en-GB')+' FOR THE '+h.sn);cash-=h.price;MS.own[h.id]=1;for(let i=0;i<4;i++)setTimeout(()=>beep(600+i*160,.1,'square',.05),i*110);renderShop('CONGRATULATIONS! THE KEYS TO YOUR '+h.sn+' ARE YOURS.');try{phText('MARLOWE ESTATES','Your new '+h.sn.toLowerCase()+' is ready. I\'ve put it on your map.')}catch(e){czErr(e,"marlowe4.js")}buildShop(SHOPCUR.o)}],['SHOW ME',()=>{closeShop();crWay(o.x,o.z,h.sn)}]])}
  dRow('',[['BACK',()=>closeShop()]])};
 /* cars: buy, swap and have the car brought to the kerb outside the door you're at */
 function kerbSpot(o){const d=o.door,k=d.pw-1.4+2.6;return{x:d.x+d.ou*k,z:d.z+d.ov*k,psi:d.psi+Math.PI/2}}

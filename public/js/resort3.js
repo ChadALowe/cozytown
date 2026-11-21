@@ -138,7 +138,7 @@ window.RESORT3={Q,did(k){Q.did[k]=1},onFish(n){Q.did.fish=1;if(n==='GOLDEN MACKE
  if(RS.wreck&&dist(RS.wreck.u,RS.wreck.v)<7)return Q.red===0?{label:'SEARCH THE WRECK',fn:()=>{toast('YOU FIND A BOTTLE WEDGED IN THE HULL...');setTimeout(bottle,600)}}:{label:'THE WRECK OF THE MARY ROSE',fn:()=>toast(pk(['ONLY BARNACLES NOW.','A CRAB WAVES A CLAW AT YOU.','THE TIMBERS CREAK IN THE SWELL.']))};
  if(RS.lh&&dist(RS.lh.u+3.6,RS.lh.v)<3.2)return Q.log>=2?{label:'CLIMB THE LIGHTHOUSE',fn:climb}:{label:'THE LIGHTHOUSE DOOR IS LOCKED',fn:()=>toast('LOCKED. MAYBE THE KEEPER IN THE COTTAGE HAS A KEY...')};
  if(dist(TOM.u,TOM.v)<3.6)return{label:Q.dog===0?'A LITTLE BOY IS CRYING':'TALK TO LITTLE TOM',fn:tomTalk};
- if(Q.red===2){const w=WELL();if(dist(w[0],w[1])<3)return{label:'DIG IN THE OLD WELL',fn:()=>{Q.red=3;cash+=800;cheer();toast('⛏ CLUNK! REDBEARD\'S GOLDEN COMPASS AND £800! QUEST COMPLETE');try{phText('MADAME ZELDA','"I told you the cards were never wrong. Well done, treasure hunter."')}catch(e){}}}}
+ if(Q.red===2){const w=WELL();if(dist(w[0],w[1])<3)return{label:'DIG IN THE OLD WELL',fn:()=>{Q.red=3;cash+=800;cheer();toast('⛏ CLUNK! REDBEARD\'S GOLDEN COMPASS AND £800! QUEST COMPLETE');try{phText('MADAME ZELDA','"I told you the cards were never wrong. Well done, treasure hunter."')}catch(e){czErr(e,"resort3.js")}}}}
  return b}}
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(!RS.built)return;caveSetup();const here=RS.inRes();
  if(here&&!tomG){tomG=man(8401,TOM.u,TOM.v,-Math.PI/2,{h:.7});tomG.scale.setScalar(.7)}if(tomG){tomG.visible=here;if(Q.dog<2)tomG.a1.rotation.x=-1.6+Math.sin(performance.now()/300)*.2}

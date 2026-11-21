@@ -67,7 +67,7 @@ function buildGames(){built=true;
   bxg(wx,0,z,.62,1.9,.9,col);bxg(wx,0,z,.7,.3,.96,0x2a2a30);bxg(wx,1.9,z,.7,.1,.96,0xe8bf4a);bxg(fx,.95,z,.14,.1,.8,0x222228);
   const ft=cvx(256,420,(g,W,H)=>{const gr=g.createLinearGradient(0,0,0,H);gr.addColorStop(0,'#'+(col+0x1000000).toString(16).slice(1));gr.addColorStop(1,'#2a0608');g.fillStyle=gr;g.fillRect(0,0,W,H);g.fillStyle='#1a0602';g.fillRect(14,14,W-28,70);g.strokeStyle='#f0c030';g.lineWidth=4;g.strokeRect(14,14,W-28,70);g.fillStyle='#ffd840';g.font='bold 36px Georgia,serif';g.textAlign='center';g.textBaseline='middle';g.fillText('FRUITY',W/2,38);g.fillText('FORTUNE',W/2,70);
    for(let k=0;k<12;k++){g.fillStyle=k%2?'#fff6a0':'#6a4a10';g.beginPath();g.arc(24+k*19,100,5,0,TAU);g.fill()}
-   g.fillStyle='#0c0404';g.fillRect(20,118,W-40,150);g.strokeStyle='#f0c030';g.lineWidth=5;g.strokeRect(20,118,W-40,150);for(let r=0;r<3;r++){g.fillStyle='#f6f0dc';g.fillRect(30+r*72,128,64,130);try{drawSym(g,(r*3+i*2+(sd>0?4:0))%10,62+r*72,193,20)}catch(e){}}
+   g.fillStyle='#0c0404';g.fillRect(20,118,W-40,150);g.strokeStyle='#f0c030';g.lineWidth=5;g.strokeRect(20,118,W-40,150);for(let r=0;r<3;r++){g.fillStyle='#f6f0dc';g.fillRect(30+r*72,128,64,130);try{drawSym(g,(r*3+i*2+(sd>0?4:0))%10,62+r*72,193,20)}catch(e){czErr(e,"casinogames.js")}}
    g.fillStyle='#f01818';g.fillRect(24,192,W-48,3);g.fillStyle='#ffe8a0';g.font='bold 20px monospace';g.fillText('£1 A GO',W/2,300);g.fillStyle='#e8bf4a';g.fillRect(70,330,116,40);g.fillStyle='#4a2a00';g.font='bold 22px monospace';g.fillText('SPIN',W/2,351)});
   const p=new THREE.Mesh(new THREE.PlaneGeometry(.84,1.38),bmat({map:ft}));p.position.set(sd*10.08,1.0,z);p.rotation.y=-sd*Math.PI/2;GG.add(p)});
  /* wall signs */
@@ -155,7 +155,7 @@ function cardTex(c){const key=c?c.r+c.s:'back';if(CARDS.has(key))return CARDS.ge
  g.fillStyle='#f8f4ea';rr(2,2,W-4,H-4,10);g.fill();g.strokeStyle='#999';g.lineWidth=2;g.stroke();const red=c.s==='♥'||c.s==='♦';g.fillStyle=red?'#c01428':'#15151a';g.textAlign='center';g.textBaseline='middle';
  const rk=c.r,rf='bold '+(rk.length>1?26:32)+'px Arial,sans-serif',sf='24px "DejaVu Sans",Arial,sans-serif',corner=()=>{g.font=rf;g.fillText(rk,19,22);g.font=sf;g.fillText(c.s,19,47)};
  corner();g.save();g.translate(W,H);g.rotate(Math.PI);corner();g.restore();g.font='58px "DejaVu Sans",Arial,sans-serif';g.fillText(c.s,W/2,H/2+3)});
- t.generateMipmaps=true;t.minFilter=THREE.LinearMipmapLinearFilter;t.magFilter=THREE.LinearFilter;try{t.anisotropy=R.capabilities.getMaxAnisotropy()}catch(e){}t.needsUpdate=true;CARDS.set(key,t);return t}
+ t.generateMipmaps=true;t.minFilter=THREE.LinearMipmapLinearFilter;t.magFilter=THREE.LinearFilter;try{t.anisotropy=R.capabilities.getMaxAnisotropy()}catch(e){czErr(e,"casinogames.js")}t.needsUpdate=true;CARDS.set(key,t);return t}
 const cval=c=>c.r==='A'?11:'JQK'.includes(c.r)?10:+c.r;
 function hv(h){let t=0,a=0;for(const c of h){t+=cval(c);if(c.r==='A')a++}while(t>21&&a){t-=10;a--}return{t,soft:a>0}}
 function newShoe(){const s=[];for(let d=0;d<6;d++)for(const su of SUITS)for(const r of RANKS)s.push({r,s:su});for(let i=s.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[s[i],s[j]]=[s[j],s[i]]}return s}
