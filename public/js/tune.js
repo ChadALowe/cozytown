@@ -352,7 +352,7 @@ const PERF=[
  {k:'brk',n:'BRAKES',d:['STOCK','SPORT','RACE','CARBON'],p:()=>[35,70,120],max:3,get:()=>TN.brk|0,set:v=>{TN.brk=v}},
  {k:'nos',n:'NITROUS KIT',d:['NOT FITTED','FITTED'],p:()=>[150],max:1,get:()=>TN.nos|0,set:v=>{TN.nos=v},desc:'HOLD THE NOS BUTTON FOR A BIG BOOST'},
  {k:'tank',n:'NITROUS TANK',d:['STANDARD','LARGE','XL'],p:()=>[100,160],max:2,get:()=>TN.tank|0,set:v=>{TN.tank=v},req:()=>TN.nos,desc:'MORE BOOST BEFORE IT RUNS DRY'}];
-const CPRs=i=>(typeof CPR==='function'?CPR(i):[0,220,380,420,480,400][i]);
+const CPRs=i=>(typeof CPR==='function'?CPR(i):[0,220,380,420,480,400,520][i]);
 const S={tab:'cars',sel:null,commit:null,msg:'',sl:[.6,.8,.5],view:'34'};let on=0;
 const cashTxt=()=>'£'+Math.round(cash);
 
@@ -374,7 +374,7 @@ function pay(n){if(cash<n){setMsg('NOT ENOUGH CASH');flash(0);return false}cash-
 
 /* ---- tab: cars ---- */
 function tabCars(){const B=$q('#tnBody');B.innerHTML='';
- for(let i=0;i<6;i++){const own=OWN.car[i],cur=i===S.commit.car,r=document.createElement('div');r.className='tnRow'+(CARI===i?' sel':'')+(cur?' cur':'');
+ for(let i=0;i<CARN.length;i++){const own=OWN.car[i],cur=i===S.commit.car,r=document.createElement('div');r.className='tnRow'+(CARI===i?' sel':'')+(cur?' cur':'');
   r.innerHTML=`<div class="n">${CARN[i]}<small>${CARSD[i]}</small></div><div class="pr ${cur?'ok':own?'ok':cash>=CPRs(i)?'':'no'}">${cur?'DRIVING':own?'OWNED':'£'+CPRs(i)}</div>`;
   r.onclick=()=>{setCar(i);neonPrev=null;neonNow();tabCars();head();carBtn()};B.appendChild(r)}
  carBtn()}

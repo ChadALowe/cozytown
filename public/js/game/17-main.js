@@ -16,8 +16,8 @@ function updCiv(){if(GS.inside)return;const cx=cam.position.x,cz=cam.position.z,
 
 /* ---------- cash shop (garage + wardrobe) ---------- */
 var OWN={paint:[1,0,0,0,0,0,0,0],out:[1,0,0,0,0,0],car:[1,0]},ENG=0,TYR=0,shopMode='';
-const DEFP=420,VANP=380,CARP=220,MXP=480,VOP=400,ENGP=[60,120,200],TYRP=[40,90],PAINTP=8,OUTP=12;
-function applyUpg(){MAXV=[38,42,46,50][ENG];ACCM=[1,1.12,1.25,1.4][ENG];GRIPM=[1,1.25,1.5][TYR];if(CARI===1){MAXV+=4;ACCM*=1.12;GRIPM*=1.1}else if(CARI===2){MAXV-=2;ACCM*=.88;GRIPM*=.97}else if(CARI===3){MAXV-=1;ACCM*=.95;GRIPM*=1.15}else if(CARI===4){MAXV+=7;ACCM*=1.18;GRIPM*=1.12}else if(CARI===5){MAXV+=2;ACCM*=1.05;GRIPM*=1.1}}
+const DEFP=420,VANP=380,CARP=220,MXP=480,VOP=400,A6P=520,ENGP=[60,120,200],TYRP=[40,90],PAINTP=8,OUTP=12;
+function applyUpg(){MAXV=[38,42,46,50][ENG];ACCM=[1,1.12,1.25,1.4][ENG];GRIPM=[1,1.25,1.5][TYR];if(CARI===1){MAXV+=4;ACCM*=1.12;GRIPM*=1.1}else if(CARI===2){MAXV-=2;ACCM*=.88;GRIPM*=.97}else if(CARI===3){MAXV-=1;ACCM*=.95;GRIPM*=1.15}else if(CARI===4){MAXV+=7;ACCM*=1.18;GRIPM*=1.12}else if(CARI===5){MAXV+=2;ACCM*=1.05;GRIPM*=1.1}else if(CARI===6){MAXV+=5;ACCM*=1.1;GRIPM*=1.16}}
 function openShop(m){if(window._cb)_cb.style.display='none';shopMode=m;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;$('shop').style.display='flex';renderShop('')}
 function closeShop(){busy=0;$('shop').style.display='none'}
 function shRow(lbl,btn,fn,on,sw){const r=document.createElement('div');r.className='shrow';const l=document.createElement('span');l.textContent=lbl;if(sw){const d=document.createElement('i');d.style.background=sw;l.prepend(d)}const b=document.createElement('button');b.textContent=btn;if(on)b.className='on';b.onclick=fn;r.append(l,b);$('shList').append(r)}
@@ -29,6 +29,7 @@ function renderShop(msg){$('shList').innerHTML='';$('shCash').textContent='CASH 
   shRow('LAND ROVER DEFENDER  (GRIPPY, TOUGH)',CARI===3?'DRIVING':OWN.car[3]?'USE':'BUY £'+DEFP,()=>{if(!OWN.car[3]){if(cash<DEFP)return renderShop('NOT ENOUGH CASH');cash-=DEFP;OWN.car[3]=1}setCar(3);renderShop('DRIVING THE DEFENDER')},CARI===3);
   shRow('MAZDA MX-5  (QUICK, SPORTY)',CARI===4?'DRIVING':OWN.car[4]?'USE':'BUY £'+MXP,()=>{if(!OWN.car[4]){if(cash<MXP)return renderShop('NOT ENOUGH CASH');cash-=MXP;OWN.car[4]=1}setCar(4);renderShop('DRIVING THE MX-5')},CARI===4);
   shRow('VOLVO V60 ESTATE  (ROOMY, STEADY)',CARI===5?'DRIVING':OWN.car[5]?'USE':'BUY £'+VOP,()=>{if(!OWN.car[5]){if(cash<VOP)return renderShop('NOT ENOUGH CASH');cash-=VOP;OWN.car[5]=1}setCar(5);renderShop('DRIVING THE VOLVO')},CARI===5);
+  shRow('AUDI A6  (QUATTRO GRIP, COMFY)',CARI===6?'DRIVING':OWN.car[6]?'USE':'BUY £'+A6P,()=>{if(!OWN.car[6]){if(cash<A6P)return renderShop('NOT ENOUGH CASH');cash-=A6P;OWN.car[6]=1}setCar(6);renderShop('DRIVING THE A6')},CARI===6);
   PCOL.forEach((c,i)=>{const cur=paintC===c[1];shRow('PAINT '+(CARI===3&&!i?'STOCK GREEN':CARI>=4&&!i?'STOCK SILVER':PN[i]),cur?'WEARING':OWN.paint[i]?'USE':'BUY £'+PAINTP,()=>{if(!OWN.paint[i]){if(cash<PAINTP)return renderShop('NOT ENOUGH CASH');cash-=PAINTP;OWN.paint[i]=1}paintC=c[1];applyPaint();renderShop('PAINTED '+PN[i])},cur,c[0])});
   shRow('ENGINE TUNE '+(ENG+1<4?'STAGE '+(ENG+1):'MAXED'),ENG>=3?'MAXED':'BUY £'+ENGP[ENG],()=>{if(ENG>=3)return;if(cash<ENGP[ENG])return renderShop('NOT ENOUGH CASH');cash-=ENGP[ENG];ENG++;applyUpg();renderShop('ENGINE UPGRADED: FASTER!')},ENG>=3);
   shRow('GRIP TYRES '+(TYR+1<3?'STAGE '+(TYR+1):'MAXED'),TYR>=2?'MAXED':'BUY £'+TYRP[TYR],()=>{if(TYR>=2)return;if(cash<TYRP[TYR])return renderShop('NOT ENOUGH CASH');cash-=TYRP[TYR];TYR++;applyUpg();renderShop('TYRES UPGRADED: MORE GRIP')},TYR>=2)}
