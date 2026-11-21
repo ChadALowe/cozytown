@@ -43,18 +43,21 @@ BLK.sort((a,b)=>Math.hypot((a.u0+a.u1)/2-cu,(a.v0+a.v1)/2-cv)-Math.hypot((b.u0+b
 const taken=new Set(),G=new THREE.Group();G.visible=false;scene.add(G);
 const cvx=(w,h,fn)=>{const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.anisotropy=4;return t};
 const signTex=D=>cvx(512,80,(g,w,h)=>{g.fillStyle=D.bg;g.fillRect(0,0,w,h);g.strokeStyle=D.fg;g.lineWidth=4;g.strokeRect(4,4,w-8,h-8);g.fillStyle=D.fg;g.font='bold 44px Georgia,serif';g.textAlign='center';g.textBaseline='middle';g.fillText(D.t,w/2,h/2+2)});
-for(const D of DEALERS){let d=null;
+/* place any city shop: finds a free block face, adds the SHOPD door, map pin, sign and glass door */
+function placeShop(D,extra){let d=null;
  for(const b of BLK){const bi=MW.BLK.indexOf(b);if(taken.has(bi))continue;
   for(const s of['s','e','n','w']){for(const f of[.5,.3,.7]){const q=doorAt(b,s,f);if(!tooClose(q)){d=q;break}}if(d)break}
   if(d){taken.add(bi);break}}
- if(!d){console.warn('dealer: no free block for',D.t);continue}
- const o={x:d.x,z:d.z,psi:d.psi,t:D.t,bg:D.bg,fg:D.fg,dealer:D,door:d,rx:12,rz:7,sz:6.2};SHOPD.push(o);HRS[D.t]=[8,20];D.o=o;
- try{CITY.poi.push({n:D.t,u:d.u,v:d.v,ic:D.bikes?'🏍':'🚘'})}catch(e){}
- /* sign + glass door on the facade */
+ if(!d){console.warn('city shop: no free block for',D.t);return null}
+ const o=Object.assign({x:d.x,z:d.z,psi:d.psi,t:D.t,bg:D.bg,fg:D.fg,door:d,rx:12,rz:7,sz:6.2},extra||{});SHOPD.push(o);HRS[D.t]=D.h||[8,20];D.o=o;
+ try{CITY.poi.push({n:D.t,u:d.u,v:d.v,ic:D.ic||'🚘'})}catch(e){}
  const fx=OX+d.fu+d.ou*.06,fz=OZ+d.fv+d.ov*.06,Y=G0;
  const sg=new THREE.Mesh(new THREE.PlaneGeometry(7,1.1),new THREE.MeshBasicMaterial({map:signTex(D)}));sg.position.set(fx,Y+3.6,fz);sg.rotation.y=d.psi;G.add(sg);
  const dr=new THREE.Mesh(new THREE.PlaneGeometry(2.4,2.4),new THREE.MeshBasicMaterial({color:0x1d2a36}));dr.position.set(fx+d.ou*.01,Y+1.2,fz+d.ov*.01);dr.rotation.y=d.psi;G.add(dr);
- const fr=new THREE.Mesh(new THREE.PlaneGeometry(2.7,2.6),new THREE.MeshBasicMaterial({color:new THREE.Color(D.bg)}));fr.position.set(fx,Y+1.3,fz);fr.rotation.y=d.psi;G.add(fr)}
+ const fr=new THREE.Mesh(new THREE.PlaneGeometry(2.7,2.6),new THREE.MeshBasicMaterial({color:new THREE.Color(D.bg)}));fr.position.set(fx,Y+1.3,fz);fr.rotation.y=d.psi;G.add(fr);
+ return o}
+for(const D of DEALERS){D.ic=D.bikes?'🏍':'🚘';placeShop(D,{dealer:D})}
+TRI.cityShop=placeShop;TRI.signTex=signTex;
 setInterval(()=>{G.visible=!!(MW.M&&MW.M.built)},1000);
 
 /* ---- the showroom inside ---- */
