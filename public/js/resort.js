@@ -47,7 +47,7 @@ const onRoad=(u,v)=>{for(const r of NS)if(Math.abs(u-r.u)<r.h+.2&&v>-392&&v<392)
 /* ------------------------------------------------------------------ colliders */
 const CG=new Map(),CGC=16,ck=(a,b)=>a*8192+b;
 function cAdd(o){for(let a=Math.floor(o.u0/CGC);a<=Math.floor(o.u1/CGC);a++)for(let b=Math.floor(o.v0/CGC);b<=Math.floor(o.v1/CGC);b++){const k=ck(a,b);let L=CG.get(k);if(!L)CG.set(k,L=[]);L.push(o)}}
-const cBox=(u0,u1,v0,v1)=>cAdd({u0:Math.min(u0,u1),u1:Math.max(u0,u1),v0:Math.min(v0,v1),v1:Math.max(v0,v1)});
+const BOXES=[];const cBox=(u0,u1,v0,v1)=>(BOXES.push([Math.min(u0,u1),Math.max(u0,u1),Math.min(v0,v1),Math.max(v0,v1)]),cAdd({u0:Math.min(u0,u1),u1:Math.max(u0,u1),v0:Math.min(v0,v1),v1:Math.max(v0,v1)}));
 const cCirc=(u,v,r)=>cAdd({u0:u-r,u1:u+r,v0:v-r,v1:v+r,r,cu:u,cv:v});
 function cResolve(x,z,rad){let u=x-OX,v=z-OZ,hit=0,nx=0,nz=0;const seen=new Set();
  for(let a=Math.floor((u-rad)/CGC);a<=Math.floor((u+rad)/CGC);a++)for(let b=Math.floor((v-rad)/CGC);b<=Math.floor((v+rad)/CGC);b++){const L=CG.get(ck(a,b));if(!L)continue;for(const o of L){if(seen.has(o))continue;seen.add(o);
@@ -294,9 +294,9 @@ function openMap(){if(busy||menuOpen||A.CIN.on)return;if(!MMC)mmBuild();busy=1;i
  const T_=GS.onFoot?P:GS;g.fillStyle='#ff3030';g.strokeStyle='#fff';g.lineWidth=3;g.beginPath();g.arc(mmX(T_.x-OX)*sx,mmZ(T_.z-OZ)*sx,8,0,TAU);g.fill();g.stroke();
  const ttl=document.createElement('div');ttl.textContent='☀ SUNHAVEN BAY ☀  ·  TAP TO CLOSE';ttl.style.cssText='position:absolute;left:0;right:0;top:-2px;text-align:center;font-size:15px;color:#ffe9a8;text-shadow:0 2px 0 #000;padding:6px';wrap.append(im,ttl);ov.appendChild(wrap);document.body.appendChild(ov);ov.onclick=()=>{ov.remove();busy=0}}
 const inRes=()=>{const T_=GS.onFoot?P:GS;return RS.built&&!GS.inside&&inReg(T_.x,T_.z)};
-addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('#mm')&&inRes()){e.stopPropagation();e.preventDefault();openMap()}},true);
-addEventListener('keydown',e=>{if((e.key==='m'||e.key==='M')&&inRes()&&!e.repeat){const t=e.target;if(t&&/INPUT|TEXTAREA/.test(t.tagName))return;e.stopPropagation();openMap()}},true);
-Object.assign(RS,{openMap,where,inRes,mmBuild,onRoad,STERM});
+addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('#mm')&&inRes()){e.stopPropagation();e.preventDefault();RS.openMap()}},true);
+addEventListener('keydown',e=>{if((e.key==='m'||e.key==='M')&&inRes()&&!e.repeat){const t=e.target;if(t&&/INPUT|TEXTAREA/.test(t.tagName))return;e.stopPropagation();RS.openMap()}},true);
+Object.assign(RS,{openMap,where,inRes,mmBuild,onRoad,STERM,BOXES});
 /* your car: parked in the Sunhaven Airport car park when you land, sent back home when you fly home */
 function parkHere(){const p=W(-205,-310.5);GS.x=p[0];GS.z=p[1];GS.psi=-Math.PI/2;GS.vx=GS.vz=0;GS.y=Y+.1;GS.vy=0;GS.prevGY=GS.y;GS.pitch=GS.roll=0;GS.speed=0}
 {const a0=RM.arrive;RM.arrive=function(sv){a0(sv);const V=window.MARLOWE2&&MARLOWE2.VAL,MW=window.MARLOWE;if(V&&!inReg(GS.x,GS.z)&&!(MW&&MW.inReg(GS.x,GS.z))){V.has=1;V.x=GS.x;V.z=GS.z;V.psi=GS.psi}parkHere();setTimeout(()=>{try{phText('COZY VALET',"Your car is waiting in the Sunhaven Airport car park, just south of the terminal. Enjoy the seaside!")}catch(e){}},2500)}}
