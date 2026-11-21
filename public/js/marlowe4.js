@@ -36,7 +36,7 @@ reg(SHOP,'estate',{rx:6,rz:4.6,sz:3.7,bg:'#3a1a4a',fg:'#ffffff'});reg(MOT,'motor
 /* on the city map + as cab destinations */
 const ICO={hotel:'🏨',home:'🏠',food:'🍽',estate:'🔑',motors:'🚗'};for(const o of ALL)CITY.poi.push({n:o.mc==='home'?o.def.sn:o.t,u:o.door.u,v:o.door.v,ic:o.t==='THE CROWN'?'🍺':o.t==='THE COFFEE HOUSE'?'☕':ICO[o.mc],kind:o.mc});
 /* ------------------------------------------------------------------ state + save */
-const MS={own:{},stay:{},room:0,gar:'home'};window.MARLOWE4={MS,ALL,HOT,HOMES};
+const MS={own:{},stay:{},room:0,gar:'home'};window.MARLHOMES=MS;window.MARLOWE4={MS,ALL,HOT,HOMES};
 {const s0=cozySave,l0=cozyLoad;cozySave=function(){const o=s0();o.m4={own:MS.own,stay:MS.stay};return o};cozyLoad=function(z){l0(z);if(z&&z.m4){MS.own=z.m4.own||{};MS.stay=z.m4.stay||{}}}}
 const stayOK=t=>{const s=MS.stay[t];return !!s&&(DAY<s.d||(DAY===s.d&&GT<11))};
 const stayTxt=t=>{const s=MS.stay[t];if(!stayOK(t))return 'NO ROOM BOOKED';const n=s.d-DAY;return 'ROOM BOOKED UNTIL 11:00 '+(n<=0?'TODAY':n===1?'TOMORROW':DOWS[(dow()+n)%7]+' (DAY '+s.d+')')};
