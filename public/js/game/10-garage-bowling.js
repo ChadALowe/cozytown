@@ -3,8 +3,8 @@ Object.assign(HRS,{'VILLAGE MOTORS':[9,18],"JOE'S GARAGE":[8,17.5],'STRIKE BOWL'
 TH['VILLAGE MOTORS']={wall:0xf4f4f8,fl:'tile',cnt:0x20242c,top:0x888890,sh:0x2a3a5a};
 TH["JOE'S GARAGE"]={wall:0xc4c2ba,fl:'stone',cnt:0x6a2a1a,top:0x9a9a9a,sh:0x2a4a8a};
 TH['STRIKE BOWL']={wall:0x5a4a7a,fl:'wood',cnt:0x2a1a4a,top:0xffd040,sh:0x8a2a8a};
-const CARN=['CITROËN C1','FORD FIESTA','ROYAL MAIL VAN','LAND ROVER DEFENDER','MAZDA MX-5','VOLVO V60 ESTATE','AUDI A6'],CARSD=['YOUR TRUSTY STANDARD','FASTER + GRIPPIER','+25% PARCEL PAY','TOUGH + GRIPPY','QUICK + SPORTY','ROOMY + STEADY','QUATTRO + COMFY'],SHOWC=[];
-const CPR=i=>[0,CARP,VANP,DEFP,MXP,VOP,A6P][i];
+const CARN=['CITROËN C1','FORD FIESTA','ROYAL MAIL VAN','LAND ROVER DEFENDER','MAZDA MX-5','VOLVO V60 ESTATE'],CARSD=['YOUR TRUSTY STANDARD','FASTER + GRIPPIER','+25% PARCEL PAY','TOUGH + GRIPPY','QUICK + SPORTY','ROOMY + STEADY'],SHOWC=[];
+const CPR=i=>i<6?[0,CARP,VANP,DEFP,MXP,VOP][i]:(window.TRI?TRI.price(i):0);
 const LEAVE_IA=()=>({r:[1.0,2.2,RZ-.3,RZ],label:'LEAVE',fn:()=>leaveShop()});
 function gbox(g,x,y,z,w,h,d,hex){const m=sbox(x,y,z,w,h,d,fmc(hex));SG.remove(m);g.add(m);return m}
 function realCar(i){let g=null;try{if(i===0)g=c1Inst([1,1,1]);else if(i===1)g=window.fiesInst(PCOL[2][1]);else if(i===2)g=window.vanInst();else if(i===3)g=window.lrInst(0);else if(window.NC)g=NC.inst(i)}catch(e){g=null}return g||dispCar(i)}
@@ -23,13 +23,15 @@ function buildShowroom(o){IA.splice(0,IA.length,LEAVE_IA());IROOM.splice(0,IROOM
  gbox(SG,0,0,-2.4,2.6,.95,.6,0x20242c);gbox(SG,0,.95,-2.4,2.7,.06,.7,0xc0c4cc);gbox(SG,.5,1.01,-2.5,.5,.35,.05,0x181c24);
  const sp=pSpec(9301,{f:false,gl:false,scarf:null,bp:false,bag:0,old:false,tc:[.12,.16,.3]});window.SHK=personIn(sp,0,-2.95,0);
  const XS=[-8.25,-5.5,-2.75,0,2.75,5.5,8.25];
- XS.forEach((x,i)=>{const pod=new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.3,.14,20),new THREE.MeshBasicMaterial({color:0x303642}));pod.position.set(x,.07,-.6);SG.add(pod);
+ const PG=window.SHOWPG|0,NPG=Math.ceil(CARN.length/XS.length);
+ XS.forEach((x,j)=>{const i=PG*XS.length+j;if(i>=CARN.length)return;const pod=new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.3,.14,20),new THREE.MeshBasicMaterial({color:0x303642}));pod.position.set(x,.07,-.6);SG.add(pod);
   const rg=new THREE.Mesh(new THREE.RingGeometry(1.1,1.24,28).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xe8c040}));rg.position.set(x,.145,-.6);SG.add(rg);
   const car=realCar(i);car.position.set(x,.14,-.6);car.scale.setScalar(.68);car.rotation.y=i*.7;SG.add(car);SHOWC.push(car);
   gbox(SG,x,0,.95,.08,.55,.08,0x303030);sPlane(1.5,.75,x,.9,.97,0,boardTex(i));
   IROOM.push([x-1.3,x+1.3,-1.5,.45]);IA.push({r:[x-1.3,x+1.3,.5,2.6],label:()=>'VIEW '+CARN[i]+(OWN.car[i]?' (OWNED)':CPR(i)?' £'+CPR(i):''),fn:()=>showroomGo(i)})});
  sPlane(5,.7,0,2.0,-RZ+.03,0,txtTex(512,72,'#10151c','#f0c840','VILLAGE MOTORS',46));
  for(const sx of[-9.2,9.2])for(const sy of[0])gbox(SG,sx,0,-2.8,.3,2.2,.3,0xc82020);
+ if(NPG>1){sPlane(2.2,.5,-2.3,2.2,RZ-.03,Math.PI,txtTex(320,72,'#10151c','#f0c840','MORE CARS '+(PG+1)+'/'+NPG,34));IA.push({r:[-3.4,-1.2,2.6,3.2],label:()=>'MORE CARS (PAGE '+((PG+1)%NPG+1)+' OF '+NPG+')',fn:()=>{window.SHOWPG=(PG+1)%NPG;buildShop(SHOPCUR.o)}})}
  IA.push({r:[-1.0,.6,2.6,3.2],label:'TALK TO DEREK',fn:()=>say('DEREK','Take your time. Every one of them has a story.',3600)})}
 function showroomGo(i){leaveShop(true);openGallery('show',i)}
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(GS.inside&&SHOPCUR&&SHOPCUR.o.t==='VILLAGE MOTORS')SHOWC.forEach((c,i)=>{c.rotation.y+=dt*(.35+i*.04);if(c.userData&&c.userData.upd)c.userData.upd()})}}

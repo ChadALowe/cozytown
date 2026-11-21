@@ -69,7 +69,7 @@ function fitImg(){if(!imgBox)return;const c=IMG[ckI];if(!c)return;const W=innerW
 addEventListener('resize',fitImg);
 function updImg(v){if(!imgNeedles)return;const mph=v*2.237,f=Math.min(1,v/42);for(const[d,e]of imgNeedles){const p=d.k==='spd'?Math.min(1,mph/d.mx):(.12+.5*f+.15*((v*.35)%1));e.style.transform='rotate('+(d.a0+p*d.sw)+'deg)'}}
 let ckI=-1;
-function buildCk(i){if(IMG[i]){buildImg(i);fitImg();return}const c=CK[i]||CK[0];ckI=i;
+function buildCk(i){if(IMG[i]){buildImg(i);fitImg();return}const c=CK[i]||(i>=6?CK[6]:CK[0]);ckI=i;
  const P=(...a)=>a.join(' '),sv=[];
  // roof header (angled lower edge) + A-pillars + door tops
  if(c.roof)sv.push(`<polygon points="0,0 100,0 100,${c.roof-(c.tall?0:3)} 50,${c.roof+1.5} 0,${c.roof-(c.tall?0:3)}" fill="${c.roofc}"/>`);
@@ -110,7 +110,7 @@ updateCam=function(dt){
  if(!fp)return;
  let x,y,z,psi,pitch=0;
  if(GS.onFoot){psi=P.psi;const bob=Math.sin(P.phase*1)*.03*Math.min(1,P.speed/3);x=P.x+Math.sin(psi)*.12;z=P.z+Math.cos(psi)*.12;y=P.y+1.62+bob}
- else{psi=GS.psi;pitch=(GS.pitch+GS.dp)*.6;const h=HGT[CARI]||1.15,c=Math.cos(psi),s=Math.sin(psi);
+ else{psi=GS.psi;pitch=(GS.pitch+GS.dp)*.6;const h=(window.TRI&&TRI.isTri(CARI)?TRI.hgt(CARI):HGT[CARI])||1.15,c=Math.cos(psi),s=Math.sin(psi);
   // local +x is the car's left; SEAT<0 puts the driver on the right
   x=GS.x+c*SEAT+s*.1;z=GS.z-s*SEAT+c*.1;y=GS.y+h;
   fpSteer+=(GS.steer-fpSteer)*Math.min(1,dt*8);{const v=Math.hypot(GS.vx||0,GS.vz||0),f=Math.min(1,v/42);updImg(v);if(needles)for(const[k,el]of needles)el.style.transform='rotate('+(k==='spd'?125+f*270:125+(.12+.5*f+.15*((v*.35)%1))*270)+'deg)'}if(wheel)wheel.style.transform='rotate('+(-fpSteer*120)+'deg)'}

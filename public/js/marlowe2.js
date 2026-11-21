@@ -27,7 +27,9 @@ const MAXN=[16,10,10,6,8,16,5];
 let IM=null;
 function buildIM(){IM=MODELS.map((m,i)=>{const mb=wmat(null,{side:THREE.DoubleSide}),md=wmat(null,{side:THREE.DoubleSide}),gb=m.b.mesh(mb).geometry,gd=m.d.mesh(md).geometry,n=MAXN[i];
  const ib=new THREE.InstancedMesh(gb,mb,n),id=new THREE.InstancedMesh(gd,md,n);ib.instanceMatrix.setUsage(THREE.DynamicDrawUsage);id.instanceMatrix.setUsage(THREE.DynamicDrawUsage);ib.count=id.count=0;ib.frustumCulled=id.frustumCulled=false;
- for(let k=0;k<n;k++)ib.setColorAt(k,new THREE.Color(1,1,1));TG.add(ib,id);return{ib,id,n}})}
+ for(let k=0;k<n;k++)ib.setColorAt(k,new THREE.Color(1,1,1));TG.add(ib,id);return{ib,id,n}});
+ if(window.TRI)for(let k=0;k<TRI.N;k++){const g=TRI.geoK(k),n=k===9?6:5,ib=TRI.lit(new THREE.InstancedMesh(g.P,TRI.mat(),n)),id=TRI.lit(new THREE.InstancedMesh(g.SF,TRI.mat(),n));
+  ib.instanceMatrix.setUsage(THREE.DynamicDrawUsage);id.instanceMatrix.setUsage(THREE.DynamicDrawUsage);ib.count=id.count=0;ib.frustumCulled=id.frustumCulled=false;for(let j=0;j<n;j++)ib.setColorAt(j,new THREE.Color(1,1,1));TG.add(ib,id);IM.push({ib,id,n})}}
 const TG=new THREE.Group();scene.add(TG);TG.visible=false;
 const CARC=[[.72,.08,.08],[.12,.22,.52],[.88,.88,.9],[.1,.1,.12],[.52,.54,.58],[.2,.42,.28],[.86,.72,.2],[.38,.2,.12],[.92,.92,.92],[.62,.64,.68],[.08,.3,.5]];
 const CABC=[[.06,.06,.07],[.06,.06,.07],[.06,.06,.07],[.06,.06,.07],[.4,.06,.1],[.9,.9,.9],[.12,.2,.42]];
@@ -54,7 +56,10 @@ function spawn(c,px,pz,rmin,rmax){for(let tries=0;tries<40;tries++){const ax=Mat
   if(!goes(ax,k,prev,d))continue;const nc=nodeC(ax,idx),pc=nodeC(ax,prev),cr=road(1-ax,idx),cp=road(1-ax,prev);if(Math.abs(s-nc)<cr.h+10||Math.abs(s-pc)<cp.h+10)continue;
   const ln=ln0;if(CARS.some(o=>o!==c&&o.on&&!o.tn&&o.ax===ax&&o.k===k&&o.d===d&&Math.abs(o.s-s)<14))continue;
   Object.assign(c,{on:1,ax,k,d,s,ln,sp:6+Math.random()*4,tn:null});plan(c);return true}c.on=0;return false}
-function newCar(i){const kind=i%11===0?6:i%3===0?5:(i%5);const c={kind,bus:kind===6,cab:kind===5,col:kind===6?[.78,.06,.08]:kind===5?CABC[(Math.random()*CABC.length)|0]:CARC[(Math.random()*CARC.length)|0],vmax:kind===6?8.5:10.5+Math.random()*3,len:MODELS[kind].len,on:0,x:0,z:0,psi:0};return c}
+function newCar(i){const k0=i%11===0?6:i%3===0?5:(i%5);let kind=k0,col=k0===6?[.78,.06,.08]:k0===5?CABC[(Math.random()*CABC.length)|0]:CARC[(Math.random()*CARC.length)|0];
+ /* triangle-car fleet (tricars.js): kinds 7.. ; black cabs become the LEVC TX half the time */
+ if(window.TRI){if(k0<5&&Math.random()<.6){const k=[0,1,2,3,4,5,6,7,8,10][(Math.random()*10)|0];kind=7+k;col=TRI.pal(k,Math.random())}else if(k0===5&&Math.random()<.5){kind=7+9;col=[.05,.05,.06]}}
+ const c={kind,bus:k0===6,cab:k0===5,col,vmax:k0===6?8.5:10.5+Math.random()*3,len:kind>=7?TRI.len(kind-7):MODELS[kind].len,on:0,x:0,z:0,psi:0};return c}
 function carXZ(c){if(!c.on||c.ax==null)return;if(c.tn){const t=c.tn.t,q=1-t,P0=c.tn.P0,P1=c.tn.P1,P2=c.tn.P2;const u=q*q*P0[0]+2*q*t*P1[0]+t*t*P2[0],v=q*q*P0[1]+2*q*t*P1[1]+t*t*P2[1],du=2*q*(P1[0]-P0[0])+2*t*(P2[0]-P1[0]),dv=2*q*(P1[1]-P0[1])+2*t*(P2[1]-P1[1]);c.x=OX+u;c.z=OZ+v;c.psi=Math.atan2(du,dv);return}
  const p=lanePos(c.ax,c.k,c.d,c.ln,c.s);c.x=OX+p[0];c.z=OZ+p[1];c.psi=psiOf(c.ax,c.d)}
 function stepCar(c,dt,px,pz,pOnFoot){

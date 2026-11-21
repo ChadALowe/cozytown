@@ -384,7 +384,7 @@ function carBtn(){const i=CARI,own=OWN.car[i],cur=i===S.commit.car;
  if(!S.msg)setMsg('TAP A CAR TO PREVIEW IT')}
 
 /* ---- tab: paint ---- */
-const pName=i=>(CARI===3&&!i?'STOCK GREEN':CARI>=4&&!i?'STOCK SILVER':PN[i]);
+const pName=i=>(CARI===3&&!i?'STOCK GREEN':CARI>=6&&!i?'STOCK COLOUR':CARI>=4&&!i?'STOCK SILVER':PN[i]);
 function hsl(h,s,l){const a=s*Math.min(l,1-l),f=n=>{const k=(n+h*12)%12;return l-a*Math.max(-1,Math.min(k-3,9-k,1))};return[f(0),f(8),f(4)]}
 function tabPaint(){const B=$q('#tnBody');B.innerHTML='<div class="tnH">COLOURS · £'+PAINTP+' EACH, FREE ONCE OWNED</div><div class="tnGrid"></div><div class="tnH">CUSTOM MIX · £15</div><div id="tnCu"></div><div class="tnH">FINISH · £30 EACH, FREE ONCE OWNED</div><div class="tnGrid" id="tnFin"></div>';
  const g=B.querySelector('.tnGrid');
