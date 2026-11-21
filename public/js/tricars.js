@@ -80,9 +80,9 @@ function build(S){
    for(const s of[1,-1]){const v=(r,k)=>[s*r.P[k][0],r.P[k][1],bend(r.P[k][0],r.P[k][1],r.z)];
     const a=v(A,b),bb=v(A,b+1),c=v(Bq,b+1),d=v(Bq,b);
     if(s>0){tri(a,d,c,hex,null,1);tri(a,c,bb,hex,null,1)}else{tri(a,c,d,hex,null,1);tri(a,bb,c,hex,null,1)}}}}
- for(const[ri,dz]of[[0,1],[RING.length-1,-1]]){const r=RING[ri],L=[];for(const p of r.P)L.push([p[0],p[1],bend(p[0],p[1],r.z)]);for(let k=r.P.length-2;k>=1;k--)L.push([-r.P[k][0],r.P[k][1],bend(r.P[k][0],r.P[k][1],r.z)]);
-  let cx=0,cy=0,cz=0;for(const p of L){cx+=p[0];cy+=p[1];cz+=p[2]}const C=[cx/L.length,cy/L.length,cz/L.length];
-  for(let k=0;k<L.length;k++)tri(C,L[k],L[(k+1)%L.length],S.capCol==null?null:S.capCol,[0,0,dz],1)}
+ /* nose and tail end faces: horizontal strips across the car (a fan from the middle creased into a V when the end leans) */
+ for(const[ri,dz]of[[0,1],[RING.length-1,-1]]){const r=RING[ri],Rt=r.P.map(p=>[p[0],p[1],bend(p[0],p[1],r.z)]),Lt=r.P.map(p=>[-p[0],p[1],bend(p[0],p[1],r.z)]),col=S.capCol==null?null:S.capCol;
+  for(let k=0;k<Rt.length-1;k++){tri(Rt[k],Rt[k+1],Lt[k+1],col,[0,0,dz],1);tri(Rt[k],Lt[k+1],Lt[k],col,[0,0,dz],1)}}
 
  /* ---- projecting flat shapes onto the hull ---- */
  const GS_=.08,GRID={x:new Map(),z:new Map()};
@@ -375,14 +375,14 @@ SPECS.push({key:'prius',name:'TOYOTA PRIUS',desc:'SIPS FUEL + SMOOTH',price:340,
    type into a side profile; brandDeco() draws that brand's grille, lights and tail lights. */
 const TYPES={/* f: front-overhang share, nose/cowl/deck/beltR/tail as fractions of height, a: windscreen base behind front axle (share of wheelbase),
                rk: windscreen run per rise, rl: roof length (share of length), R: wheel radius, d2: two doors */
- hatchS:{f:.52,nose:.48,cowl:.65,beltR:.69,tail:.82,yb:.11,a:.16,rk:1.25,rl:.26,R:.29,rakeR:.18,tp:.85,hatch:1},
- hatch:{f:.50,nose:.43,cowl:.63,beltR:.68,tail:.73,yb:.105,a:.20,rk:1.45,rl:.22,R:.31,rakeR:.30,tp:.85,hatch:1},
- estate:{f:.47,nose:.42,cowl:.62,beltR:.68,tail:.93,yb:.105,a:.29,rk:1.55,rl:.42,R:.33,rakeR:.07,tp:1.6,hatch:1},
+ hatchS:{f:.52,nose:.48,cowl:.65,beltR:.69,tail:.87,yb:.11,a:.16,rk:1.25,rl:.31,R:.29,rakeR:.16,tp:.85,hatch:1},
+ hatch:{f:.50,nose:.43,cowl:.63,beltR:.68,tail:.84,yb:.105,a:.20,rk:1.45,rl:.27,R:.31,rakeR:.26,tp:.85,hatch:1},
+ estate:{f:.47,nose:.42,cowl:.62,beltR:.68,tail:.95,yb:.105,a:.29,rk:1.55,rl:.48,R:.33,rakeR:.05,tp:1.6,hatch:1},
  saloon:{f:.44,nose:.42,cowl:.63,deck:.69,yb:.105,a:.30,rk:1.6,rl:.21,rs:.15,R:.33,sal:1},
- coupe:{f:.44,nose:.43,cowl:.62,deck:.71,yb:.1,a:.34,rk:1.8,rl:.14,rs:.20,R:.34,sal:1,d2:1},
+ coupe:{f:.44,nose:.43,cowl:.62,deck:.71,yb:.1,a:.34,rk:1.8,rl:.17,rs:.23,R:.34,sal:1,d2:1},
  gt:{f:.40,nose:.45,cowl:.64,deck:.73,yb:.1,a:.45,rk:1.8,rl:.12,rs:.19,R:.35,sal:1,d2:1,crown:.05},
- roadster:{f:.42,nose:.45,cowl:.66,deck:.73,yb:.1,a:.40,rk:1.6,rl:.08,rs:.10,R:.33,sal:1,d2:1,soft:1},
- super:{f:.42,nose:.33,cowl:.58,deck:.80,yb:.085,a:.03,rk:2.1,rl:.10,rs:.20,R:.35,sal:1,d2:1,crown:-.03,roofW:.60,q:.5,intakes:1},
+ roadster:{f:.42,nose:.45,cowl:.66,deck:.73,yb:.1,a:.40,rk:1.6,rl:.14,rs:.22,R:.33,sal:1,d2:1,soft:1},
+ super:{f:.42,nose:.33,cowl:.58,deck:.76,yb:.085,a:.03,rk:2.1,rl:.10,rs:.27,R:.35,sal:1,d2:1,crown:-.03,roofW:.60,q:.5,intakes:1},
  suvS:{f:.48,nose:.49,cowl:.64,beltR:.68,tail:.87,yb:.125,a:.25,rk:1.3,rl:.34,R:.33,rakeR:.18,tp:1.3,hatch:1,p3:.33},
  suv:{f:.47,nose:.50,cowl:.64,beltR:.69,tail:.90,yb:.13,a:.25,rk:1.3,rl:.40,R:.355,rakeR:.12,tp:1.4,hatch:1,p3:.35,round:.7},
  suvL:{f:.45,nose:.52,cowl:.65,beltR:.69,tail:.93,yb:.14,a:.25,rk:1.25,rl:.44,R:.385,rakeR:.07,tp:1.5,hatch:1,p3:.37,round:.55,roofW:.76},
@@ -393,16 +393,16 @@ const TYPES={/* f: front-overhang share, nose/cowl/deck/beltR/tail as fractions 
  classic:{f:.42,nose:.52,cowl:.66,beltR:.70,tail:.88,yb:.12,a:.22,rk:.95,rl:.28,R:.27,rakeR:.14,tp:1.2,hatch:1,round:1.2},
  classicSaloon:{f:.44,nose:.50,cowl:.64,deck:.70,yb:.12,a:.30,rk:1.1,rl:.20,rs:.12,R:.29,sal:1,round:1.2},
  gtclassic:{f:.40,nose:.42,cowl:.62,deck:.70,yb:.11,a:.52,rk:1.5,rl:.12,rs:.18,R:.33,sal:1,d2:1,round:1.2},
- roadsterClassic:{f:.42,nose:.50,cowl:.68,deck:.72,yb:.12,a:.42,rk:1.2,rl:.08,rs:.10,R:.30,sal:1,d2:1,soft:1,round:1.2}};
+ roadsterClassic:{f:.42,nose:.50,cowl:.68,deck:.72,yb:.12,a:.42,rk:1.2,rl:.14,rs:.22,R:.30,sal:1,d2:1,soft:1,round:1.2}};
 
 function typeGen(T,c){const L=c.L,W=c.W,H=c.H,WB=c.WB,NZ=L/2,ZF=NZ-(L-WB)*T.f,ZB=ZF-WB,R=c.R||T.R,yb=H*(T.yb||.11);
  const nose=H*T.nose,cowl=H*T.cowl,ws0=ZF-T.a*WB,ws1=ws0-(H-.04-cowl)*T.rk,zpk=ws1-.12*L,rf1=Math.max(ws1-T.rl*L,-NZ+.35);
  const p={L,W,H,WB,fo:NZ-ZF,R,yb,nose,cowl,ws0,ws1,zpk:Math.max(zpk,(ws1+rf1)/2),rf1,rfd:.04,q:T.q,crown:T.crown,round:T.round,roofW:T.roofW?W/2*T.roofW:null,p3y:T.p3?H*T.p3:null,rim:c.rim,sill:c.sill};
  if(T.sal){p.type='saloon';p.deck=H*T.deck;p.rs0=Math.max(rf1-T.rs*L*(T.soft?.6:1),-NZ+.30);if(T.d2)p.posts=[];else{const bp=(ws1+rf1)/2+.02;p.posts=[[bp-.05,bp+.05]]}}
- else{p.type='hatch';p.beltR=H*T.beltR;p.tail=H*T.tail;p.rakeR=T.rakeR;p.pullR=.08*(T.round==null?1:T.round);p.tp=T.tp;
+ else{p.type='hatch';p.beltR=H*T.beltR;p.tail=H*(c.tail||T.tail);p.rakeR=c.rakeR!=null?c.rakeR:T.rakeR;p.pullR=.08*(T.round==null?1:T.round);p.tp=T.tp;
   if(T.van){p.sideB=ws1-.5;p.posts=[]}
-  else if(T.pickup){p.cabEnd=ws1-.95;p.rf1=p.cabEnd+.12;p.zpk=(ws1+p.rf1)/2;p.sideB=p.cabEnd+.05;p.bed=[-NZ-.1,p.cabEnd-.08];p.rsGlass=[p.cabEnd-.1,p.cabEnd+.01];const bp=(ws1+p.cabEnd)/2;p.posts=[[bp-.05,bp+.05]]}
-  else{p.sideB=-NZ+(T.tail>.9?.45:.55);const bp=(ws1+rf1)/2+.1;p.posts=[[bp-.05,bp+.05]];if(T.tail>.85&&!c.d2)p.posts.push([p.sideB+.32,p.sideB+.36])}}
+  else if(T.pickup){p.cabEnd=ws1-1.45;p.rf1=p.cabEnd+.12;p.zpk=(ws1+p.rf1)/2;p.sideB=p.cabEnd+.05;p.bed=[-NZ-.1,p.cabEnd-.08];p.rsGlass=[p.cabEnd-.1,p.cabEnd+.01];const bp=(ws1+p.cabEnd)/2;p.posts=[[bp-.05,bp+.05]]}
+  else{p.sideB=-NZ+(T.tail>.9?.45:.55);if(!T.spare)p.rsGlass=[-NZ-.3,rf1+.02];const bp=(ws1+rf1)/2+.1;p.posts=[[bp-.05,bp+.05]];if(T.tail>.85&&!c.d2)p.posts.push([p.sideB+.32,p.sideB+.36])}}
  if(T.soft)p.roofCol=0x1a1a1c;
  if(c.pillars)p.pillars=1;if(c.roofCol!=null)p.roofCol=c.roofCol;
  return p}
@@ -491,7 +491,7 @@ function brandDeco(B,P,T){const W0=P.W/2,NZ=P.L/2,yF0=P.yb+.09,yF1=P.nose,yR0=P.
   else if(t==='square'){tl(bx([.70,.55],[.92,.85]))}
   else if(t==='oval'){both('z',-1,rp(circ(.72,.78,.18,.12)),0x6d0a10,1);both('z',-1,shrink(rp(circ(.72,.78,.18,.12)),.8),0xc31a26,2)}
   const rpY=T.sal?Rr(0,.45)[1]:Rr(0,.30)[1];plate('z',-1,rpY,rpY+.11,0xf0c418);
-  if(T.hatch&&!T.pickup){const a=W0*(T.van?.82:.64),b2=W0*(T.van?.80:.54),y0=P.beltR+.03,y1=P.tail-.07;if(y1-y0>.12){if(T.van){both('z',-1,[[.05,y0+.05],[a,y0+.05],[b2,y1],[.05,y1]],WSC,1);decal('z',-1,rect(-.008,yR0,.008,P.tail-.03),0x1b1c1f,1)}else decal('z',-1,[[-a,y0],[a,y0],[b2,y1],[-b2,y1]],WSC,1)}}
+  if(T.hatch&&!T.pickup){const a=W0*(T.van?.82:.66),b2=W0*(T.van?.80:.56),y0=P.beltR+.02,y1=P.tail-.03;if(y1-y0>.08){if(T.van){both('z',-1,[[.05,y0+.05],[a,y0+.05],[b2,y1],[.05,y1]],WSC,1);decal('z',-1,rect(-.008,yR0,.008,P.tail-.03),0x1b1c1f,1)}else decal('z',-1,[[-a,y0],[a,y0],[b2,y1],[-b2,y1]],WSC,1)}}
   if(T.intakes)sides([[P.ZB+P.R+.1,P.yb+.25],[P.ZB+P.R+.85,P.yb+.25],[P.ZB+P.R+.85,P.deck-.2],[P.ZB+P.R+.3,P.deck-.25]],0x0f1012,1);
   /* doors, handles, sills */
   const ZF=NZ-P.fo,ZB=ZF-P.WB,RA=P.R+.039,d0=P.ws0-.06;let doors;
@@ -583,9 +583,9 @@ const CAT=[
  ['q5','AUDI Q5','audi','suv',4.682,1.893,1.662,2.819,520,5,'prem',{rim:'twin'}],
  ['rs6','AUDI RS6 AVANT','audi','estate',4.995,1.951,1.460,2.928,1000,9,'prem',{rim:'dark'}],
  ['tt','AUDI TT','audi','coupe',4.191,1.832,1.353,2.505,400,7,'prem',{rim:'twin'}],
- ['cayenne','PORSCHE CAYENNE','porsche','suvL',4.930,1.983,1.698,2.895,800,7,'prem',{rim:'twin'}],
+ ['cayenne','PORSCHE CAYENNE','porsche','suvL',4.930,1.983,1.698,2.895,800,7,'prem',{rim:'twin',deco:{h:'slim',g:'wide'}}],
  ['taycan','PORSCHE TAYCAN','porsche','saloon',4.963,1.966,1.379,2.900,850,9,'super',{rim:'dark'}],
- ['macan','PORSCHE MACAN','porsche','suv',4.726,1.922,1.622,2.807,600,7,'prem',{rim:'twin'}],
+ ['macan','PORSCHE MACAN','porsche','suv',4.726,1.922,1.622,2.807,600,7,'prem',{rim:'twin',deco:{h:'slim',g:'wide'}}],
  ['boxster','PORSCHE BOXSTER','porsche','roadster',4.379,1.801,1.281,2.475,650,8,'super',{rim:'twin'}],
  ['golfgti','VW GOLF GTI','vw','hatch',4.289,1.789,1.471,2.627,350,7,'every',{rim:'dark'}],
  // ---- ELECTRIC AVENUE
@@ -606,7 +606,7 @@ const CAT=[
  ['roma','FERRARI ROMA','ferrari','gt',4.656,1.974,1.301,2.670,1900,9,'super',{rim:'fine'}],
  ['huracan','LAMBORGHINI HURACAN','lambo','super',4.520,1.933,1.165,2.620,2200,10,'super',{rim:'super'}],
  ['revuelto','LAMBORGHINI REVUELTO','lambo','super',4.947,2.033,1.160,2.779,4500,11,'super',{rim:'super'}],
- ['urus','LAMBORGHINI URUS','lambo','suvL',5.112,2.016,1.638,3.003,1900,9,'super',{rim:'super'}],
+ ['urus','LAMBORGHINI URUS','lambo','suvL',5.112,2.016,1.638,3.003,1900,9,'super',{rim:'super',tail:.78,rakeR:.34}],
  ['m750s','McLAREN 750S','mclaren','super',4.569,1.930,1.196,2.670,2500,10,'super',{rim:'super'}],
  ['artura','McLAREN ARTURA','mclaren','super',4.539,1.976,1.193,2.640,1900,9,'super',{rim:'super'}],
  ['db12','ASTON MARTIN DB12','aston','gt',4.725,1.980,1.295,2.805,1900,9,'super',{rim:'fine'}],
@@ -640,8 +640,8 @@ const CATLABEL={hatchS:'CITY CAR',hatch:'HATCHBACK',estate:'ESTATE',saloon:'SALO
  box4x4:'4X4',van:'VAN',vanL:'BIG VAN',pickup:'PICKUP',classic:'CLASSIC',classicSaloon:'CLASSIC',gtclassic:'CLASSIC GT',roadsterClassic:'CLASSIC ROADSTER'};
 const PERF=['GENTLE','EASYGOING','STEADY','LIVELY','PERKY','QUICK','BRISK','FAST','VERY FAST','RAPID','BLISTERING','HYPERCAR'];
 for(const row of CAT){const[key,name,brand,type,L,W,H,WB,price,pf,pal,ex]=row,T=TYPES[type],X=ex||{};
- const P=typeGen(T,{L,W,H,WB,R:X.R,rim:RIMS[X.rim||(pf>=8?'dark':'silver')],sill:X.sill,pillars:X.pillars,roofCol:X.roofCol,d2:T.d2});
- const B=BRAND[brand]||BRAND.vw;const body=brandDeco(B,P,T);
+ const P=typeGen(T,{L,W,H,WB,R:X.R,rim:RIMS[X.rim||(pf>=8?'dark':'silver')],sill:X.sill,pillars:X.pillars,roofCol:X.roofCol,d2:T.d2,tail:X.tail,rakeR:X.rakeR});
+ const B=Object.assign({},BRAND[brand]||BRAND.vw,X.deco||{});const body=brandDeco(B,P,T);
  P.deco=T.spare?(D=>{body(D);spareX(P)(D)}):body;
  if(type==='super')P.extras=D=>{D.box([0,P.deck+.03,-L/2+.18],[W*.62,.025,.14],0,null)};
  const S=gen(P);const big=T===TYPES.suvL||T===TYPES.box4x4||T===TYPES.van||T===TYPES.vanL||T===TYPES.pickup;
