@@ -1,2 +1,4 @@
 .wrangler/
 node_modules/
+tests/fulltest/report/
+__pycache__/

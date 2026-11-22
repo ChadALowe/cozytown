@@ -1,0 +1,36 @@
+# Full test: plays through the whole game in headless Chrome.
+# It only runs when you start it yourself: GitHub -> Actions -> "Full test" -> Run workflow.
+# It never runs on pushes or pull requests.
+name: Full test
+on:
+  workflow_dispatch:
+    inputs:
+      quick:
+        description: 'Quick run (first 12 buildings only, a few minutes)'
+        type: boolean
+        default: false
+jobs:
+  fulltest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright
+        run: |
+          pip install playwright==1.49.1
+          python -m playwright install --with-deps chromium
+      - name: Play through the game
+        run: python tests/fulltest/run.py --workers 2 ${{ inputs.quick && '--quick' || '' }}
+      - name: Show the report
+        if: always()
+        run: cat tests/fulltest/report/report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Keep the report and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fulltest-report
+          path: tests/fulltest/report
+          retention-days: 14
