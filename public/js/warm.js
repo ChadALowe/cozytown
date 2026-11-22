@@ -22,5 +22,5 @@ function warm(){
 }
 let tries=0;(function wait(){if(window.READY===true){setTimeout(warm,300);return}if(++tries<600)setTimeout(wait,100)})();
 // the extra cars' textures arrive asynchronously: draw them once more when they have landed
-setTimeout(()=>{try{if(window.NC){const rt=new THREE.WebGLRenderTarget(16,16),keep=[];scene.traverse(o=>{keep.push([o,o.visible,o.frustumCulled]);o.visible=true;o.frustumCulled=false});R.setRenderTarget(rt);R.render(scene,cam);R.setRenderTarget(null);for(const[o,v,f]of keep){o.visible=v;o.frustumCulled=f}rt.dispose()}}catch(e){}},4500);
+setTimeout(()=>{try{if(window.NC){const rt=new THREE.WebGLRenderTarget(16,16),keep=[];scene.traverse(o=>{keep.push([o,o.visible,o.frustumCulled]);o.visible=true;o.frustumCulled=false});R.setRenderTarget(rt);R.render(scene,cam);R.setRenderTarget(null);for(const[o,v,f]of keep){o.visible=v;o.frustumCulled=f}rt.dispose()}}catch(e){czErr(e,"warm.js")}},4500);
 })();

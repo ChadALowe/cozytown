@@ -43,7 +43,7 @@ T.pois.push({x:FARM.x,z:FARM.z,n:'HOLLOW FARM',c:'farm',ic:'🏚',r:60},{x:QUARR
 const SECRETS=[{k:'quarry',x:935,z:-780,lab:'FISH SOMETHING OUT OF THE QUARRY POND',go:()=>{cash+=200;toast('🔐 A RUSTY SAFE! INSIDE: £200 IN OLD NOTES.')}},{k:'pill',x:PILL[0],z:PILL[1]-3.6,lab:'SEARCH THE PILLBOX',go:()=>{keep('A WW2 MEDAL');toast('🎖 AN OLD AMMO TIN. INSIDE: A WW2 MEDAL!')}},
  {k:'cave',x:CAVE[0]-6,z:CAVE[1]-1,lab:'EXPLORE THE CAVE',go:()=>{cash+=300;keep('A PIRATE DOUBLOON');toast('🏴‍☠️ A SMUGGLER\'S CHEST! £300 AND A GOLD DOUBLOON.')}},{k:'tun',x:TUN[0]-1.6,z:TUN[1],lab:'TRY THE SERVICE DOOR',go:()=>{cash+=100;keep('A VINTAGE RAILWAY LAMP');toast('🚇 A FORGOTTEN STORE ROOM. £100 AND AN OLD RAILWAY LAMP.')}},
  {k:'farm',x:-995,z:-768,lab:'POKE AROUND THE RUINED FARMHOUSE',go:()=>{cash+=60;toast('🏚 UNDER A FLOORBOARD: £60. AND A NOTE: "THE BANK VAULT DOOR STICKS."');CJ.bank.tip=1}}];
-function keep(n){try{TOWNSHOPS.col[n]=1}catch(e){}}
+function keep(n){try{TOWNSHOPS.col[n]=1}catch(e){czErr(e,"crime_jobs.js")}}
 
 /* ================================================================ Big Terry (behind The Railway Tavern) */
 const TP={};{const d=door('THE RAILWAY TAVERN');if(d){const p=out(d,2.2,-8.5);TP.x=p[0];TP.z=p[1];TP.g=person(4242,{beard:true,old:false,tc:[.12,.12,.14],hs:2},TP.x,TP.z,d.psi);near(TP.g,200);
@@ -227,7 +227,7 @@ PHX.push({k:'crime',ic:'🎩',n:'UNDERWORLD',bg:'#3a0a14',render({el,btn}){el('d
 PHX.push({k:'taxi',ic:'🚕',n:'TAXI',bg:'#a08010',render({el,btn}){el('div','phH','COZY CABS');el('small',null,'WE\'LL TAKE YOU ANYWHERE YOU\'VE BEEN. YOUR CAR STAYS PUT.');
  if(!C.inTown()){el('div','phR','ONLY IN COZYTOWN');return}if(C.W.st){el('div','phR','"NOT WITH THE OLD BILL ON YOUR TAIL, MATE."');return}
  const p=C.LAST,L=[{n:'HOME',x:HM.x,z:HM.z}];if(PH.way)L.push({n:'WAYPOINT: '+PH.way.n,x:PH.way.x,z:PH.way.z});for(const q of T.pois)if(q.d)L.push(q);
- for(const q of L){const d=Math.hypot(q.x-p.x,q.z-p.z);if(d<60)continue;const f=Math.round(4+d/90),r=el('div','phR');el('div',null,q.n,r);btn(el('div','bt',null,r),'£'+f+' · '+Math.round(d)+'M',()=>{if(cash<f)return toast('NOT ENOUGH CASH');cash-=f;try{phClose()}catch(e){}
+ for(const q of L){const d=Math.hypot(q.x-p.x,q.z-p.z);if(d<60)continue;const f=Math.round(4+d/90),r=el('div','phR');el('div',null,q.n,r);btn(el('div','bt',null,r),'£'+f+' · '+Math.round(d)+'M',()=>{if(cash<f)return toast('NOT ENOUGH CASH');cash-=f;try{phClose()}catch(e){czErr(e,"crime_jobs.js")}
   setTimeout(()=>fade(()=>{if(!GS.onFoot){GS.onFoot=1;man.visible=true;setLabels()}let x=q.x,z=q.z;const r2=roadNear(x,z);if(r2.s){x=r2.q.px;z=r2.q.pz;const nx=-r2.s.dz,nz=r2.s.dx;x+=nx*(RW+1);z+=nz*(RW+1)}P.x=x;P.z=z;GT+=d/2400;toast('🚕 HERE YOU ARE, '+q.n+'. CHEERS!')}),200)})}}});
 {const j0=phJobs;phJobs=function(){const L=j0();if(TP.x)L.push({n:'BIG TERRY\'S JOBS',pay:'£££ · ILLEGAL',info:'Ask around the back of the Railway Tavern. Smuggling, cars to order and worse.',pos:{x:TP.x,z:TP.z},st:CJ.job?'ON A JOB: '+CJ.job.n:''});L.push({n:'TRAIN TRIPS',pay:'£3 A TICKET',info:'Three stations: Central, Westbrook Halt and Eastfield.',pos:{x:T.stations[0].door[0],z:T.stations[0].door[1]},st:''});return L}}
 window.CRIME2={CJ,startJob,failJob,JOBS,TP,SECRETS,FARM,CHOP,brag,vault,mailVan,rummage,EVT};

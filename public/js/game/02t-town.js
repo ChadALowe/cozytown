@@ -10,7 +10,7 @@ function landOK(cx,cz,rot,hw,hd){const c=Math.cos(rot),s=Math.sin(rot);
  for(let a=-1;a<=1.01;a+=.5)for(let b=-1;b<=1.01;b+=1){const lx=a*(hw+6),lz=b*(hd+6),x=cx+lx*c+lz*s,z=cz-lx*s+lz*c;
   if(!landAt(x,z)||inOld(x,z,0)||z>coastZ(x)-26||wetAt(x,z)||Math.abs(z-RAILZ)<9||x<TB.x0+26||x>TB.x1-26||z<TB.z0+26)return false}return true}
 const mGrass=wmat(null,null,grassTex),mWater=wmat([1.05,1.05,1.05],{polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1},objTex);
-const gk=(x,z)=>{const K=ck(x,z);return K.gr||(K.gr=new Builder(8))},wk=(x,z)=>{const K=ck(x,z);return K.wa||(K.wa=new Builder(6))};
+const gk=(x,z)=>{const K=ck(x,z);return K.gr||(K.gr=new CBuilder(8))},wk=(x,z)=>{const K=ck(x,z);return K.wa||(K.wa=new CBuilder(6))};
 const LWB=(cx,cz,rot)=>{const c=Math.cos(rot),s=Math.sin(rot);return(lx,ly,lz)=>[cx+lx*c+lz*s,Y0+ly,cz-lx*s+lz*c]};
 const rr=(a,b)=>a+rnd()*(b-a);
 const reserve=(x,z,hw,hd,rot)=>PLACED.push({x,z,rot:rot||0,hw,hd});
@@ -363,10 +363,10 @@ for(let q=0,n=0;q<9000&&n<1500;q++){const x=rr(TB.x0+30,TB.x1-30),z=rr(TB.z0+30,
 for(const[x,z,ry,t]of[[-1052,-120,Math.PI/2,'COZYTOWN'],[852,-140,-Math.PI/2,'COZYTOWN'],[-10,-1100,0,'COZYTOWN 2 MILES'],[868,-560,-Math.PI/2,'EASTFIELD STATION ←']]){const K=ck(x,z);pbox(K.o,x-1.6,Y0,z,.14,2.2,.14,[.2,.2,.2]);pbox(K.o,x+1.6,Y0,z,.14,2.2,.14,[.2,.2,.2]);signPlane(K,t,'#ffffff','#101018',3.6,.7,x,Y0+2.1,z,ry,256,48)}
 
 /* ---------------------------------------------------------------- finalise every chunk (village + town) */
-for(const c of CHL){const g=new THREE.Group();c.grp=g;for(const[k,m]of[['o',mObj],['b',mBrick],['s',mStone],['r',mRoof],['g',mGlass],['l',gLit],['rd',mRoad],['gr',mGrass],['wa',mWater]]){if(!c[k])continue;if(c[k].p.length){const me=c[k].mesh(m);g.add(me);if(k==='gr'){me.userData.cs=Float32Array.from(c[k].c);TOWN.grM=TOWN.grM||[];TOWN.grM.push(me)}}c[k].p=c[k].c=c[k].u=null}for(const e of c.x)g.add(e);scene.add(g)}
-{for(const me of TOWN.grM||[]){const cs=me.userData.cs,cw=new Float32Array(cs.length);for(let i=0;i<cs.length;i+=3){const sand=cs[i]>.6&&cs[i+2]<cs[i]*.8&&cs[i+1]>.55;if(sand){cw[i]=cs[i];cw[i+1]=cs[i+1];cw[i+2]=cs[i+2];continue}const l=.84+.12*(cs[i+1]-.4);cw[i]=.86*l;cw[i+1]=.89*l;cw[i+2]=.93*l}me.userData.cw=cw}
+for(const c of CHL){const g=new THREE.Group();c.grp=g;for(const[k,m]of[['o',mObj],['b',mBrick],['s',mStone],['r',mRoof],['g',mGlass],['l',gLit],['rd',mRoad],['gr',mGrass],['wa',mWater]]){if(!c[k])continue;if(c[k].p.length){const me=c[k].mesh(cmat(m),k==='gr');g.add(me);if(k==='gr'&&me.geometry.attributes.color){me.userData.cs=me.geometry.attributes.color.array.slice();TOWN.grM=TOWN.grM||[];TOWN.grM.push(me)}}c[k].p=c[k].c=c[k].u=null}for(const e of c.x)g.add(e);scene.add(g)}
+{for(const me of TOWN.grM||[]){const c8=me.userData.cs,cw=new Uint8Array(c8.length),K=1/127.5,w8=v=>Math.max(0,Math.min(255,Math.round(v*127.5)));for(let i=0;i<c8.length;i+=3){const r=c8[i]*K,gg=c8[i+1]*K,b=c8[i+2]*K;const sand=r>.6&&b<r*.8&&gg>.55;if(sand){cw[i]=c8[i];cw[i+1]=c8[i+1];cw[i+2]=c8[i+2];continue}const l=.84+.12*(gg-.4);cw[i]=w8(.86*l);cw[i+1]=w8(.89*l);cw[i+2]=w8(.93*l)}me.userData.cw=cw}
 }
-function cullChunks(){const R=scene.fog.far+15,R2=R*R,cx=cam.position.x,cz=cam.position.z;for(const c of CHL){const dx=c.cx-cx,dz=c.cz-cz;c.grp.visible=dx*dx+dz*dz<R2}homeG.visible=Math.hypot(HM.x-cx,HM.z-cz)<R+20}
+function cullChunks(){syncCMat();const R=scene.fog.far+15,R2=R*R,cx=cam.position.x,cz=cam.position.z;for(const c of CHL){const dx=c.cx-cx,dz=c.cz-cz;c.grp.visible=dx*dx+dz*dz<R2}homeG.visible=Math.hypot(HM.x-cx,HM.z-cz)<R+20}
 /* every static collider so far goes into a spatial grid; COL keeps only the ones added later (traffic, doors, minigames) */
 TOWN.ncol=COL.length;colGrid(COL.splice(0));
 window.VINFO={bld:BLD.length,tg:TG.length,col:TOWN.ncol,chunks:CHL.length,cnt,town:TOWN.cnt,fields:TOWN.fields};

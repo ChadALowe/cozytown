@@ -127,8 +127,8 @@ if(window.MARLOWE){const MW=MARLOWE,pk=(MW.BLK||[]).find(b=>b.sp==='parkw');
   const b={key:'mdr',n:'SKY TOWER DRONE DASH',type:'drone',bg:'#10b0a0',fg:'#ffffff',pts:DPTS2.map(q=>[q[0],q[1]*.88,q[2]]),gs:3.6,laps:2,lp:[10,-44],pad:[0,-46],prize:[150,80,30],x:ex,z:ez,rot:0,y:gy(ex,ez),R:50,city:1};TRACKS.push(b);buildDrone(b)}}
 /* city tracks only show once Marlowe is built; map pins */
 setInterval(()=>{for(const T of TRACKS)if(T.city)T.G.visible=!!(window.MARLOWE&&MARLOWE.M&&MARLOWE.M.built)},1000);
-try{if(window.TOWN&&TOWN.pois)for(const T of TRACKS)if(!T.city)TOWN.pois.push({x:T.px,z:T.pz,n:T.n,c:'fun',ic:T.type==='drone'?'🛸':'🏎',d:1})}catch(e){}
-try{const MW=window.MARLOWE;for(const T of TRACKS)if(T.city)MW.CITY.poi.push({n:T.n,u:T.px-MW.OX,v:T.pz-MW.OZ,ic:T.type==='drone'?'🛸':'🏎'})}catch(e){}
+try{if(window.TOWN&&TOWN.pois)for(const T of TRACKS)if(!T.city)TOWN.pois.push({x:T.px,z:T.pz,n:T.n,c:'fun',ic:T.type==='drone'?'🛸':'🏎',d:1})}catch(e){czErr(e,"rc.js")}
+try{const MW=window.MARLOWE;for(const T of TRACKS)if(T.city)MW.CITY.poi.push({n:T.n,u:T.px-MW.OX,v:T.pz-MW.OZ,ic:T.type==='drone'?'🛸':'🏎'})}catch(e){czErr(e,"rc.js")}
 window.RCTRACKS=TRACKS;
 
 /* ------------------------------------------------------------------ shops */
@@ -160,7 +160,7 @@ CUSTOM_SHOP.rcbuy=function(msg){const S=SHOPKIND||SHOPS[0],K=S.kind;document.get
  document.getElementById('shMsg').textContent=msg||(K==='d'?'RACE THEM AT COZY DRONE PARK AND THE SKY TOWER DRONE DASH':'RACE THEM AT COZY RC RACEWAY AND MARLOWE PARK RC CIRCUIT');
  for(const it of S.list){const o=own(K,it.k),sel=RS.sel[K]===it.k,sp=K==='d'?it.spd/7:it.spd/4.4,ag=K==='d'?it.yaw/.76:it.grip/1.6;
   dRow(it.n+'  ·  '+it.d+'  ·  SPEED '+bar(sp)+'  HANDLING '+bar(ag),[[o?(sel?'SELECTED':'USE'):'BUY £'+it.p,()=>{if(!o){if(cash<it.p)return renderShop('NOT ENOUGH CASH');cash-=it.p;RS.own[K][it.k]=1;beep(660,.1,'square',.06);setTimeout(()=>beep(990,.15,'square',.06),110)}
-   RS.sel[K]=it.k;try{saveGame()}catch(e){}renderShop(o?'NOW USING THE '+it.n:'YOURS! '+it.n+' · HEAD TO A TRACK AND STEP ON THE PAD')},sel]])}
+   RS.sel[K]=it.k;try{saveGame()}catch(e){czErr(e,"rc.js")}renderShop(o?'NOW USING THE '+it.n:'YOURS! '+it.n+' · HEAD TO A TRACK AND STEP ON THE PAD')},sel]])}
  dRow('',[['BACK',()=>closeShop()]])};
 
 /* ------------------------------------------------------------------ the race */
@@ -194,7 +194,7 @@ const IN=()=>({g:!!(TP.g||KB.KeyW||keys.up),b:!!(TP.b||KB.KeyS||keys.down),st:cl
 /* sound: a motor whine per race (yours) */
 let snd=null;function sndOn(type){try{if(typeof initAudio==='function')initAudio();if(!AC)return;const o=AC.createOscillator(),o2=AC.createOscillator(),f=AC.createBiquadFilter(),g=AC.createGain();o.type='sawtooth';o2.type='square';f.type='lowpass';f.frequency.value=type==='drone'?2600:1800;g.gain.value=0;o.connect(f);o2.connect(f);f.connect(g);g.connect(AC.destination);o.start();o2.start();snd={o,o2,g,f}}catch(e){snd=null}}
 function sndSet(fr,v){if(!snd)return;const t=AC.currentTime;snd.o.frequency.setTargetAtTime(fr,t,.05);snd.o2.frequency.setTargetAtTime(fr*1.503,t,.05);snd.g.gain.setTargetAtTime(v,t,.08)}
-function sndOff(){if(!snd)return;try{snd.g.gain.setTargetAtTime(0,AC.currentTime,.05);const s=snd;setTimeout(()=>{try{s.o.stop();s.o2.stop()}catch(e){}},300)}catch(e){}snd=null}
+function sndOff(){if(!snd)return;try{snd.g.gain.setTargetAtTime(0,AC.currentTime,.05);const s=snd;setTimeout(()=>{try{s.o.stop();s.o2.stop()}catch(e){czErr(e,"rc.js")}},300)}catch(e){czErr(e,"rc.js")}snd=null}
 const chime=(n)=>{const f=[784,988,1175,1568];for(let i=0;i<(n||2);i++)setTimeout(()=>beep(f[i%4],.12,'triangle',.06),i*70)};
 
 /* sparks / dust */
@@ -277,7 +277,7 @@ function lapDone(r){const T=R.T,lt=R.t-r.lapT;r.lapT=R.t;if(lt<r.best)r.best=lt;
 const flash=v=>{const f=H('.flash');f.style.transition='none';f.style.opacity=v;requestAnimationFrame(()=>{f.style.transition='opacity .35s';f.style.opacity=0})};
 function finish(quit){if(!R.on||R.fin)return;R.fin=1;const T=R.T,me=R.me;sndOff();
  if(quit){end();return}
- const place=me.place||R.list.filter(q=>q.done).length,pr=T.prize[place-1]||0;cash+=pr;if(place===1)RS.wins=(RS.wins|0)+1;try{saveGame()}catch(e){}
+ const place=me.place||R.list.filter(q=>q.done).length,pr=T.prize[place-1]||0;cash+=pr;if(place===1)RS.wins=(RS.wins|0)+1;try{saveGame()}catch(e){czErr(e,"rc.js")}
  const ord=['1ST','2ND','3RD','4TH'][place-1],bx=document.createElement('div');bx.className='res';
  bx.innerHTML=`<h2>${place===1?'🏆 ':''}${ord}!</h2><p>${T.n}</p><p>TIME ${me.t.toFixed(2)}s · BEST LAP ${me.best.toFixed(2)}s</p><p>TRACK RECORD ${(RS.best[T.key]||me.best).toFixed(2)}s</p><p style="color:#3aff7a;font-size:20px">${pr?'+£'+pr+' PRIZE':'NO PRIZE THIS TIME'}</p><button data-a="again">RACE AGAIN</button><button data-a="done">DONE</button>`;
  bx.querySelector('[data-a=again]').onclick=e=>{e.stopPropagation();end();setTimeout(()=>start(T),60)};bx.querySelector('[data-a=done]').onclick=e=>{e.stopPropagation();end()};hud.appendChild(bx);

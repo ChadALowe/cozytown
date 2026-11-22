@@ -219,7 +219,7 @@ addEventListener('keydown',e=>{if((e.key==='m'||e.key==='M')&&here()&&!FOV&&!e.r
 /* ------------------------------------------------------------------ your car: waiting in the airport car park */
 const VAL={has:0,x:0,z:0,psi:0};
 function parkAtAirport(){const p=W(-205,-310.5);GS.x=p[0];GS.z=p[1];GS.psi=-Math.PI/2;GS.vx=GS.vz=0;GS.y=Y+.1;GS.vy=0;GS.prevGY=GS.y;GS.pitch=GS.roll=0}
-{const a0=M.arrive;M.arrive=function(sv){a0(sv);if(!inReg(GS.x,GS.z)&&!(window.RESORT&&RESORT.inReg(GS.x,GS.z))&&!(window.MOON&&MOON.MN.on)){VAL.has=1;VAL.x=GS.x;VAL.z=GS.z;VAL.psi=GS.psi}parkAtAirport();setTimeout(()=>{try{phText('COZY VALET',"Your car is waiting for you in the Marlowe Airport car park, just south of the terminal. Enjoy the city!")}catch(e){}},2500)}}
+{const a0=M.arrive;M.arrive=function(sv){a0(sv);if(!inReg(GS.x,GS.z)&&!(window.RESORT&&RESORT.inReg(GS.x,GS.z))&&!(window.MOON&&MOON.MN.on)){VAL.has=1;VAL.x=GS.x;VAL.z=GS.z;VAL.psi=GS.psi}parkAtAirport();setTimeout(()=>{try{phText('COZY VALET',"Your car is waiting for you in the Marlowe Airport car park, just south of the terminal. Enjoy the city!")}catch(e){czErr(e,"marlowe2.js")}},2500)}}
 {const H=window.AIRFIELDS.HOME,a0=H.arrive;H.arrive=function(sv){a0(sv);if(inReg(GS.x,GS.z)){if(VAL.has){GS.x=VAL.x;GS.z=VAL.z;GS.psi=VAL.psi}else respawn(false);GS.vx=GS.vz=0;GS.y=gH(GS.x,GS.z)+.1;GS.prevGY=GS.y;VAL.has=0}}}
 {const s0=cozySave,l0=cozyLoad;cozySave=function(){const o=s0();o.mval=VAL;return o};cozyLoad=function(z){l0(z);if(z&&z.mval)Object.assign(VAL,z.mval)}}
 /* ------------------------------------------------------------------ per-frame */

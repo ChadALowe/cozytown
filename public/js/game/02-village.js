@@ -2,7 +2,7 @@
 const mObj=wmat(null,null,objTex),mBrick=hmat(T_BRICK,1),mStone=hmat(T_CONC,1),mRoof=hmat(T_ROOF,1),mGlass=wmat([.3,.38,.52],{vertexColors:false}),mRoad=wmat(null,{polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2},roadTex);
 const gLit=new THREE.MeshBasicMaterial({color:0x4d607f,side:THREE.DoubleSide}),lampM=new THREE.MeshBasicMaterial({color:0xbbbbb0,side:THREE.DoubleSide});
 const CHK=[],CHL=[];
-function ck(x,z){const i=clamp(Math.floor((x+HALF)/CH),0,NCH-1),j=clamp(Math.floor((z+HALF)/CH),0,NCH-1),k=j*NCH+i;let c=CHK[k];if(!c){c=CHK[k]={cx:-HALF+(i+.5)*CH,cz:-HALF+(j+.5)*CH,o:new Builder(3),b:new Builder(2),s:new Builder(2),r:new Builder(2),g:new Builder(3),l:new Builder(3),rd:new Builder(4),x:[]};CHL.push(c)}return c}
+function ck(x,z){const i=clamp(Math.floor((x+HALF)/CH),0,NCH-1),j=clamp(Math.floor((z+HALF)/CH),0,NCH-1),k=j*NCH+i;let c=CHK[k];if(!c){c=CHK[k]={cx:-HALF+(i+.5)*CH,cz:-HALF+(j+.5)*CH,o:new CBuilder(3),b:new CBuilder(2),s:new CBuilder(2),r:new CBuilder(2),g:new CBuilder(3),l:new CBuilder(3),rd:new CBuilder(4),x:[]};CHL.push(c)}return c}
 function obbHit(a,b){const dx=b.x-a.x,dz=b.z-a.z;for(const o of[a,b])for(const ang of[o.rot,o.rot+Math.PI/2]){const ax=Math.sin(ang),az=Math.cos(ang);const ra=a.hw*Math.abs(Math.cos(a.rot)*ax-Math.sin(a.rot)*az)+a.hd*Math.abs(Math.sin(a.rot)*ax+Math.cos(a.rot)*az),rb=b.hw*Math.abs(Math.cos(b.rot)*ax-Math.sin(b.rot)*az)+b.hd*Math.abs(Math.sin(b.rot)*ax+Math.cos(b.rot)*az);if(Math.abs(dx*ax+dz*az)>=ra+rb)return false}return true}
 const PLACED=[],BLD=[],OBS=[];
 PLACED.push({x:LW(3.5,-2.5)[0],z:LW(3.5,-2.5)[1],rot:HM.th,hw:8,hd:7.5});

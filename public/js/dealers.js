@@ -50,7 +50,7 @@ function placeShop(D,extra){let d=null;
   if(d){taken.add(bi);break}}
  if(!d){console.warn('city shop: no free block for',D.t);return null}
  const o=Object.assign({x:d.x,z:d.z,psi:d.psi,t:D.t,bg:D.bg,fg:D.fg,door:d,rx:12,rz:7,sz:6.2},extra||{});SHOPD.push(o);HRS[D.t]=D.h||[8,20];D.o=o;
- try{CITY.poi.push({n:D.t,u:d.u,v:d.v,ic:D.ic||'🚘'})}catch(e){}
+ try{CITY.poi.push({n:D.t,u:d.u,v:d.v,ic:D.ic||'🚘'})}catch(e){czErr(e,"dealers.js")}
  const fx=OX+d.fu+d.ou*.06,fz=OZ+d.fv+d.ov*.06,Y=G0;
  const sg=new THREE.Mesh(new THREE.PlaneGeometry(7,1.1),new THREE.MeshBasicMaterial({map:signTex(D)}));sg.position.set(fx,Y+3.6,fz);sg.rotation.y=d.psi;G.add(sg);
  const dr=new THREE.Mesh(new THREE.PlaneGeometry(2.4,2.4),new THREE.MeshBasicMaterial({color:0x1d2a36}));dr.position.set(fx+d.ou*.01,Y+1.2,fz+d.ov*.01);dr.rotation.y=d.psi;G.add(dr);

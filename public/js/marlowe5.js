@@ -13,7 +13,7 @@ const inCity=()=>M.built&&!GS.inside&&MW.inReg(P.x,P.z);
 const PASS={st:{},best:0,paid:0};const STAMPS={eye:'THE MARLOWE EYE',sky:'SKY TOWER SPOT IT!',busk:'BUSKING AT THE CIRCUS',boat:'MARLE SPEEDBOATS',metro:'MARLOWE METRO'};
 {const s0=cozySave,l0=cozyLoad;cozySave=function(){const o=s0();o.m5=PASS;return o};cozyLoad=function(z){l0(z);if(z&&z.m5)Object.assign(PASS,z.m5)}}
 function stamp(k){if(PASS.st[k])return;PASS.st[k]=1;if(window.REP)REP.add('tourist',6);const n=Object.keys(PASS.st).length;setTimeout(()=>{toast('MARLOWE PASSPORT STAMP: '+STAMPS[k]+' ('+n+'/5)');beep(784,.1,'square',.05);setTimeout(()=>beep(1046,.14,'square',.05),110)},1800);
- if(n>=5&&!PASS.paid){PASS.paid=1;setTimeout(()=>{cash+=300;toast('PASSPORT COMPLETE! THE TOURIST BOARD SENDS YOU £300');try{phText('MARLOWE TOURIST BOARD','Congratulations! You\'ve done everything Marlowe has to offer. Here\'s £300 to spend in the city.')}catch(e){}},4200)}}
+ if(n>=5&&!PASS.paid){PASS.paid=1;setTimeout(()=>{cash+=300;toast('PASSPORT COMPLETE! THE TOURIST BOARD SENDS YOU £300');try{phText('MARLOWE TOURIST BOARD','Congratulations! You\'ve done everything Marlowe has to offer. Here\'s £300 to spend in the city.')}catch(e){czErr(e,"marlowe5.js")}},4200)}}
 /* ------------------------------------------------------------------ activity framework: freeze the player, take the camera, show a HUD */
 const ACT={on:0};
 const hud=document.createElement('div');hud.style.cssText='position:fixed;inset:0;z-index:70;display:none;pointer-events:none;font:bold 13px ui-monospace,monospace;color:#fff;user-select:none;touch-action:none';document.body.appendChild(hud);

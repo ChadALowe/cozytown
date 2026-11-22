@@ -164,7 +164,7 @@ const DM={a:null,b:null,c:null,fl:[],co:[],rg:null,li:null};let DECR=[];
 function dTrace(){try{for(const r of DECR){for(const A of[IROOM,HOUSE_R]){const i=A.indexOf(r);if(i>=0)A.splice(i,1)}}}catch(e){for(const r of DECR){const i=IROOM.indexOf(r);if(i>=0)IROOM.splice(i,1)}}DECR=[]}
 function applyDecor(){['a','b','c'].forEach(k=>{const i=DEC[k],o=DM[k];o.g.visible=i>0;if(i>0){o.m.map=artTex[i];o.m.needsUpdate=true}});
  DM.fl.forEach((g,i)=>{if(g)g.visible=DEC.fl===i});DM.co.forEach((g,i)=>{if(g)g.visible=DEC.co===i});if(DEC.rg>0){DM.rg.material.map=rugTex[DEC.rg];DM.rg.material.needsUpdate=true}DM.rg.visible=DEC.rg>0;DM.li.visible=DEC.li>0;
- dTrace();const add=r=>{DECR.push(r);if(!SHOPCUR&&!(GS.inside&&SG.visible))IROOM.push(r);try{HOUSE_R.push(r)}catch(e){}};
+ dTrace();const add=r=>{DECR.push(r);if(!SHOPCUR&&!(GS.inside&&SG.visible))IROOM.push(r);try{HOUSE_R.push(r)}catch(e){czErr(e,"06-life.js")}};
  if(DEC.fl>0)add([2.0,2.9,.1,1.0]);if(DEC.co===1)add([3.55,4.1,.95,2.15]);if(DEC.co===2)add([3.5,4.1,1.25,1.85])}
 CUSTOM_SHOP.decor=function(msg){document.getElementById('shT').textContent='DECOR CATALOGUE';document.getElementById('shMsg').textContent=msg||'◀ ▶ TO BROWSE · BUY OR PLACE';
  for(const[k,nm,L]of DSL){const sel=DOWN['s'+k]==null?DEC[k]:DOWN['s'+k],it=L[sel],own=sel===0||DOWN[k+sel];
@@ -331,7 +331,7 @@ function camClip(T,d,dt){let tg=d;if(d>1.3){const sx=-Math.sin(camAng),sz=-Math.
 /* ---- drag to look around, menu helpers ---- */
 var CAMD={hold:0,el:0};
 {const st=document.getElementById('stage');let id=null,lx=0,ly=0;
- st.addEventListener('pointerdown',e=>{if(id!==null||menuOpen||busy||GAL.on||GS.inside)return;id=e.pointerId;lx=e.clientX;ly=e.clientY;try{st.setPointerCapture(id)}catch(_){}});
+ st.addEventListener('pointerdown',e=>{if(id!==null||menuOpen||busy||GAL.on||GS.inside)return;id=e.pointerId;lx=e.clientX;ly=e.clientY;try{st.setPointerCapture(id)}catch(_){czErr(_,"06-life.js")}});
  st.addEventListener('pointermove',e=>{if(e.pointerId!==id)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;camAng-=dx*.008;CAMD.el=Math.max(-.6,Math.min(3.2,CAMD.el+dy*.014));CAMD.hold=3.5});
  const up=e=>{if(e.pointerId===id)id=null};st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up);st.addEventListener('lostpointercapture',up)}
 document.getElementById('shop').addEventListener('click',e=>{if(e.target.id==='shop')closeShop()});
@@ -393,10 +393,10 @@ const FISHM=new THREE.Group();{const bd=new THREE.Mesh(new THREE.BoxGeometry(.18
 function fishTint(f){const c=FSC[f[1]]||FSC.roach;FISHM.userData.bd.material.color.setRGB(c[0],c[1],c[2]);FISHM.userData.tl.material.color.setRGB(c[0]*.8,c[1]*.8,c[2]*.8);FISHM.scale.setScalar((c[3]+.4)*1.3)}
 function pondD(){return Math.hypot(P.x-POND[0],P.z-POND[1])}
 function pondNear(){if(!GS.onFoot||GS.inside)return null;const d=pondD();if(d>PR+2.6||d<PR-1.5)return null;
- if(FSH.st>=3)return null;if(FSH.st===0)return{d:Math.max(0,d-PR)*.4,btn:{label:'CAST LINE',fn:fishCast}};if(FSH.st===1)return{d:0,btn:{label:'WAITING...',fn:()=>{FSH.st=0;toast('TOO EARLY. NOTHING YET')}}};if(FSH.st===2)return{d:0,btn:{label:'REEL IN!',fn:fishReel}};return null}
+ if(FSH.st>=3)return null;if(FSH.st===0)return{d:Math.max(0,d-PR)*.4,btn:{label:'CAST LINE',fn:()=>{let rod=true;try{const p_=window.PASTIMES;if(p_&&p_.fish)rod=!!p_.fish.rod}catch(e){czErr(e,"06-life.js")}if(!rod)return toast('YOU NEED A ROD. TACKLE & BAIT ON THE PIER, OR THE HARDWARE SHOP.');fishCast()}}};if(FSH.st===1)return{d:0,btn:{label:'WAITING...',fn:()=>{FSH.st=0;toast('TOO EARLY. NOTHING YET')}}};if(FSH.st===2)return{d:0,btn:{label:'REEL IN!',fn:fishReel}};return null}
 function fishCast(){const dx=P.x-POND[0],dz=P.z-POND[1],dl=Math.hypot(dx,dz)||1;FSH.tx=POND[0]-dx/dl*(PR*.5)+(-dz/dl)*(Math.random()-.5)*3;FSH.tz=POND[1]-dz/dl*(PR*.5)+(dx/dl)*(Math.random()-.5)*3;FSH.st=4;FSH.fl=0;FSH.ph=0;P.psi=Math.atan2(-dx,-dz);beep(260,.18,'sawtooth',.03);setTimeout(()=>beep(520,.1,'sine',.03),120)}
 function fishPick(){const h=GT,dusk=(h>=5&&h<8.5)||(h>=17&&h<20.5),rain=rainI>0;const w=FISHD.map(f=>{let x=f[3];if((f[1]==='trout'||f[1]==='pike')&&dusk)x*=2.2;if(f[1]==='carp'&&(dusk||rain))x*=2;if(f[1]==='boot'&&rain)x*=.5;return x});let r=Math.random()*w.reduce((a,b)=>a+b,0);for(let i=0;i<w.length;i++){r-=w[i];if(r<=0)return FISHD[i]}return FISHD[0]}
-function fishReel(){FSH.st=3;FSH.fl=0;FSH.ph=0;beep(500,.08,'square',.05);if(navigator.vibrate)try{navigator.vibrate(30)}catch(e){}splash(FSH.tx,FSH.tz,10)}
+function fishReel(){FSH.st=3;FSH.fl=0;FSH.ph=0;beep(500,.08,'square',.05);if(navigator.vibrate)try{navigator.vibrate(30)}catch(e){czErr(e,"06-life.js")}splash(FSH.tx,FSH.tz,10)}
 function fishLand(){const f=FSH.fish||FISHD[0];INV[f[1]]=(INV[f[1]]|0)+1;const first=!FLOG[f[1]];FLOG[f[1]]=(FLOG[f[1]]|0)+1;if(first){const b=f[2]*4;cash+=b;setTimeout(()=>toast('NEW IN FISH LOG! BONUS £'+b+' ('+Object.keys(FLOG).length+'/'+FISHD.length+')'),1500);if(Object.keys(FLOG).length===FISHD.length){cash+=100;addVP(3);setTimeout(()=>toast('FISH LOG COMPLETE! +£100'),4000)}}FSH.st=0;FSH.res=1.2;FSH.hold=1.4;FISHM.visible=true;beep(660,.1,'square',.06);setTimeout(()=>beep(880,.12,'square',.05),110);if(f[1]==='carp')setTimeout(()=>{beep(1180,.12,'square',.05);beep(1480,.2,'square',.05)},260);toast(f[1]==='boot'?'AN OLD BOOT. CLASSIC.':'CAUGHT '+(f[0]==='GOLDEN CARP'?'A GOLDEN CARP!!':'A '+f[0]+'!')+' £'+f[2])}
 function updFish(dt){if(menuOpen||GAL.on)return;
  if(FSH.res>0)FSH.res-=dt;
@@ -407,7 +407,7 @@ function updFish(dt){if(menuOpen||GAL.on)return;
  FSH.ph+=dt;
  if(FSH.st>0||hs){let d=(P.psi+1.15)-camAng;d=Math.atan2(Math.sin(d),Math.cos(d));camAng+=d*Math.min(1,dt*3)}
  if(FSH.st===4){FSH.fl+=dt/.7;if(FSH.fl>=1){FSH.fl=1;FSH.st=1;FSH.t=(2.5+Math.random()*4.5)*(1-ROD*.25);FSH.rp=0;splash(FSH.tx,FSH.tz,7);toast('CAST...')}}
- else if(FSH.st===1){FSH.t-=dt;FSH.rp=(FSH.rp||0)+dt;if(FSH.rp>1.6){FSH.rp=0;RIP2.t=0;RIP2.x=FSH.tx;RIP2.z=FSH.tz;RIP2.on=1}if(FSH.t<=0){FSH.st=2;FSH.t=1.2+ROD*.35+Math.random()*.5;FSH.fish=fishPick();beep(900,.08,'square',.06);if(navigator.vibrate)try{navigator.vibrate([60,40,60])}catch(e){}splash(FSH.tx,FSH.tz,4);toast('A BITE! REEL IN!')}}
+ else if(FSH.st===1){FSH.t-=dt;FSH.rp=(FSH.rp||0)+dt;if(FSH.rp>1.6){FSH.rp=0;RIP2.t=0;RIP2.x=FSH.tx;RIP2.z=FSH.tz;RIP2.on=1}if(FSH.t<=0){FSH.st=2;FSH.t=1.2+ROD*.35+Math.random()*.5;FSH.fish=fishPick();beep(900,.08,'square',.06);if(navigator.vibrate)try{navigator.vibrate([60,40,60])}catch(e){czErr(e,"06-life.js")}splash(FSH.tx,FSH.tz,4);toast('A BITE! REEL IN!')}}
  else if(FSH.st===2){FSH.t-=dt;if(FSH.t<=0){FSH.st=0;toast('IT GOT AWAY...')}}
  else if(FSH.st===3){FSH.fl+=dt/.85;if(FSH.fl>=1){fishLand()}}
  const on=FSH.st>0||hs;

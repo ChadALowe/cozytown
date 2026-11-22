@@ -82,7 +82,7 @@ CUSTOM_SHOP.poldesk=function(msg){$('shT').textContent='👮 FRONT DESK';
  dRow('READ THE NOTICE BOARD',[['READ',()=>renderShop(pk(['WANTED: "VIPER", LEADER OF THE SERPENTS GANG.','REWARD FOR INFORMATION ON OLIVE OIL SMUGGLING ON SOUTH QUAY.','LOST: ONE PIGEON, ANSWERS TO "GERALD".','STREET RACING UNDER THE AIRPORT WAY BRIDGE MUST STOP.']))]]);dRow('',[['BACK',()=>closeShop()]])};
 const pk=a=>a[(Math.random()*a.length)|0];
 {const b0=buildShop;buildShop=function(o){if(!o||!o.pol)return b0(o);while(SG.children.length)SG.remove(SG.children[0]);RX=o.rx;RZ=o.rz;SHK=null;const Hh=IH+.9,B=(x,y,z,w,h,d,hex)=>sbox(x,y,z,w,h,d,fmc(hex));
- SG.add(new THREE.Mesh(new THREE.PlaneGeometry(2*RX,2*RZ).rotateX(-Math.PI/2),imat(FLR.tile())));const wm=tx=>{const m=imat(tx);m.color.setHex(0xdfe6ee);return m};
+ SG.add(new THREE.Mesh(new THREE.PlaneGeometry(2*RX,2*RZ).rotateX(-Math.PI/2),imat(FLR.tile2())));const wm=tx=>{const m=imat(tx);m.color.setHex(0xdfe6ee);return m};
  splane(2*RX,Hh,0,Hh/2,-RZ,0,wm(sWl));splane(2*RX,Hh,0,Hh/2,RZ,Math.PI,wm(sWl));splane(2*RZ,Hh,RX,Hh/2,0,-Math.PI/2,wm(sWl2));splane(2*RZ,Hh,-RX,Hh/2,0,Math.PI/2,wm(sWl2));
  const vd=new THREE.Mesh(new THREE.BoxGeometry(90,70,90),new THREE.MeshBasicMaterial({color:0x080a12,side:THREE.BackSide,fog:false}));vd.position.y=Hh/2;SG.add(vd);splane(1.1,2.2,0,1.1,RZ-.02,Math.PI,imat(T_FDOOR));
  IROOM.splice(0,IROOM.length,[-RX-1,RX+1,-RZ-1,-RZ+.25],[-RX-1,-RX+.25,-RZ,RZ],[RX-.25,RX+1,-RZ,RZ]);IA.splice(0,IA.length);
@@ -91,6 +91,15 @@ const pk=a=>a[(Math.random()*a.length)|0];
  sPlane(4.6,.8,0,2.6,-RZ+.03,0,txtTex(512,90,'#0a2a6a','#ffffff','MARLOWE POLICE',50));
  sPlane(1.6,1.2,-RX+.03,1.7,-1,Math.PI/2,txtTex(256,192,'#e8dcc0','#202020','WANTED: VIPER',28));sPlane(1.4,1,-RX+.03,1.6,1.2,Math.PI/2,txtTex(256,180,'#f4f4f0','#c81e1e','STOP STREET RACING',22));
  for(const[x,z]of[[-3,2],[3,2]]){B(x,0,z,1.8,.45,.6,0x2a3a5a);B(x,.45,z-.25,1.8,.5,.12,0x2a3a5a);IROOM.push([x-.9,x+.9,z-.3,z+.3])}
+ /* blue-and-white band round the walls, a glass screen on the desk, the office behind, a cell, a notice board, a water cooler */
+ for(const[x,z,w,d]of[[0,-RZ+.05,2*RX,.04],[-RX+.05,0,.04,2*RZ],[RX-.05,0,.04,2*RZ]])B(x,1.0,z,w,.14,d,0x0a2a6a),B(x,1.14,z,w,.1,d,0xffffff);
+ B(0,1.11,-RZ+1.95,4.4,.7,.03,0xa8c8e8);for(let k=0;k<5;k++)B(-2.2+k*1.1,1.11,-RZ+1.95,.05,.7,.05,0x9aa0a8);
+ for(const x of[-RX+1,-RX+1.7])B(x,0,-RZ+.35,.6,1.3,.55,0x7a8088);for(const x of[RX-1.2])B(x,0,-RZ+.6,1.2,.75,.7,0xb8b0a0),B(x,.75,-RZ+.55,.5,.38,.05,0x101418),B(x,.79,-RZ+.53,.44,.3,.02,0x2a6ad0);
+ IROOM.push([-RX,-RX+2.1,-RZ,-RZ+.7],[RX-1.9,RX,-RZ,-RZ+1]);
+ /* holding cell with bars on the right */const cz0=.4,cz1=2.8;for(let z=cz0;z<=cz1;z+=.22)B(RX-1.6,0,z,.05,2.3,.05,0x30343a);B(RX-.8,2.3,(cz0+cz1)/2,1.6,.08,cz1-cz0,0x30343a);B(RX-.5,0,(cz0+cz1)/2,.6,.4,1.6,0x7a7a7a);IROOM.push([RX-1.7,RX,cz0-.1,cz1+.1]);
+ sPlane(1.4,.3,RX-1.62,2.0,(cz0+cz1)/2,-Math.PI/2,txtTex(256,56,'#0a2a6a','#ffffff','HOLDING CELL',24));
+ B(-RX+.06,1.2,-2.8,.03,1.0,1.4,0x8a6a3a);for(let k=0;k<5;k++)B(-RX+.09,1.3+(k%2)*.4,-3.3+k*.25,.02,.3,.22,[0xf4f4f0,0xf8e8a0,0xf4f4f0,0xc8e8f8,0xf4f4f0][k]);
+ B(RX-.4,0,RZ-1.2,.4,1.0,.4,0xe8eaee);B(RX-.4,1.0,RZ-1.2,.32,.45,.32,0x8ac8f0);IROOM.push([RX-.7,RX,RZ-1.5,RZ-.9]);
  SHOPCUR={o,k:['DESK SERGEANT','"Evening. What can we do for you?"']};
  IA.push({r:[-2.2,2.2,-RZ+2,-RZ+3],label:()=>POL.joined?(SH&&SH.k==='police'?'FRONT DESK (ON DUTY)':'FRONT DESK: START A SHIFT'):'FRONT DESK: JOIN THE POLICE',fn:()=>openShop('poldesk')},{r:[-1,1,RZ-.35,RZ],label:'LEAVE',fn:()=>leaveShop()})}}
 let decor=0;function dressStation(){decor=1;const g=new THREE.Group(),y0=Y+KH,fx=OX+sfu-.06,fz=OZ+sfv,mk=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshBasicMaterial({color:c}));m.position.set(x,y,z);g.add(m);return m};

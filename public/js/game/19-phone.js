@@ -9,7 +9,7 @@ function phBadge(){const b=document.getElementById('phBadge');if(!b)return;const
 const PHTX=[['MR SINGH','Fresh samosas just out of the fryer. Pop in!'],['FARMER HOLT','Could use a hand baling hay if you are free. Pays £7 a bale.'],['FRANKIE','Busy night at the chippy. Food deliveries pay well tonight.'],['MR SHAH','The parcels board is full. Come and grab a round.'],['KEV THE BUILDER','Quiz night at the Royal Oak. You in?'],['RANI','New silk saris and sherwanis in this week!'],['JOE',"Got some new turbo kits in at the garage."],['MUM','Are you eating properly? Ring me sometime x'],['OLD TOM','Rovers at home this weekend. Save me a seat.'],['RUTH & CO','House prices are up. Thinking of buying?'],['CASINO ROYALE','Your table is waiting. Gold card holders get comps.'],['COZY KARTS','Track is quiet. Come and set a lap record.']];
 {const nd0=newDay;newDay=function(){nd0();try{
  if(window.PROP){const p=Object.values(PROP.PR.pend||{}).reduce((a,b)=>a+(+b||0),0);if(p>0)phText('RUTH & CO','You have '+phMoney(p)+' of rent waiting to collect at the estate agent.')}
- const t=PHTX[(DAY*7+3)%PHTX.length];phText(t[0],t[1])}catch(e){}}}
+ const t=PHTX[(DAY*7+3)%PHTX.length];phText(t[0],t[1])}catch(e){czErr(e,"19-phone.js")}}}
 /* ---- waypoint: a light beam in the world and a pill under the HUD ---- */
 const phBeam=(()=>{const g=new THREE.Group(),m=new THREE.MeshBasicMaterial({color:0x40c8ff,transparent:true,opacity:.45,depthWrite:false,fog:false});const c=new THREE.Mesh(new THREE.CylinderGeometry(.6,.6,60,10,1,true),m);c.position.y=30;g.add(c);const r=new THREE.Mesh(new THREE.RingGeometry(1.4,2.2,24).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x40c8ff,transparent:true,opacity:.8,side:THREE.DoubleSide,fog:false}));r.position.y=.15;g.add(r);g.visible=false;scene.add(g);return g})();
 const phPill=(()=>{const e=document.createElement('div');e.style.cssText='position:fixed;left:50%;top:44px;transform:translateX(-50%);z-index:25;background:rgba(10,40,70,.85);border:2px solid #40c8ff;border-radius:14px;color:#fff;font:bold 12px ui-monospace,monospace;padding:3px 10px;pointer-events:auto;display:none;cursor:pointer';e.title='Tap to clear';e.onclick=()=>{if(PH.way&&PH.way.keep)return;PH.way=null;phWay()};document.body.appendChild(e);return e})();
@@ -73,8 +73,8 @@ function phRender(){const o=PHN.ov;if(!o)return;o.querySelector('#phT').textCont
  else if(a==='msg'){if(PHN.sub!=null){const m=PH.msgs[PHN.sub];if(!m)return phGo('msg');m.r=1;el('div','phH',m.f);const r=el('div','phR');el('div',null,m.t,r);el('small',null,'DAY '+m.d+' · '+m.h,r);return}
   el('div','phH','MESSAGES');if(!PH.msgs.length)el('div','phR','No messages yet.');PH.msgs.forEach((m,i)=>{const r=el('div','phR');r.style.cursor='pointer';if(!m.r)r.style.borderColor='#3aa0ff';const k=el('div','phK',null,r);el('span',null,(m.r?'':'● ')+m.f,k);el('small',null,'DAY '+m.d+' '+m.h,k);el('small',null,m.t.length>46?m.t.slice(0,44)+'…':m.t,r);r.onclick=()=>{PHN.sub=i;phRender()}});
   if(PH.msgs.length){const bt=el('div','bt');btn(bt,'MARK ALL READ',()=>{PH.msgs.forEach(m=>m.r=1);phRender()})}}
- else if(a==='bank'){let sv=0,own=0,pend=0,chips=0;try{const S=STOCKS.ST;for(const c of STOCKS.CO)sv+=S.sh[c[0]]*S.px[c[0]]}catch(e){}try{own=Object.keys(PROP.PR.own).length;pend=Object.values(PROP.PR.pend).reduce((x,y)=>x+(+y||0),0)}catch(e){}try{chips=CG.S.chips||0}catch(e){}
-  let pv=0;try{for(const k in PROP.PR.own)pv+=PROP.price(+k)}catch(e){}
+ else if(a==='bank'){let sv=0,own=0,pend=0,chips=0;try{if(window.STOCKS){const S=STOCKS.ST;for(const c of STOCKS.CO)sv+=S.sh[c[0]]*S.px[c[0]]}}catch(e){czErr(e,"19-phone.js")}try{own=Object.keys(PROP.PR.own).length;pend=Object.values(PROP.PR.pend).reduce((x,y)=>x+(+y||0),0)}catch(e){czErr(e,"19-phone.js")}try{chips=CG.S.chips||0}catch(e){czErr(e,"19-phone.js")}
+  let pv=0;try{for(const k in PROP.PR.own)pv+=PROP.price(+k)}catch(e){czErr(e,"19-phone.js")}
   el('div','phH','BLUEBELL BANK');el('div',null,'CURRENT ACCOUNT');el('div','phBig',phMoney(cash));
   for(const[n,v]of[['SHARES',sv],['CASINO CHIPS',chips],['PROPERTY ('+own+' HOUSE'+(own===1?'':'S')+')',pv],['RENT WAITING',pend]]){const r=el('div','phR phK');el('span',null,n,r);el('span',null,phMoney(v),r)}
   const r=el('div','phR phK');r.style.borderColor='#ffd24a';el('span',null,'NET WORTH',r);el('span',null,phMoney(cash+sv+chips+pv+pend),r);
@@ -93,7 +93,7 @@ function phRender(){const o=PHN.ov;if(!o)return;o.querySelector('#phT').textCont
 const PHC={on:0,a:0,p:.35,d:6};
 function phPhoto(){if(PHC.on)return;PHC.on=1;busy=1;inp.gas=inp.brk=inp.hand=inp.pad=0;const T=GS.onFoot?P:GS;PHC.a=(T.psi||0)+Math.PI;PHC.p=.32;PHC.d=GS.onFoot?5:8;document.body.classList.add('photo');
  const u=document.createElement('div');u.id='photoUI';u.innerHTML='<div class="hint">DRAG TO MOVE THE CAMERA · PINCH OR SCROLL TO ZOOM</div><button class="phBtn x">✕ CLOSE</button><button class="sh" aria-label="Take photo"></button><div class="fl"></div>';document.body.appendChild(u);PHC.ui=u;
- const ptr=new Map();let pd=0;u.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;ptr.set(e.pointerId,[e.clientX,e.clientY]);try{u.setPointerCapture(e.pointerId)}catch(_){}});
+ const ptr=new Map();let pd=0;u.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;ptr.set(e.pointerId,[e.clientX,e.clientY]);try{u.setPointerCapture(e.pointerId)}catch(_){czErr(_,"19-phone.js")}});
  u.addEventListener('pointermove',e=>{if(!ptr.has(e.pointerId))return;const o=ptr.get(e.pointerId);if(ptr.size===2){ptr.set(e.pointerId,[e.clientX,e.clientY]);const [p1,p2]=[...ptr.values()],dd=Math.hypot(p1[0]-p2[0],p1[1]-p2[1]);if(pd)PHC.d=clamp(PHC.d*pd/dd,1.5,30);pd=dd;return}PHC.a-=(e.clientX-o[0])*.008;PHC.p=clamp(PHC.p+(e.clientY-o[1])*.005,-.15,1.35);ptr.set(e.pointerId,[e.clientX,e.clientY])});
  const up=e=>{ptr.delete(e.pointerId);pd=0};u.addEventListener('pointerup',up);u.addEventListener('pointercancel',up);
  u.addEventListener('wheel',e=>{PHC.d=clamp(PHC.d*(e.deltaY>0?1.1:.9),1.5,30);e.preventDefault()},{passive:false});
@@ -105,7 +105,7 @@ function phPhotoEnd(){if(!PHC.on)return;PHC.on=0;removeEventListener('keydown',P
 /* ---- ticking: cash log, stock news texts, waypoint distance, idle villager texts ---- */
 {const u0=updCozy;updCozy=function(dt){u0(dt);
  if(PH.lastCash==null)PH.lastCash=cash;const dc=cash-PH.lastCash;if(Math.abs(dc)>=1){PH.log.unshift({v:dc,d:DAY,h:phClock()});PH.log.length=Math.min(PH.log.length,15);PH.lastCash=cash}
- try{const n=STOCKS.ST.news[0];if(n&&n!==PH.lastNews){if(PH.lastNews)phText('COZY MARKETS',n,true);PH.lastNews=n}}catch(e){}
+ try{const n=window.STOCKS&&STOCKS.ST.news[0];if(n&&n!==PH.lastNews){if(PH.lastNews)phText('COZY MARKETS',n,true);PH.lastNews=n}}catch(e){czErr(e,"19-phone.js")}
  PH.hrT+=dt;if(PH.hrT>150){PH.hrT=0;if(Math.random()<.35){const t=PHTX[Math.floor(Math.random()*PHTX.length)];phText(t[0],t[1])}}
  if(!PH.seen.w){PH.seen.w=1;phText('MUM',"Hope the new place is cosy! I've put your phone on the 📱 button. Press P on a keyboard. Love you x",true)}
  const w=PH.way;phBeam.visible=!!w&&!GS.inside;if(w){const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z,d=Math.hypot(w.x-px,w.z-pz);if(d<7&&!GS.inside&&!w.keep){toast('ARRIVED: '+w.n);PH.way=null;phWay()}else{phPill.style.display=GS.inside||menuOpen||PHC.on?'none':'block';phPill.textContent='📍 '+w.n+' · '+Math.round(d)+'m'+(w.keep?'':'   ✕');phBeam.children[1].rotation.y+=dt}}

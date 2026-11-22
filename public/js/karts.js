@@ -5,8 +5,8 @@
 const CX=-95,CZ=-58,SX=.94,LAPS=4,HW=5.0,BAR=6.8,FEE=5,PRIZE=[40,20,10,0];
 const KF=-1,KIOSK={x:-60,z:-24},PARK={x0:-87,x1:-64,z0:-29,z1:-19},STRIP={x:-86,z0:-5.3,z1:-18.5,hw:3.8}; // the strip squeezes through the gap between two High Street houses (x -91.2..-80.8)
 const KT={on:0,state:'idle',cd:0,t:0,tot:0,idx:0,lapsDone:0,lapT:0,laps:[],best:0,bestRace:0,ai:[],back:0,rank:1,hudT:0,saved:null,bigT:0};
-try{const d=JSON.parse(localStorage.getItem('c1kart')||'null');if(d){KT.best=d.lap||0;KT.bestRace=d.race||0}}catch(e){}
-function saveBest(){try{localStorage.setItem('c1kart',JSON.stringify({lap:KT.best,race:KT.bestRace}))}catch(e){}}
+try{const d=JSON.parse(localStorage.getItem('c1kart')||'null');if(d){KT.best=d.lap||0;KT.bestRace=d.race||0}}catch(e){czErr(e,"karts.js")}
+function saveBest(){try{localStorage.setItem('c1kart',JSON.stringify({lap:KT.best,race:KT.bestRace}))}catch(e){czErr(e,"karts.js")}}
 
 /* ---------- track centre-line (closed Catmull-Rom, resampled every ~1.5 m) ---------- */
 const CP=[[-30,20],[-8,20],[14,20],[34,20],[45,12],[47,-2],[42,-14],[32,-22],[22,-20],[17,-8],[11,2],[3,3],[-3,-6],[-5,-18],[-14,-24],[-26,-24],[-36,-22],[-43,-14],[-45,-2],[-40,10],[-36,18]].map(p=>[CX+p[0]*SX,CZ+p[1]]);

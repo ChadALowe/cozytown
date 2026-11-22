@@ -56,7 +56,7 @@ CUSTOM_SHOP.don=function(msg){$('shT').textContent='🎩 DON VITTORIO';
  sPlane(1.6,1.0,dx,2.0,-RZ+.03,0,cvx(256,160,(g,W_,H_)=>{g.fillStyle='#3a2a14';g.fillRect(0,0,W_,H_);g.fillStyle='#d8b060';g.fillRect(8,8,W_-16,H_-16);g.fillStyle='#5a7a9a';g.fillRect(16,16,W_-32,H_-32);g.fillStyle='#e8d8b0';g.beginPath();g.arc(W_/2,H_*.5,30,0,7);g.fill();g.fillStyle='#2a1a10';g.font='bold 14px Georgia';g.textAlign='center';g.fillText('NONNA, 1952',W_/2,H_-24)}));
  SHOPCUR={o,k:['WAITER','Benvenuto! A table for one?']};
  IA.push({r:[-5.4,-1.8,-RZ+1.3,-RZ+2.3],label:'ORDER FOOD',fn:()=>openShop('vitfood')},{r:[dx-1.8,dx+1.8,dz+1.2,dz+2.2],label:()=>MAF.met?'TALK TO DON VITTORIO':'THE MAN IN THE WHITE SUIT',fn:()=>openShop('don')},{r:[-1.0,1.0,RZ-.35,RZ],label:'LEAVE',fn:()=>leaveShop()});
- try{addVisitors(o)}catch(e){}}}
+ try{addVisitors(o)}catch(e){czErr(e,"marlowe6.js")}}}
 /* door dressing outside */
 let dressed=0;function dress(){dressed=1;const g=new THREE.Group(),y0=Y+KH,fx=OX+fu+.06,fz=OZ+fv,mk=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshBasicMaterial({color:c}));m.position.set(x,y,z);g.add(m);return m};
  mk(.12,2.6,1.7,0xd8d0c0,fx,y0+1.3,fz);mk(.16,2.4,1.4,0x1e3a26,fx,y0+1.2,fz);mk(1.6,.16,3.4,0x1e4a2a,fx+.8,y0+3.05,fz);for(let k=0;k<6;k++)mk(1.62,.05,.28,k%2?0xf4f0e8:0xc81e1e,fx+.8,y0+3.15,fz-1.4+k*.56);
@@ -91,7 +91,7 @@ function copTick(dt){const p=crPos();trailT+=dt;if(trailT>.25){trailT=0;const l=
  const slow=GS.onFoot||Math.abs(GS.speed)<3.5;if(near<5&&slow){bustT+=dt;if(bustT>2.2)busted()}else bustT=Math.max(0,bustT-dt);
  sirenT-=dt;if(sirenT<=0&&near<180){sirenT=.42;beep((t*2|0)%2?720:960,.32,'triangle',.022)}}
 function busted(){const fine=Math.round(80+heat*60+crLvl('mafia')*40);cash=Math.max(0,cash-fine);MAF.busts++;if(window.REP){REP.add('police',-3);REP.add('family',-3)}toast('🚔 BUSTED! FINED £'+fine+'. THE CARGO WAS CONFISCATED.');clearCops();beep(150,.6,'sawtooth',.08);
- setTimeout(()=>{try{phText('DON VITTORIO','"You got caught? Madonna... We say nothing, you say nothing. Come back when you\'re ready."')}catch(e){}},2500);if(SH&&SH.k==='mafia')crEnd(false)}
+ setTimeout(()=>{try{phText('DON VITTORIO','"You got caught? Madonna... We say nothing, you say nothing. Come back when you\'re ready."')}catch(e){czErr(e,"marlowe6.js")}},2500);if(SH&&SH.k==='mafia')crEnd(false)}
 /* ------------------------------------------------------------------ jobs */
 let J=null;const crew=[];
 const snapTo=(u,v,n)=>{const s=window.MARLOWE3&&MARLOWE3.snap(u,v);if(!s)return null;const p=W(s.cu,s.cv);return Object.assign(s,{x:p[0],z:p[1],name:n})};
@@ -154,7 +154,7 @@ function shoot(){if(!J||J.k!=='war'||!GS.onFoot||GS.inside||fireCd>0||hp<=0)retu
  else tracer(gx,gy,gz,gx+fx*30,gy,gz+fz*30)}
 const pk=a=>a[(Math.random()*a.length)|0];
 function warWon(){J.st='flee';if(window.REP){REP.add('serpents',-15);REP.add('family',5);REP.add('police',-3)}toast('THE DOCKS BELONG TO THE FAMILY AGAIN!');setTimeout(()=>setHeat(2,'SHOTS FIRED AT SOUTH QUAY! THE POLICE ARE COMING. GET AWAY!'),1800);if(fireBtn)fireBtn.style.display='none'}
-function knockedOut(){hp=0;toast('💫 YOU WERE KNOCKED OUT!');fade(()=>{yardClear();P.x=TR.x;P.z=TR.z;P.y=gH(P.x,P.z);P.psi=TR.psi;camAng=P.psi;const fee=120;cash=Math.max(0,cash-fee);hp=100;toast('THE DON\'S DOCTOR PATCHED YOU UP (-£'+fee+')');try{phText('DON VITTORIO','"The Serpents got lucky. Rest, eat something, then we try again."')}catch(e){}if(SH&&SH.k==='mafia')crEnd(false)})}
+function knockedOut(){hp=0;toast('💫 YOU WERE KNOCKED OUT!');fade(()=>{yardClear();P.x=TR.x;P.z=TR.z;P.y=gH(P.x,P.z);P.psi=TR.psi;camAng=P.psi;const fee=120;cash=Math.max(0,cash-fee);hp=100;toast('THE DON\'S DOCTOR PATCHED YOU UP (-£'+fee+')');try{phText('DON VITTORIO','"The Serpents got lucky. Rest, eat something, then we try again."')}catch(e){czErr(e,"marlowe6.js")}if(SH&&SH.k==='mafia')crEnd(false)})}
 addEventListener('keydown',e=>{if((e.key==='f'||e.key==='F')&&J&&J.k==='war'&&!e.repeat){e.preventDefault();shoot()}});
 function warTick(dt){fireCd-=dt;const onSite=Math.hypot(P.x-OX-YARD.u,P.z-OZ-YARD.v)<60&&GS.onFoot&&!GS.inside;
  if(!fireBtn){fireBtn=document.createElement('button');fireBtn.textContent='🔫 FIRE';fireBtn.style.cssText='position:fixed;right:18px;bottom:120px;z-index:40;width:96px;height:96px;border-radius:50%;border:4px solid #fff;background:#c8102ecc;color:#fff;font:bold 18px ui-monospace,monospace;touch-action:none;display:none';fireBtn.onpointerdown=e=>{e.preventDefault();e.stopPropagation();shoot();fireBtn._h=setInterval(shoot,330)};fireBtn.onpointerup=fireBtn.onpointerleave=fireBtn.onpointercancel=()=>clearInterval(fireBtn._h);document.body.appendChild(fireBtn)}
@@ -184,7 +184,7 @@ const STORY=[['A FAVOUR','"An old friend at THE GRAND MARLOWE is expecting an en
  ['THE WITHDRAWAL','"My nephews have business at the bank. Get them out, and get them home."'],
  ['VIPER\'S NEST','"Viper himself is at the North Quay warehouses with his whole gang. End this, once and for all."']];
 function storyJob(c){const t=STORY[c];phText('DON VITTORIO','CHAPTER '+(c+1)+': '+t[0]+'. '+t[1],true);toast('🎩 CHAPTER '+(c+1)+' · '+t[0]);
- if(c===1||c===4||c===5)setTimeout(()=>{try{phText('VIPER',pk(['"Marlowe belongs to the Serpents now. Tell the old man."','"Nice car. Shame if something happened to it."','"You\'re working for a dinosaur, kid."']))}catch(e){}},5000);
+ if(c===1||c===4||c===5)setTimeout(()=>{try{phText('VIPER',pk(['"Marlowe belongs to the Serpents now. Tell the old man."','"Nice car. Shame if something happened to it."','"You\'re working for a dinosaur, kid."']))}catch(e){czErr(e,"marlowe6.js")}},5000);
  if(c===0){const g=window.MARLOWE4.ALL.find(o=>o.t==='THE GRAND MARLOWE'),s=snapTo(g.door.u,g.door.v,'THE GRAND MARLOWE');J={k:'del',st:'drop',b:s,a:s,t:0,story:1,spotted:1,dist:Math.hypot(s.x-GS.x,s.z-GS.z)};J.tmax=Math.round(J.dist/8+40);crWay(s.x,s.z,'ENVELOPE: THE GRAND MARLOWE')}
  else if(c===1){const r=new RUNNER({near:crPos(),rmin:130,rmax:230,mesh:MCARMESH([.92,.9,.82],[.1,.4,.12],E=>{E(0,.86,1.6,1.7,.9,1.4,[.92,.9,.82])}),vmax:19,flee:1});J={k:'chase',st:'chase',r,t:0,catchT:0,lostT:0,story:1};toast('FIND THE CREAM VAN WITH THE GREEN STRIPE AND STAY CLOSE TO STOP IT')}
  else if(c===2){warJob('south',0,1);J.story=1}
@@ -198,7 +198,7 @@ function chaseLine(dt){const r=J.r,p=crPos();if(J.st==='chase'){r.step(dt,p);RUN
  if(J.st==='grab'){r.step(dt,p);J.w+=dt;if(J.w>2){r.remove();J.st='home';const s=snapTo(fu+1.4,fv,"VITTORIO'S TRATTORIA");J.b=s;crWay(s.x,s.z,'DRIVE THE OIL HOME');toast('NOW TAKE THE OLIVE OIL BACK TO THE TRATTORIA')}return 'RECOVERING THE CRATES…'}
  if(J.st==='home'){if(crStopped(J.b.x,J.b.z,9)){jobPay(120,'THE OLIVE OIL IS HOME');return ''}return 'TAKE THE OIL BACK TO VITTORIO\'S · '+Math.round(Math.hypot(J.b.x-p.x,J.b.z-p.z))+'M'}return ''}
 function storyDone(){MAF.ch=(MAF.ch|0)+1;const c=MAF.ch;cash+=150+c*60;toast('CHAPTER '+c+' COMPLETE! THE DON ADDS £'+(150+c*60));if(window.REP)REP.add('family',4);
- setTimeout(()=>{try{phText('DON VITTORIO',c>=STORY.length?'"Viper is finished. Come and see me. We need to talk about your future."':'"Bravissimo. When you\'re ready, come and see me for the next job: '+STORY[c][0]+'."')}catch(e){}},2500);crEnd(true)}
+ setTimeout(()=>{try{phText('DON VITTORIO',c>=STORY.length?'"Viper is finished. Come and see me. We need to talk about your future."':'"Bravissimo. When you\'re ready, come and see me for the next job: '+STORY[c][0]+'."')}catch(e){czErr(e,"marlowe6.js")}},2500);crEnd(true)}
 /* minimap: police dots */
 {const w=window.MARLOWE3,m0=w.mm;w.mm=function(mc,T,k){m0(mc,T,k);if(!SH||SH.k!=='mafia')return;const dot=(x,z,c,r)=>{const gx=Math.max(4,Math.min(MMS-4,(x-T.x)*k+MMS/2)),gz=Math.max(4,Math.min(MMS-17,-(z-T.z)*k+MMS/2));mc.fillStyle=c;mc.strokeStyle='#000';mc.lineWidth=1.5;mc.beginPath();mc.arc(gx,gz,r,0,6.3);mc.fill();mc.stroke()};
  const tg=J&&(J.st==='drop'||J.st==='run'?J.b:J.a);if(tg)dot(tg.x,tg.z,'#c040ff',4.5);const t=performance.now()/250|0;for(const c of COPS)dot(c.x,c.z,t%2?'#2a6aff':'#ff2a2a',3.5)}}

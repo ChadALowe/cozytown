@@ -1,9 +1,9 @@
 /* ---- TUNING GARAGE: car selector, paint (incl. custom colour), performance parts, nitrous, underglow ---- */
 (function(){
 const TN={brk:0,trb:0,nos:0,tank:0,neon:{},nown:{},cust:null,custOn:0,fin:{},fown:{},rim:{},rown:{},kit:{},kown:{},vin:{},vown:{}};window.TN=TN;
-try{const s=JSON.parse(localStorage.getItem('tune1')||'null');if(s)Object.assign(TN,s)}catch(e){}
+try{const s=JSON.parse(localStorage.getItem('tune1')||'null');if(s)Object.assign(TN,s)}catch(e){czErr(e,"tune.js")}
 for(const k of['fin','fown','rim','rown','neon','nown','kit','kown','vin','vown'])if(!TN[k])TN[k]={};
-const canon=a=>{const c=PCOL.find(c=>c[1].every((v,i)=>Math.abs(v-a[i])<1e-6));return c?c[1]:a.slice()};const save=()=>{try{localStorage.setItem('tune1',JSON.stringify(TN))}catch(e){}};
+const canon=a=>{const c=PCOL.find(c=>c[1].every((v,i)=>Math.abs(v-a[i])<1e-6));return c?c[1]:a.slice()};const save=()=>{try{localStorage.setItem('tune1',JSON.stringify(TN))}catch(e){czErr(e,"tune.js")}};
 const $q=(s,r)=>(r||document).querySelector(s);
 
 /* ======== game hooks ======== */
@@ -514,7 +514,7 @@ function build(){
   if(VIEWS[v]){gv(...VIEWS[v]);GAL.spin=0}else if(v==='night'){GAL.lt=GAL.lt==='NIGHT'?'STUDIO':'NIGHT';b.classList.toggle('on',GAL.lt==='NIGHT')}else if(v==='spin'){GAL.spin=GAL.spin?0:1;b.classList.toggle('on',!!GAL.spin)}});}
 function openTune(tab){
  if(on||GAL.on)return;
- if(GS.inside&&SHOPCUR){try{closeShop()}catch(e){}try{leaveShop(true)}catch(e){}}
+ if(GS.inside&&SHOPCUR){try{closeShop()}catch(e){czErr(e,"tune.js")}try{leaveShop(true)}catch(e){czErr(e,"tune.js")}}
  on=1;S.commit={car:CARI,paint:paintC};S.msg='';S.sel=null;neonPrev=null;
  openGallery();GAL.mode=null;galUI.classList.add('tuning');
  const gx=document.getElementById('galX');if(gx)gx.style.display='none';
@@ -541,6 +541,6 @@ window.openTune=openTune;window.closeTune=closeTune;window.TNon=()=>on;
 // Joe's garage + the old spray booth now open the tuning screen
 {const o0=openShop;openShop=function(m){if(m==='garage2'){toast('DRIVE YOUR CAR INTO A BAY AT JOES GARAGE');return}o0.apply(this,arguments)}}
 garagePaint=function(){toast('DRIVE YOUR CAR INTO A BAY AT JOES GARAGE')};
-{const lg=loadGame;loadGame=function(){const r=lg.apply(this,arguments);if(r&&TN.pnt){paintC=canon(TN.pnt);try{applyPaint()}catch(e){}}neonNow();return r}}
+{const lg=loadGame;loadGame=function(){const r=lg.apply(this,arguments);if(r&&TN.pnt){paintC=canon(TN.pnt);try{applyPaint()}catch(e){czErr(e,"tune.js")}}neonNow();return r}}
 })();
 

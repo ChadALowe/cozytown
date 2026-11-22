@@ -71,7 +71,7 @@ const DIST=[['THE OLD VILLAGE','HISTORIC HEART',(x,z)=>x>-VH&&x<VH&&z>-VH&&z<VH]
  ['COZE WOOD','MIND THE GAMEKEEPER',(x,z)=>x>-560&&x<-250&&z>-1160&&z<-700],['WINDMILL HILL','',(x,z)=>Math.hypot(x-630,z+1140)<80],['HOLLOW FARM','KEEP OUT',(x,z)=>Math.hypot(x+1005,z+780)<45],['THE OLD QUARRY','DANGER · DEEP WATER',(x,z)=>Math.hypot(x-922,z+800)<50],
  ['THE MOORS','COUNTRYSIDE',(x,z)=>z<-690],['CHAPEL STREET','',(x,z)=>z>-420&&z<-340],['COZYTOWN','',()=>true]];
 const DS={cur:'',cand:'',t:0};
-function distUpd(dt){if(!inTown()){DS.cur='';return}const p=pos();let d=null;for(const q of DIST)if(q[2](p.x,p.z)){d=q;break}if(!d)return;if(d[0]===DS.cur){DS.t=0;return}if(d[0]!==DS.cand){DS.cand=d[0];DS.t=0}DS.t+=dt;if(DS.t>1.2){DS.cur=d[0];disEl.innerHTML=d[0]+(d[1]?'<small>'+d[1]+'</small>':'');disEl.style.opacity=1;clearTimeout(DS.h);DS.h=setTimeout(()=>disEl.style.opacity=0,2600)}}
+function distUpd(dt){if(typeof menuOpen!=='undefined'&&menuOpen||GS.inside){disEl.style.opacity=0;return}if(!inTown()){DS.cur='';return}const p=pos();let d=null;for(const q of DIST)if(q[2](p.x,p.z)){d=q;break}if(!d)return;if(d[0]===DS.cur){DS.t=0;return}if(d[0]!==DS.cand){DS.cand=d[0];DS.t=0}DS.t+=dt;if(DS.t>1.2){DS.cur=d[0];disEl.innerHTML=d[0]+(d[1]?'<small>'+d[1]+'</small>':'');disEl.style.opacity=1;clearTimeout(DS.h);DS.h=setTimeout(()=>disEl.style.opacity=0,2600)}}
 let discT=0;function discUpd(dt){discT-=dt;if(discT>0||!inTown())return;discT=.5;const p=pos();for(const q of T.pois){if(q.d)continue;if(Math.hypot(p.x-q.x,p.z-q.z)<(q.r||70)){q.d=1;toast('🗺 DISCOVERED: '+q.n+' (ADDED TO YOUR MAP)');beep(880,.08,'square',.04);setTimeout(()=>beep(1175,.12,'square',.04),90)}}}
 {const s0=cozySave,l0=cozyLoad;cozySave=function(){const o=s0();o.tdisc=T.pois.filter(q=>q.d).map(q=>q.n);o.wanted=0;return o};cozyLoad=function(z){l0(z);if(z&&z.tdisc)for(const q of T.pois)if(z.tdisc.includes(q.n))q.d=1}}
 
@@ -125,7 +125,7 @@ function copsUpd(dt){const p=pos(),now=performance.now();const town=inTown();
  /* siren */W.sirenT-=dt;if(W.st>0&&nearest<150&&W.sirenT<0){W.sirenT=.42;W.hi=!W.hi;beep(W.hi?960:720,.38,'triangle',Math.max(.012,.055*(1-nearest/150)))}
  /* HUD */const ev=W.st>0&&!W.seen&&(now/300|0)%2;stEl.style.display=W.st>0?'block':'none';stEl.innerHTML='<span style="color:'+(ev?'#fff8':'#ffd24a')+'">'+'★'.repeat(W.st)+'</span><span style="color:#fff3">'+'★'.repeat(5-W.st)+'</span>'+(W.bustT>0?' <span style="color:#ff4040">STOP! '+Math.max(0,2.2-W.bustT).toFixed(1)+'</span>':'')}
 const BUSTH=[];
-function busted(){W.bustT=0;const fine=Math.min(Math.floor(cash),50+W.st*40+Math.floor(cash*.05));const lost=[];for(const f of BUSTH){try{const r=f();if(r)lost.push(r)}catch(e){}}W.st=0;for(const c of[...W.cops])if(!c.patrol)dropCop(c);
+function busted(){W.bustT=0;const fine=Math.min(Math.floor(cash),50+W.st*40+Math.floor(cash*.05));const lost=[];for(const f of BUSTH){try{const r=f();if(r)lost.push(r)}catch(e){czErr(e,"crime_core.js")}}W.st=0;for(const c of[...W.cops])if(!c.patrol)dropCop(c);
  big('BUSTED','FINE £'+fine+(lost.length?' · CONFISCATED: '+lost.join(', '):''),3000);beep(150,.6,'sawtooth',.1);
  setTimeout(()=>fade(()=>{cash-=fine;const st=SHOPD.find(s=>s.t==='COZYTOWN POLICE');if(st){if(!GS.onFoot){GS.onFoot=1;man.visible=true}GS.x=st.x+7;GS.z=st.z+4;GS.vx=GS.vz=0;GS.speed=0;GS.psi=0;P.x=st.x;P.z=st.z+1.5;P.psi=0;setLabels()}GT+=2;if(GT>=24){GT-=24;newDay()}toast('A NIGHT IN THE CELLS. YOUR CAR IS IN THE POLICE CAR PARK.');obj('')}),1400)}
 /* police station front desk */

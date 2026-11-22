@@ -201,7 +201,7 @@ let showCar=null,clerk=null;
  IROOM.splice(0,IROOM.length,[-RX-1,RX+1,-RZ-1,-RZ+.9],[-5.0,-.2,-RZ+1.9,-RZ+2.7],[1.2,4.8,-RZ+.5,-RZ+5.9],[RX-1,RX+1,-2,2],[-RX,-RX+1.5,1.1,3.7]);
  SHOPCUR={o:o,k:['CLERK',"Welcome to the Cozy Motorsport Club. Book a race and we'll fly you to the circuit."]};
  IA.splice(0,IA.length,{r:[-4.6,-.6,-RZ+2.7,-RZ+3.6],label:'BOOK A RACE',fn:()=>bookOpen(0)},{r:[RX-2.4,RX-1,-2.2,2.2],label:'TROPHIES & RECORDS',fn:()=>bookOpen(2)},{r:[-1.0,1.0,RZ-.3,RZ],label:'LEAVE',fn:()=>leaveShop()});
- try{addVisitors(o)}catch(e){}}}
+ try{addVisitors(o)}catch(e){czErr(e,"racing.js")}}}
 {const u0=updCozy;updCozy=function(dt){u0(dt);if(showCar&&GS.inside&&SHOPCUR&&SHOPCUR.o&&SHOPCUR.o.race)showCar.rotation.y+=dt*.5}}
 /* ---------------------------------------------------------------- booking overlay */
 let BK=null;

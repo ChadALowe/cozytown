@@ -20,5 +20,5 @@ function check(dt){
  window.JOEBAY={x:out[0],z:out[1],psi:Math.atan2(HM.s,HM.c)};
  window.TUNEHOME=1;
  fade(()=>{busy=0;openTune('cars');setTimeout(()=>{busy=1},350)})}
-{const u0=updHome;updHome=function(dt){u0(dt);try{check(dt)}catch(e){}}}
+{const u0=updHome;updHome=function(dt){u0(dt);try{check(dt)}catch(e){czErr(e,"homegarage.js")}}}
 })();

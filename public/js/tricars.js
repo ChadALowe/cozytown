@@ -800,7 +800,7 @@ window.TRI=TRI;
   for(const[t,d]of[['◀',-1],['▶',1]]){const b=document.createElement('button');b.textContent=t;b.dataset.g='carstep';b.style.flex='0 0 44px';b.onclick=e=>{e.stopPropagation();step(d)};row.appendChild(b)}}}
 
 /* ---- black cab: fares pay 20% more (village taxi and Marlowe cab careers) ---- */
-try{if(typeof crPay==='function'){const p0=crPay;crPay=function(k,base,msg){return p0(k,CARI===FIRST+9&&(k==='taxi'||k==='mcab')?base*1.2:base,msg)}}}catch(e){}
+try{if(typeof crPay==='function'){const p0=crPay;crPay=function(k,base,msg){return p0(k,CARI===FIRST+9&&(k==='taxi'||k==='mcab')?base*1.2:base,msg)}}}catch(e){czErr(e,"tricars.js")}
 
 /* ---- village/town traffic: about half the small cars and some vans become fleet models ---- */
 {const CARK=['a6','golf','m3','mini','3s','qq','prius','corsa','polo','focus','puma','fiat500','corolla','juke','sportage','tiguan','modely','cclass','xc40','clio'].map(k=>TRI.byKey[k]-FIRST),hash=(o,n)=>{const v=Math.sin((o.x||0)*12.9898+(o.z||0)*78.233+n*37.719)*43758.5453;return v-Math.floor(v)};let n=0;
@@ -809,5 +809,5 @@ try{if(typeof crPay==='function'){const p0=crPay;crPay=function(k,base,msg){retu
   else if(o.m===2&&r<.4){const k=TRI.byKey[r<.2?'tc':'transporter']-FIRST;o.m=10+k;o.col=TRI.pal(k,hash(o,n+13))}
   return o};
  if(typeof CIV!=='undefined')for(const o of CIV){const m=o.m;swap(o);if(o.m!==m&&o.inst){scene.remove(o.inst);o.inst=null}if(o.m!==m&&o.far){scene.remove(o.far);o.far=null}}
- try{if(typeof civAdd==='function'){const c0=civAdd;civAdd=function(o){return c0(swap(o))}}}catch(e){}}
+ try{if(typeof civAdd==='function'){const c0=civAdd;civAdd=function(o){return c0(swap(o))}}}catch(e){czErr(e,"tricars.js")}}
 })();
