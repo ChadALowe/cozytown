@@ -229,9 +229,10 @@ Builder.prototype.mesh=function(mat){const g=new THREE.BufferGeometry();g.setAtt
 /* Compact builder for the town chunks: grows typed arrays instead of JS arrays (a JS number array costs 8 bytes a value
    and dominated the load-time memory peak), stores colours as bytes at half scale (the chunk material doubles them back)
    and positions as 16-bit ints round the mesh centre. About 17 bytes a vertex instead of 32. */
-function CBuilder(us){this.us=us||6;this.n=0;this.P=new Float32Array(3*768);this.C=new Uint8Array(3*768);this.U=new Float32Array(2*768);this.p={length:0};this.c=this.u=null}
+function CBuilder(us,cull){this.us=us||6;this.cull=!!cull&&window.MESH_CULL&&MESH_CULL.length?MESH_CULL:null;this.n=0;this.P=new Float32Array(3*768);this.C=new Uint8Array(3*768);this.U=new Float32Array(2*768);this.p={length:0};this.c=this.u=null}
 CBuilder.prototype.grow=function(){const k=this.P.length*2;let a=new Float32Array(k);a.set(this.P);this.P=a;a=new Uint8Array(k);a.set(this.C);this.C=a;a=new Float32Array(k/3*2);a.set(this.U);this.U=a};
 CBuilder.prototype.tri=function(a,b,c,ca,cb,cc,up,cen){
+ if(this.cull){const mx=(a[0]+b[0]+c[0])/3,mz=(a[2]+b[2]+c[2])/3;for(const q of this.cull)if((mx-q.x)*(mx-q.x)+(mz-q.z)*(mz-q.z)<q.r*q.r)return}
  const ux=b[0]-a[0],uy=b[1]-a[1],uz=b[2]-a[2],vx=c[0]-a[0],vy=c[1]-a[1],vz=c[2]-a[2];
  let nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;const l=Math.hypot(nx,ny,nz)||1;nx/=l;ny/=l;nz/=l;
  if(up){if(ny<0){nx=-nx;ny=-ny;nz=-nz}}else if(cen){if(nx*(a[0]-cen[0])+ny*(a[1]-cen[1])+nz*(a[2]-cen[2])<0){nx=-nx;ny=-ny;nz=-nz}}

@@ -10,7 +10,7 @@ function landOK(cx,cz,rot,hw,hd){const c=Math.cos(rot),s=Math.sin(rot);
  for(let a=-1;a<=1.01;a+=.5)for(let b=-1;b<=1.01;b+=1){const lx=a*(hw+6),lz=b*(hd+6),x=cx+lx*c+lz*s,z=cz-lx*s+lz*c;
   if(!landAt(x,z)||inOld(x,z,0)||z>coastZ(x)-26||wetAt(x,z)||Math.abs(z-RAILZ)<9||x<TB.x0+26||x>TB.x1-26||z<TB.z0+26)return false}return true}
 const mGrass=wmat(null,null,grassTex),mWater=wmat([1.05,1.05,1.05],{polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1},objTex);
-const gk=(x,z)=>{const K=ck(x,z);return K.gr||(K.gr=new CBuilder(8))},wk=(x,z)=>{const K=ck(x,z);return K.wa||(K.wa=new CBuilder(6))};
+const gk=(x,z)=>{const K=ck(x,z);return K.gr||(K.gr=new CBuilder(8,1))},wk=(x,z)=>{const K=ck(x,z);return K.wa||(K.wa=new CBuilder(6))};
 const LWB=(cx,cz,rot)=>{const c=Math.cos(rot),s=Math.sin(rot);return(lx,ly,lz)=>[cx+lx*c+lz*s,Y0+ly,cz-lx*s+lz*c]};
 const rr=(a,b)=>a+rnd()*(b-a);
 const reserve=(x,z,hw,hd,rot)=>PLACED.push({x,z,rot:rot||0,hw,hd});
