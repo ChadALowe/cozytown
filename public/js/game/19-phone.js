@@ -73,7 +73,7 @@ function phRender(){const o=PHN.ov;if(!o)return;o.querySelector('#phT').textCont
  else if(a==='msg'){if(PHN.sub!=null){const m=PH.msgs[PHN.sub];if(!m)return phGo('msg');m.r=1;el('div','phH',m.f);const r=el('div','phR');el('div',null,m.t,r);el('small',null,'DAY '+m.d+' · '+m.h,r);return}
   el('div','phH','MESSAGES');if(!PH.msgs.length)el('div','phR','No messages yet.');PH.msgs.forEach((m,i)=>{const r=el('div','phR');r.style.cursor='pointer';if(!m.r)r.style.borderColor='#3aa0ff';const k=el('div','phK',null,r);el('span',null,(m.r?'':'● ')+m.f,k);el('small',null,'DAY '+m.d+' '+m.h,k);el('small',null,m.t.length>46?m.t.slice(0,44)+'…':m.t,r);r.onclick=()=>{PHN.sub=i;phRender()}});
   if(PH.msgs.length){const bt=el('div','bt');btn(bt,'MARK ALL READ',()=>{PH.msgs.forEach(m=>m.r=1);phRender()})}}
- else if(a==='bank'){let sv=0,own=0,pend=0,chips=0;try{const S=STOCKS.ST;for(const c of STOCKS.CO)sv+=S.sh[c[0]]*S.px[c[0]]}catch(e){czErr(e,"19-phone.js")}try{own=Object.keys(PROP.PR.own).length;pend=Object.values(PROP.PR.pend).reduce((x,y)=>x+(+y||0),0)}catch(e){czErr(e,"19-phone.js")}try{chips=CG.S.chips||0}catch(e){czErr(e,"19-phone.js")}
+ else if(a==='bank'){let sv=0,own=0,pend=0,chips=0;try{if(window.STOCKS){const S=STOCKS.ST;for(const c of STOCKS.CO)sv+=S.sh[c[0]]*S.px[c[0]]}}catch(e){czErr(e,"19-phone.js")}try{own=Object.keys(PROP.PR.own).length;pend=Object.values(PROP.PR.pend).reduce((x,y)=>x+(+y||0),0)}catch(e){czErr(e,"19-phone.js")}try{chips=CG.S.chips||0}catch(e){czErr(e,"19-phone.js")}
   let pv=0;try{for(const k in PROP.PR.own)pv+=PROP.price(+k)}catch(e){czErr(e,"19-phone.js")}
   el('div','phH','BLUEBELL BANK');el('div',null,'CURRENT ACCOUNT');el('div','phBig',phMoney(cash));
   for(const[n,v]of[['SHARES',sv],['CASINO CHIPS',chips],['PROPERTY ('+own+' HOUSE'+(own===1?'':'S')+')',pv],['RENT WAITING',pend]]){const r=el('div','phR phK');el('span',null,n,r);el('span',null,phMoney(v),r)}
@@ -105,7 +105,7 @@ function phPhotoEnd(){if(!PHC.on)return;PHC.on=0;removeEventListener('keydown',P
 /* ---- ticking: cash log, stock news texts, waypoint distance, idle villager texts ---- */
 {const u0=updCozy;updCozy=function(dt){u0(dt);
  if(PH.lastCash==null)PH.lastCash=cash;const dc=cash-PH.lastCash;if(Math.abs(dc)>=1){PH.log.unshift({v:dc,d:DAY,h:phClock()});PH.log.length=Math.min(PH.log.length,15);PH.lastCash=cash}
- try{const n=STOCKS.ST.news[0];if(n&&n!==PH.lastNews){if(PH.lastNews)phText('COZY MARKETS',n,true);PH.lastNews=n}}catch(e){czErr(e,"19-phone.js")}
+ try{const n=window.STOCKS&&STOCKS.ST.news[0];if(n&&n!==PH.lastNews){if(PH.lastNews)phText('COZY MARKETS',n,true);PH.lastNews=n}}catch(e){czErr(e,"19-phone.js")}
  PH.hrT+=dt;if(PH.hrT>150){PH.hrT=0;if(Math.random()<.35){const t=PHTX[Math.floor(Math.random()*PHTX.length)];phText(t[0],t[1])}}
  if(!PH.seen.w){PH.seen.w=1;phText('MUM',"Hope the new place is cosy! I've put your phone on the 📱 button. Press P on a keyboard. Love you x",true)}
  const w=PH.way;phBeam.visible=!!w&&!GS.inside;if(w){const px=GS.onFoot?P.x:GS.x,pz=GS.onFoot?P.z:GS.z,d=Math.hypot(w.x-px,w.z-pz);if(d<7&&!GS.inside&&!w.keep){toast('ARRIVED: '+w.n);PH.way=null;phWay()}else{phPill.style.display=GS.inside||menuOpen||PHC.on?'none':'block';phPill.textContent='📍 '+w.n+' · '+Math.round(d)+'m'+(w.keep?'':'   ✕');phBeam.children[1].rotation.y+=dt}}
